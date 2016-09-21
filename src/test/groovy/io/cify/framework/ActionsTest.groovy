@@ -132,5 +132,4 @@ class ActionsTest extends GroovyTestCase {
         String obj = proxyObject.toString()
         return obj.substring(0, obj.indexOf('@'))
     }
-
 }

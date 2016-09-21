@@ -80,6 +80,4 @@ public class Actions {
     private static IActions getCustomActionsByDevice(Device device, String className) {
         return (IActions) Factory.get(device, className)
     }
-
-
 }
