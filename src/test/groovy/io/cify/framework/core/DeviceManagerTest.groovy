@@ -78,6 +78,18 @@ class DeviceManagerTest extends GroovyTestCase {
         assert device.getCapability() == "ANDROID"
     }
 
+    void testCreateDeviceWithKeyValue() {
+        Device device = DeviceManager.createDevice("capability", "ANDROID")
+        device.getCapability()
+        assert device.getCapability() == "ANDROID"
+    }
+
+    void testCreateDeviceWithCapabilityIgnoreCase() {
+        Device device = DeviceManager.createDevice("capability", "AnDrOiD")
+        device.getCapability()
+        assert device.getCapability() == "ANDROID"
+    }
+
     void testCreateDeviceWithCapability() {
         Device device = DeviceManager.createDevice(["capability": "ANDROID"])
         device.getCapability()

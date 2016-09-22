@@ -227,8 +227,8 @@ class DeviceManager {
 
         Map<String, String> capability = capabilitiesList.find {
             boolean matches = true
-            parameters.each { k, v ->
-                if (!it.containsKey(k) || it.get(k) != v) {
+            parameters.each { pkey, pvalue ->
+                if (!it.containsKey(pkey) || it.get(pkey).toLowerCase() != pvalue.toLowerCase()) {
                     matches = false
                 }
             }
