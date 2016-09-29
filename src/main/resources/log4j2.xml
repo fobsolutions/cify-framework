@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <RollingFile name="RollingFile" filename="build/cify/log/cify-framework.log"
+                     filepattern="build/cify/log/cify-framework%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="[%-5level] %d{dd.MM.yyyy HH:mm:ss} [%t] %-20marker %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy max="4"/>
+        </RollingFile>
+
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
