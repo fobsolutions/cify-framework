@@ -1,23 +1,23 @@
 package io.cify.framework.core
 
 import io.cify.framework.core.interfaces.IDevice
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Marker
-import org.apache.logging.log4j.MarkerManager
-import org.apache.logging.log4j.core.Logger
+import io.cify.framework.logging.LoggingOutputStream
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
+import groovy.util.logging.Slf4j
+import org.slf4j.Marker
+import org.slf4j.MarkerFactory
 
 /**
  * Created by FOB Solutions
  *
  * This is a model class for Device
  */
+
+@Slf4j
 class Device implements IDevice {
 
-
-    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
-    private static final Marker MARKER = MarkerManager.getMarker('DEVICE') as Marker
+    private static final Marker MARKER = MarkerFactory.getMarker('DEVICE') as Marker
 
     private String id
     private DeviceCategory category
@@ -33,7 +33,7 @@ class Device implements IDevice {
      * @param capabilities device desired capabilities
      * */
     public Device(String id, DeviceCategory category, DesiredCapabilities capabilities) {
-        LOG.debug(MARKER, "Create new device with id $id, category $category and capabilities $capabilities")
+        log.debug(MARKER, "Create new device with id $id, category $category and capabilities $capabilities")
         this.id = id
         this.category = category
         this.capabilities = capabilities
@@ -46,7 +46,7 @@ class Device implements IDevice {
      * */
     @Override
     public String getId() {
-        LOG.debug(MARKER, "Get device id")
+        log.debug(MARKER, "Get device id")
         return id
     }
 
@@ -57,7 +57,7 @@ class Device implements IDevice {
      * */
     @Override
     public DeviceCategory getCategory() {
-        LOG.debug(MARKER, "Get device category")
+        log.debug(MARKER, "Get device category")
         return this.category
     }
 
@@ -68,7 +68,7 @@ class Device implements IDevice {
      * */
     @Override
     public WebDriver getDriver() {
-        LOG.debug(MARKER, "Get device driver")
+        log.debug(MARKER, "Get device driver")
         return driver
     }
 
@@ -80,7 +80,7 @@ class Device implements IDevice {
      * */
     @Override
     public void setCapability(String key, String value) {
-        LOG.debug(MARKER, "Set desire capability $key : $value")
+        log.debug(MARKER, "Set desire capability $key : $value")
         if (key != null && value != null) {
             capabilities.setCapability(key, value)
         }
@@ -94,7 +94,7 @@ class Device implements IDevice {
      * */
     @Override
     public DesiredCapabilities getCapabilities() {
-        LOG.debug(MARKER, "Get all desired capabilities")
+        log.debug(MARKER, "Get all desired capabilities")
         return capabilities
     }
 
@@ -120,7 +120,7 @@ class Device implements IDevice {
      * */
     @Override
     public void openApp(String app, String appActivity, String appPackage) {
-        LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
+        log.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
             if(!validateApp(app, appActivity, appPackage)) {
                 throw new CifyFrameworkException("App in not valid")
@@ -144,7 +144,7 @@ class Device implements IDevice {
      * */
     @Override
     public void openBrowser(String url) {
-        LOG.debug(MARKER, "Open url $url")
+        log.debug(MARKER, "Open url $url")
         try {
             if(!validateUrl(url)){
                 throw new CifyFrameworkException("Url in not valid")
@@ -162,7 +162,7 @@ class Device implements IDevice {
     @Override
     void quit() {
         if(hasDriver()) {
-            LOG.debug(MARKER, "Quit device driver")
+            log.debug(MARKER, "Quit device driver")
             getDriver().quit()
         }
     }
@@ -172,7 +172,8 @@ class Device implements IDevice {
      * Creates webdriver for device
      * */
     private void createDriver() {
-        LOG.debug(MARKER, "Create new device driver")
+        log.debug(MARKER, "Create new device driver")
+        LoggingOutputStream.redirectSystemOutAndSystemErrToLogger()
         quit()
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
@@ -182,13 +183,13 @@ class Device implements IDevice {
      * Checks if driver exists
      * */
     private boolean hasDriver() {
-        LOG.debug(MARKER, "Check if driver exists")
+        log.debug(MARKER, "Check if driver exists")
         if (getDriver() == null) {
-            LOG.debug(MARKER, "No driver found")
+            log.debug(MARKER, "No driver found")
             return false
         }
 
-        LOG.debug(MARKER, "Driver found")
+        log.debug(MARKER, "Driver found")
         return true
     }
 
