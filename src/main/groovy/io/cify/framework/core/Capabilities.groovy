@@ -3,21 +3,21 @@ package io.cify.framework.core
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.json.internal.LazyMap
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Marker
-import org.apache.logging.log4j.MarkerManager
-import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.remote.DesiredCapabilities
+import groovy.util.logging.Slf4j
+import org.slf4j.Marker
+import org.slf4j.MarkerFactory
 
 /**
  * Created by FOB Solution
  *
  * This class holds device capabilities
  */
+
+@Slf4j
 class Capabilities {
 
-    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
-    private static final Marker MARKER = MarkerManager.getMarker('CAPABILITIES') as Marker
+    private static final Marker MARKER = MarkerFactory.getMarker('CAPABILITIES') as Marker
 
     private LazyMap android = [:]
     private LazyMap ios = [:]
@@ -31,7 +31,7 @@ class Capabilities {
      * @return Capabilities
      */
     public static Capabilities parseFromJsonString(String capabilitiesJson) {
-        LOG.debug(MARKER, "Parse capabilities from json string \n $capabilitiesJson")
+        log.debug(MARKER, "Parse capabilities from json string \n $capabilitiesJson")
         return new JsonSlurper().parseText(capabilitiesJson) as Capabilities
     }
 
@@ -41,7 +41,7 @@ class Capabilities {
      * @return String
      */
     public String toPrettyString() {
-        LOG.debug(MARKER, "Converts capabilities to json string")
+        log.debug(MARKER, "Converts capabilities to json string")
         return new JsonBuilder(this).toPrettyString()
     }
 
@@ -53,7 +53,7 @@ class Capabilities {
      * @return DesiredCapabilities
      */
     public DesiredCapabilities toDesiredCapabilities(DeviceCategory category) {
-        LOG.debug(MARKER, "Get desired capabilities for category $category")
+        log.debug(MARKER, "Get desired capabilities for category $category")
         switch (category) {
             case DeviceCategory.BROWSER:
                 return new DesiredCapabilities(browser)
