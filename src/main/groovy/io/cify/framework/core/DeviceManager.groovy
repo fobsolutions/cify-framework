@@ -1,11 +1,10 @@
 package io.cify.framework.core
 
-import groovy.json.JsonSlurper
-import io.cify.framework.core.models.Device
-import io.cify.framework.Constants
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.core.Logger
-import org.codehaus.groovy.GroovyException
+import io.cify.framework.core.interfaces.IDeviceManager
+import org.openqa.selenium.remote.DesiredCapabilities
+import groovy.util.logging.Slf4j
+import org.slf4j.Marker
+import org.slf4j.MarkerFactory
 
 import static java.util.UUID.randomUUID
 
@@ -15,230 +14,302 @@ import static java.util.UUID.randomUUID
  * This class is responsible for managing Devices
  */
 
-class DeviceManager {
+@Slf4j
+class DeviceManager implements IDeviceManager {
 
-    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
+    private static final Marker MARKER = MarkerFactory.getMarker('DEVICE MANAGER') as Marker
 
-    private static final String MAIN_CAPABILITY = "mainCapability"
-    private List capabilities
-    private Map<String, Device> devices = [:]
+    /**
+     * System property to be used to pass capabilities to Device Manager
+     * */
+    public static final String SYSTEM_PROPERTY_CAPABILITIES = "capabilities"
+
+    /**
+     * Json string of supported capabilities
+     * */
+    public static final String SUPPORTED_CAPABILITIES = '''
+        {
+            "browser" : {
+                "capability" : "chrome",
+            },
+            "android" : {
+                "capability" : "android",
+                "version" : ""
+            },
+            "ios" : {
+                "capability" : "iphone",
+                "version" : ""
+            }
+        }
+    '''
+
+    private Capabilities capabilities
+    private List<Device> devices = []
     private static volatile DeviceManager instance
 
     /**
-     * Default constructor for DeviceManager
+     * Default constructor for Device Manager
      * */
-    private DeviceManager() {
-        String capabilitiesString
-        LOG.debug("Reading full device list from saved file")
+    public DeviceManager() {
+        log.debug(MARKER, 'Create new DeviceManager')
         try {
-            String capabilitiesFilePath = System.getProperty("capabilitiesFilePath") != null ? System.getProperty("capabilitiesFilePath") : Constants.PARAMETERS_PATH + Constants.FULL_CAPABILITIES_FILE;
-            capabilitiesString = new File(capabilitiesFilePath).text
-            LOG.debug("Full capabilities file content: " + capabilitiesString)
-            capabilities = new JsonSlurper().parseText(capabilitiesString).capabilities as List
+            String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES, SUPPORTED_CAPABILITIES)
+            this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
         } catch (all) {
-            String error = "Cannot read device list from saved parameters file. Run gradle parameters task to setup parameters file"
-            LOG.error(error, all.message, all)
-            throw all
+            throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message", all)
         }
     }
 
     /**
-     * returns instance of Device manager
+     * Returns instance of Device Manager
      *
      * @return DeviceManager instance
      */
-    private static DeviceManager getInstance() {
+    public static DeviceManager getInstance() {
+        log.debug(MARKER, 'Get instance of DeviceManager')
         if (instance == null) {
             synchronized (DeviceManager.class) {
                 if (instance == null) {
-                    instance = new DeviceManager();
+                    instance = new DeviceManager()
                 }
             }
         }
-        return instance;
+        return instance
     }
 
     /**
-     * Reads main capability from system property
+     * Returns Device Manager capabilities
      *
-     * @return Map string:string - mainCapability
+     * @return Capabilities
      */
-    private static Map<String, String> readMainCapability() {
-        LOG.debug("Reading main capability from system property.")
-        String mainCapability = System.getProperty(MAIN_CAPABILITY)
-        if (mainCapability == null) {
-            throw new GroovyException("main capability not found in system property")
+    @Override
+    Capabilities getCapabilities() {
+        log.debug(MARKER, 'Get DeviceManager capabilities')
+        return capabilities
+    }
+
+    /**
+     * Creates device of selected category
+     *
+     * @param category device category
+     *
+     * @return Device
+     */
+    @Override
+    Device createDevice(DeviceCategory category) {
+        return createDevice(category, generateRandomDeviceId())
+    }
+
+    /**
+     * Creates device of selected category and with unique id
+     *
+     * @param category device category
+     * @param deviceId unique device id
+     *
+     * @return Device
+     * @throws CifyFrameworkException  if device id is null or empty
+     * @throws CifyFrameworkException  if active device with same id already exists
+     */
+    @Override
+    Device createDevice(DeviceCategory category, String deviceId) {
+        log.debug(MARKER, "Create new device with category $category and device id $deviceId")
+        if (deviceId == null || deviceId.isEmpty()) {
+            throw new CifyFrameworkException("Failed to create device. Id is null or empty")
         }
-        List mainCapsParams = mainCapability.split(":")
-        Map<String, String> map = [:]
-        map.put(mainCapsParams.first().toString(), mainCapsParams.last().toString())
-        LOG.debug("Found main capability in system property. Main capability = " + mainCapability)
-        return map
-    }
-
-    /**
-     * Create Device instance
-     *
-     * @return Device instance
-     */
-    public static Device createDevice() {
-        LOG.debug("Creating new device with main capability.")
-        return createDevice(readMainCapability())
-    }
-
-    /**
-     * Create Device instance with custom device id
-     *
-     * @param String customDeviceId
-     * @return Device instance
-     */
-    public static Device createDevice(String customDeviceId) {
-        LOG.debug("Creating device with custom device id: " + customDeviceId + " and main capability")
-        return createDevice(customDeviceId, readMainCapability())
-    }
-
-    /**
-     * Create Device instance with capability
-     *
-     * @param String capability
-     * @param String value
-     * @return Device instance
-     */
-    public static Device createDevice(String key, String value) {
-        LOG.debug("Creating device with capability: " + key + "=" + value + " and random device uuid.")
-        Map <String,String> capability = [:]
-        capability.put(key,value)
-        return createDevice(generateRandomDeviceId(), capability)
-    }
-    
-    /**
-     * Create Device instance with capability
-     *
-     * @param Map < String , String >  capability
-     * @return Device instance
-     */
-    public static Device createDevice(Map<String, String> capability) {
-        LOG.debug("Creating device with capability: " + capability + " and random device uuid.")
-        return createDevice(generateRandomDeviceId(), capability)
-    }
-
-    /**
-     * Create Device instance with capability and device id
-     *
-     * @param String deviceId
-     * @param Map < String , String >  - capability
-     * @return Device instance
-     */
-    public static Device createDevice(String deviceId, Map<String, String> capability) {
-        LOG.debug("Creating device with capability: " + capability + " and device id:" + deviceId)
-        Map<String, String> desiredCapabilities = search(capability, getInstance().capabilities as List)
-        if (desiredCapabilities.isEmpty()) {
-            throw new GroovyException("Desired capability: " + capability + " not found")
+        if (hasActiveDevice(deviceId)) {
+            throw new CifyFrameworkException("Failed to create device. Device with id $deviceId already exists")
         }
-        Device device = new Device(desiredCapabilities)
-        getInstance().devices.put(deviceId, device)
-        LOG.debug("Created device with capability: " + capability + " and device id:" + deviceId)
-        return getActiveDevice(deviceId)
-    }
 
-    /**
-     * Get active Device instance
-     *
-     * @return Device instance
-     */
-    public static Device getActiveDevice() {
-        LOG.debug("Getting active device.")
-        String deviceId
-        if (getInstance().devices.isEmpty()) {
-            throw new GroovyException("No active devices found")
+        DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category)
+        if (desiredCapabilities.asMap().isEmpty()) {
+            throw new CifyFrameworkException("Failed to create device. No capabilities provided for $category")
         }
-        deviceId = getInstance().devices.entrySet().first().key
+
+        Device device = new Device(deviceId, category, desiredCapabilities)
+        devices.add(device)
 
         return getActiveDevice(deviceId)
     }
 
     /**
-     * Get active Device instance with given deviceId
+     * Checks if an active device of selected category exists
      *
-     * @param deviceId
-     * @return Device instance
+     * @param category device category
+     *
+     * @return boolean
      */
-    public static Device getActiveDevice(String deviceId) {
-        LOG.debug("Getting active device with deviceId: " + deviceId)
-        Device device
-        if (getInstance().devices.isEmpty()) {
-            throw new GroovyException("No active devices found")
+    @Override
+    boolean hasActiveDevice(DeviceCategory category) {
+        log.debug(MARKER, "Check if device with category $category exists")
+        Device device = devices.find { device ->
+            device.getCategory() == category
         }
-        device = getInstance().devices[deviceId]
 
         if (device == null) {
-            throw new GroovyException("Active device with deviceId: " + deviceId + " not found")
+            log.debug(MARKER, "No device with category $category found")
+            return false
         }
 
-        LOG.debug("Returned active device. deviceId: " + deviceId)
+        log.debug(MARKER, "Device with category $category found")
+        return true
+    }
+
+    /**
+     * Checks if an active device with id exists
+     *
+     * @param deviceId device id
+     *
+     * @return boolean
+     */
+    @Override
+    boolean hasActiveDevice(String deviceId) {
+        log.debug(MARKER, "Check if device with id $deviceId exists")
+        Device device = devices.find { device ->
+            device.getId() == deviceId
+        }
+
+        if (device == null) {
+            log.debug(MARKER, "No device with id $deviceId found")
+            return false
+        }
+
+        log.debug(MARKER, "Device with id $deviceId found")
+        return true
+    }
+
+    /**
+     * Returns all active devices
+     *
+     * @return List < Device >
+     */
+    @Override
+    List<Device> getAllActiveDevices() {
+        log.debug(MARKER, "Get all active devices")
+        return devices
+    }
+
+    /**
+     * Returns list of all active devices by category
+     *
+     * @param category device category
+     *
+     * @return List < Device >
+     */
+    @Override
+    List<Device> getAllActiveDevices(DeviceCategory category) {
+        log.debug(MARKER, "Find all active devices of category $category")
+        return devices.findAll { device ->
+            device.getCategory() == category
+        }
+    }
+
+
+    /**
+     * Returns first active device
+     *
+     * @return Device
+     */
+    @Override
+    Device getActiveDevice() {
+        log.debug(MARKER, "Get first active device")
+        return devices.first()
+    }
+
+    /**
+     * Returns first active device by category
+     *
+     * @param category device category
+     *
+     * @return Device
+     * @throws CifyFrameworkException  if no active device found
+     */
+    @Override
+    Device getActiveDevice(DeviceCategory category) {
+        log.debug(MARKER, "Find first active devices of category $category")
+        Device device = devices.find { device ->
+            device.getCategory() == category
+        }
+
+        if (device == null) {
+            throw new CifyFrameworkException("No active device with category $category found")
+        }
+
         return device
     }
 
     /**
-     * Gets all active devices
+     * Returns first active device by id
      *
-     * @return Map < String , Device >  - all active devices
-     * */
-    public static Map<String, Device> getAllActiveDevices() {
-        LOG.debug("Getting active devices. Active devices: " + getInstance().devices)
-        return getInstance().devices
+     * @param deviceId device unique id
+     *
+     * @return Device
+     * @throws CifyFrameworkException  if no active device found
+     */
+    @Override
+    Device getActiveDevice(String deviceId) {
+        log.debug(MARKER, "Find active device with id $deviceId")
+        Device device = devices.find { device ->
+            device.getId() == deviceId
+        }
+
+        if (device == null) {
+            throw new CifyFrameworkException("No active device with id $deviceId found")
+        }
+
+        return device
+    }
+
+
+    /**
+     * Quits device
+     *
+     * @param deviceId device id
+     */
+    @Override
+    void quitDevice(String deviceId) {
+        log.debug(MARKER, "Quit device with id $deviceId")
+        Device device = getActiveDevice(deviceId)
+        quitDevice(device)
+    }
+
+    /**
+     * Quits device
+     *
+     * @param device device
+     */
+    @Override
+    void quitDevice(Device device) {
+        log.debug(MARKER, "Quit device $device")
+        if (device != null) {
+            device.quit()
+            devices.removeElement(device)
+        }
     }
 
     /**
      * Quits all active devices
+     *
      */
-    public static void quitDevices() {
-        LOG.debug("Quitting all the active devices")
-        getAllActiveDevices().each {
-            deviceId, device ->
-                device.quitDriver()
+    @Override
+    void quitAllDevices() {
+        log.debug(MARKER, "Quit all active devices")
+        devices.each { device ->
+            device.quit()
         }
-        getInstance().devices.clear()
+        devices.clear()
     }
 
     /**
-     * Quits device with deviceId
+     * Quits devices of selected category
      *
-     * @param deviceId
-     * */
-    public static void quitDevice(String deviceId) {
-        LOG.debug("Quitting device with id: " + deviceId)
-        Device device = getActiveDevice(deviceId)
-        if (device != null) {
-            device.quitDriver()
-            getInstance().devices.remove(deviceId)
+     * @param category device category
+     */
+    @Override
+    void quitAllDevices(DeviceCategory category) {
+        log.debug(MARKER, "Quit all active devices of selected category")
+        getAllActiveDevices(category).each { device ->
+            quitDevice(device)
         }
-    }
-
-    /**
-     * Searches desired capability with specific parameters from list
-     *
-     * @param parameters - map of parameters
-     * @param capabilitiesList - list of capabilities
-     * @return DesiredCapabilities
-     * */
-    private static Map<String, String> search(Map<String, String> parameters,
-                                              List<Map<String, String>> capabilitiesList) {
-
-        Map<String, String> capability = capabilitiesList.find {
-            boolean matches = true
-            parameters.each { pkey, pvalue ->
-                if (!it.containsKey(pkey) || it.get(pkey).toLowerCase() != pvalue.toLowerCase()) {
-                    matches = false
-                }
-            }
-            return matches
-        }
-
-        if (capability == null) {
-            capability = [:]
-        }
-        return capability
     }
 
     /**
@@ -250,20 +321,4 @@ class DeviceManager {
         def uuid = randomUUID() as String
         return uuid.toUpperCase()
     }
-
-    /**
-     * Checks if device with device id is already opened
-     *
-     * @param deviceId
-     * */
-    public static boolean hasActiveDevice(String deviceId) {
-        boolean hasDevice = true
-        try {
-            getActiveDevice(deviceId)
-        } catch (ignored) {
-            hasDevice = false
-        }
-        return hasDevice
-    }
 }
-

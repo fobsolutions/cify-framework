@@ -1,10 +1,10 @@
 1. <a href="#what">What Is Cify Framework?</a>
-1. <a href="#usage">How To Use Cify Framework</a>
+2. <a href="#usage">How To Use Cify Framework</a>
 
 <a name="what" />
 ## What Is Cify Framework?
 
-Cify Framework is part of a open source test automation framework called Cify. Framework is responsible for device management and creating WebDrivers.
+Cify Framework is part of an open source test automation tool called Cify. Framework is responsible for managing communication with devices, and handling device actions (click, touch, tap, fillIn, sendKeys etc.) independently from device platform.
 
 <a name="usage" />
 ## How To Use Cify Framework
@@ -23,7 +23,6 @@ dependencies {
     compile 'io.cify:cify-framework:1.0.0'
 }
 ```
-----------
 
 ### Actions
 
@@ -37,8 +36,8 @@ Actions are activities that user can do on specific page. To make it work on dif
      /**
      * Login with given credentials
      *
-     * @param username - username
-     * @param password - password
+     * @param username username
+     * @param password password
      */
     void login(String username, String password);
 
@@ -64,86 +63,94 @@ Matchers are assertions that user can do on specific page. To make it work on di
 
 ### UI Type
 
-There is a parameter called UIType, if certain device have this capability element then framework will find correct implementation of actions or matchers from given path.
+There is a parameter called UIType, if certain device have this capability element then framework will find correct implementation of actions or matchers from given UIType.
 
-Let's say that user have 3 different device groups: Tablet, Web, Mobile. When user tries to find login activities implementations then he/she can call:
+Let's say that user have 3 different device groups: Desktop, Mobile, OldMobile. When user tries to find login activities implementations then he/she can call:
 ```
     /**
      * Gets login actions to given device
      *
-     * @param device - device under test
+     * @param device device under test
+     *
+     * @return ILoginActions
      */
-    public static ILoginActivities getLoginActivities(Device device) {
+    public static ILoginActions getLoginActivities(Device device) {
         return (ILoginActions) Factory.get(device, "com.path.to.your.implementation.package.LoginActions");
     }
 ```
 
+The framework will automatically search for one of the following classes LoginActionsDesktop, LoginActionsMobile or LoginActionsOldMobile depending on given device UIType. 
+
+If no UIType specified the framework will search for LoginActions class.
+
+
 ### Actions/Matchers Implementation
 
-When using this interface user must name classes for different platforms or screen sizes like defined in capabilities file UIType parameter. Each implementation class should have constructor with Device parameter, cause implementation must know which device it should send them.
+When using implementation classes for different platforms or screen sizes based on device UIType parameter, each class should have constructor with Device parameter. The framework will provided correct device automatically.
 
-#### Example
-
-Let's say that the device under test have capability UIType with value Tablet.
-
-Then...
 ```
-    /**
-     * Gets login actions to given device
-     *
-     * @param device - device under test
-     */
-    public static ILoginActivities getLoginActivities(Device device) {
-        return (ILoginActions) Factory.get(device, "path.to.your.implementation.package.LoginActions");
+    public UserActions (Device device) {
+        this.device = device
     }
+    
+    @Override
+    @Title("User navigates back")
+    public void back() {
+        device.getDriver().navigate().back();
+    }
+    
 ```
-... this will return class named LoginActionsTablet
+
+### DeviceCategory
+
+The framework supports 3 device category:
+
+1. Browser - desktop and mobile web
+2. Android - Android native applications
+3. iOS - iOS native applications
+
+
 
 ### DeviceManager
 
-Device manager is center of the framework. It manages the active devices, creates devices and closes devices.
+Device manager is center of the framework. It creates new devices, manages active devices and closes unused.
 
 ```
+     /**
+     * Creates device of given category
+     */
+    Device createDevice(DeviceCategory category)
+    
     /**
-     * Creates WebDriver with main capability
+     * Creates device with unique id
      */
-    DeviceManager.createDevice();
-
-     /**
-     * Creates WebDriver with given parameters
-     */
-    DeviceManager.createDevice("platform", "android");
-
-     /**
-     * Creates WebDriver with given parameters and gives it a codename
-     * that user can use to call it afterwards
-     */
-    DeviceManager.createDevice("MyAndroiDevice", "platform", "android");
+    Device createDevice(DeviceCategory category, String deviceId)
 
      /**
      * Gets active Device (first one)
      */
-    public static Device getActiveDevice();
+    Device getActiveDevice()
+    
+    /**
+     * Gets active Device of given category(first one)
+     */
+    Device getActiveDevice(DeviceCategory category)
 
     /**
-     * Gets active Device with codename
+     * Gets active Device with deviceId
      */
-    public static Device getActiveDevice("MyAndroidDevice");
-
-    /**
-     * Quits active Device with codename
-     */
-    public static Device quitDevice("MyAndroidDevice");
+    Device getActiveDevice(deviceId)
 
     /**
      * Quits all devices
      */
-    public static Device quitDevices();
+    void quitAllDevices()
 ```
+
 
 ### Page Objects
 
-Page objects manage WebElements. In this class there should be defined all WebElements that can be used within implementation methods.
+Page objects describe elements of native applications and web pages. All elements should be describe here to be correctly used within implementation methods.
 
 #### Example of a PageObject class
 ```

@@ -1,6 +1,8 @@
 package io.cify.framework.matchers
 
-import io.cify.framework.core.models.Device
+import io.cify.framework.core.Device
+import org.hamcrest.Matcher
+import org.openqa.selenium.WebElement
 
 /**
  * Created by FOB Solutions
@@ -14,4 +16,8 @@ class MatchersTabletWeb implements IMatchers {
 
     }
 
+    @Override
+    Matcher<WebElement> isElementDisplayed() {
+        return null
+    }
 }

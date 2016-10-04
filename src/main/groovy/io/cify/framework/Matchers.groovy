@@ -1,7 +1,7 @@
 package io.cify.framework
 
+import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceManager
-import io.cify.framework.core.models.Device
 import io.cify.framework.matchers.IMatchers
 
 /**
@@ -15,7 +15,7 @@ public class Matchers {
      * @return IMatchers interface
      * */
     public static IMatchers getMatchers() {
-        return getMatchers(DeviceManager.getActiveDevice())
+        return getMatchers(DeviceManager.getInstance().getActiveDevice())
     }
 
     /**
@@ -25,7 +25,7 @@ public class Matchers {
      * @return IMatchers interface
      * */
     public static IMatchers getMatchers(String activeDeviceId) {
-        return getMatchers(DeviceManager.getActiveDevice(activeDeviceId))
+        return getMatchers(DeviceManager.getInstance().getActiveDevice(activeDeviceId))
     }
 
     /**
@@ -35,50 +35,38 @@ public class Matchers {
      * @return IMatchers interface
      * */
     public static IMatchers getMatchers(Device device) {
-        return getCustomMatchersByDevice(device, "io.cify.framework.matchers.Matchers")
+        return (IMatchers) Factory.get(device, "io.cify.framework.matchers.Matchers")
     }
 
     /**
-     * Gets custom matchers for first active device from classpath
+     * Gets custom matchers class for first active device and given classpath
      *
      * @param className - package and class name
-     * @return IMatchers interface
+     * @return generic class object
      * */
-    public static IMatchers getCustomMatchers(String className) {
-        return getCustomMatchers(DeviceManager.getActiveDevice(), className)
+    public static def getCustomMatchers(String className) {
+        return getCustomMatchers(DeviceManager.getInstance().getActiveDevice(), className)
     }
 
     /**
-     * Gets custom matchers for device with id from classpath
+     * Gets custom matchers class for device with id and given classpath
      *
      * @param acticeDeviceId - Id from active device
      * @param className - package and class name
-     * @return IMatchers interface
+     * @return generic class object
      * */
-    public static IMatchers getCustomMatchers(String activeDeviceId, String className) {
-        return getCustomMatchers(DeviceManager.getActiveDevice(activeDeviceId), className)
+    public static def getCustomMatchers(String activeDeviceId, String className) {
+        return getCustomMatchers(DeviceManager.getInstance().getActiveDevice(activeDeviceId), className)
     }
 
     /**
-     * Gets custom matchers for device from classpath
+     * Gets custom matchers class for device and given classpath
      *
      * @param className - package and class name
      * @param device - Device object
-     * @return IMatchers interface
+     * @return generic class object
      * */
-    public static IMatchers getCustomMatchers(Device device, String className) {
-        return getCustomMatchersByDevice(device, className)
+    public static def getCustomMatchers(Device device, String className) {
+        return Factory.get(device, className)
     }
-
-    /**
-     * Gets custom matchers for device from classpath
-     *
-     * @param className - package and class name
-     * @param device - Device object
-     * @return IMatchers interface
-     * */
-    private static IMatchers getCustomMatchersByDevice(Device device, String className) {
-        return (IMatchers) Factory.get(device, className)
-    }
-
 }

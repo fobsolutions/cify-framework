@@ -1,8 +1,8 @@
 package io.cify.framework
 
 import io.cify.framework.actions.IActions
+import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceManager
-import io.cify.framework.core.models.Device
 
 /**
  * This class is responsible for getting actions
@@ -15,7 +15,7 @@ public class Actions {
      * @return IActions interface object
      * */
     public static IActions getActions() {
-        return getActions(DeviceManager.getActiveDevice())
+        return getActions(DeviceManager.getInstance().getActiveDevice())
     }
 
     /**
@@ -25,7 +25,7 @@ public class Actions {
      * @return IActions interface object
      * */
     public static IActions getActions(String activeDeviceId) {
-        return getActions(DeviceManager.getActiveDevice(activeDeviceId))
+        return getActions(DeviceManager.getInstance().getActiveDevice(activeDeviceId))
     }
 
     /**
@@ -35,51 +35,38 @@ public class Actions {
      * @return IActions interface object
      * */
     public static IActions getActions(Device device) {
-        return getCustomActionsByDevice(device, "io.cify.framework.actions.Actions")
+        return (IActions) Factory.get(device, "io.cify.framework.actions.Actions")
     }
 
     /**
-     * Gets custom actions for first active device from classpath
+     * Gets custom actions for first active device and for given classpath
      *
      * @param class package and name
-     * @return IActions interface object
+     * @return generic class object
      * */
-    public static IActions getCustomActions(String className) {
-        return getCustomActions(DeviceManager.getActiveDevice(), className)
+    public static def getCustomActions(String className) {
+        return getCustomActions(DeviceManager.getInstance().getActiveDevice(), className)
     }
 
     /**
-     * Gets custom actions for active device with id and className
+     * Gets custom actions for active device with id and and for given classpath
      *
      * @param activeDeviceId - Id from actice device
      * @param className - class package and name
-     * @return IActions interface object
+     * @return generic class object
      * */
-    public static IActions getCustomActions(String activeDeviceId, String className) {
-        return getCustomActions(DeviceManager.getActiveDevice(activeDeviceId), className)
+    public static def getCustomActions(String activeDeviceId, String className) {
+        return getCustomActions(DeviceManager.getInstance().getActiveDevice(activeDeviceId), className)
     }
 
     /**
-     * Gets custom actions for device from classpath
+     * Gets custom actions for device and for given classpath
      *
      * @param device - Device object
      * @param className - class package and name
-     * @return IActions interface object
+     * @return generic class object
      * */
-    public static IActions getCustomActions(Device device, String className) {
-        return getCustomActionsByDevice(device, className)
+    public static def getCustomActions(Device device, String className) {
+        return Factory.get(device, className)
     }
-
-    /**
-     * Gets custom actions for device from classpath
-     *
-     * @param device - Device object
-     * @param className - class package and name
-     * @return IActions interface object
-     * */
-    private static IActions getCustomActionsByDevice(Device device, String className) {
-        return (IActions) Factory.get(device, className)
-    }
-
-
 }

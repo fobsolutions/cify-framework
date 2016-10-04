@@ -1,23 +1,26 @@
 package io.cify.framework
 
-
 import io.cify.framework.annotations.Title
-import io.cify.framework.core.models.Device
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Marker
-import org.apache.logging.log4j.MarkerManager
-import org.apache.logging.log4j.core.Logger
+import io.cify.framework.core.CifyFrameworkException
+import io.cify.framework.core.Device
+import org.slf4j.Marker
+import org.slf4j.MarkerFactory
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import groovy.util.logging.Slf4j
 
 /**
  * Factory class for getting page objects
  */
+
+@Slf4j
 public class Factory implements InvocationHandler {
 
-    private static final Logger LOG = LogManager.getLogger(Factory.class)
+    private static final Marker MARKER = MarkerFactory.getMarker('FACTORY') as Marker
+
+    public static final String CAPABILITY_UI_TYPE = "UIType"
 
     private Object obj
 
@@ -29,56 +32,54 @@ public class Factory implements InvocationHandler {
     }
 
     /**
-     * Gets page object implementation class for specific device
+     * Gets proxy instance for specific class and device
      *
-     * @param device - device object
-     * @param className - classname
+     * @param device device object
+     * @param className class name
+     *
+     * @return Object
+     * @throws CifyFrameworkException if failed to create proxy instance
      * */
     public static Object get(Device device, String className) {
-        String uiType = "";
+        log.debug(MARKER, "Create new proxy instance for class $className and device $device")
+
         try {
-            uiType = device.getCapabilityByName(Constants.UI_TYPE) != null ? device.getCapabilityByName(Constants.UI_TYPE) : ""
-            LOG.debug("Creating new proxy instance for classname: " + className + uiType + " for device: " + device.getCapabilityByName(Constants.CAPABILITY_ID))
+            String uiType = device.getCapabilities().getCapability(CAPABILITY_UI_TYPE)
+            if (uiType == null) {
+                uiType = ""
+            }
+            log.debug(MARKER, "UIType: $uiType")
+
             String nameForClass = className + uiType
             Class<?> clazz = Class.forName(nameForClass)
             Object obj = clazz.newInstance(device)
             return Proxy.newProxyInstance(obj.getClass().getClassLoader(), obj.getClass().getInterfaces(),
                     new Factory(obj))
-        } catch (Exception e) {
-            LOG.error("Unable to create new proxy instance for classname: " + className + uiType + ", class not found.")
-            throw new RuntimeException(e)
+        } catch (all) {
+            throw new CifyFrameworkException("Unable to create new proxy instance", all)
         }
     }
 
+
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) {
+        log.debug(MARKER, "Invoke method $method with args $args")
 
         Object result
 
-
-        Marker marker = MarkerManager.getMarker("ACTIONS")
-        if (method.getName().contains("is") || method.getName().contains("should")) {
-            marker = MarkerManager.getMarker("MATCHERS")
-        }
-
         Method annotationMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes())
-        String argsString = ""
+        if (annotationMethod.getAnnotation(Title.class) != null) {
+            log.debug(MARKER, "Title: {}", annotationMethod.getAnnotation(Title.class).value())
+        }
 
         if (args != null && args.length > 0) {
-            argsString = args.findAll({ it != null }).join(", ")
+            String argsString = args.findAll({ it != null }).join(", ")
+            log.debug(MARKER, "Args: {}", argsString)
         }
-
-        if (annotationMethod.getAnnotation(Title.class) != null) {
-            LOG.debug(marker, "{}", annotationMethod.getAnnotation(Title.class).value())
-        } else {
-            LOG.debug(marker, "Executing")
-        }
-        LOG.debug(marker, "{}", argsString)
 
 
         try {
             result = method.invoke(obj, args)
-            LOG.debug(marker, "Done")
         } catch (InvocationTargetException e) {
             throw e.getTargetException()
         }

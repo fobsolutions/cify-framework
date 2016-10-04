@@ -2,7 +2,7 @@ package io.cify.framework
 
 import io.appium.java_client.pagefactory.AppiumFieldDecorator
 import io.cify.framework.core.DeviceManager
-import io.cify.framework.core.models.Device
+import io.cify.framework.core.Device
 import org.openqa.selenium.support.PageFactory
 
 import java.util.concurrent.TimeUnit
@@ -33,7 +33,7 @@ public class PageObjects {
      * @param timeOutInSeconds - timeout time in seconds
      * */
     public PageObjects(String deviceId, long timeOutInSeconds) {
-        this(DeviceManager.getActiveDevice(deviceId), timeOutInSeconds)
+        this(DeviceManager.getInstance().getActiveDevice(deviceId), timeOutInSeconds)
     }
 
     /**
