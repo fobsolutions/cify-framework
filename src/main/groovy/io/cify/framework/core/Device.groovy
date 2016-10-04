@@ -2,11 +2,12 @@ package io.cify.framework.core
 
 import io.cify.framework.core.interfaces.IDevice
 import io.cify.framework.logging.LoggingOutputStream
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Marker
+import org.apache.logging.log4j.MarkerManager
+import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
-import groovy.util.logging.Slf4j
-import org.slf4j.Marker
-import org.slf4j.MarkerFactory
 
 /**
  * Created by FOB Solutions
@@ -14,10 +15,10 @@ import org.slf4j.MarkerFactory
  * This is a model class for Device
  */
 
-@Slf4j
 class Device implements IDevice {
 
-    private static final Marker MARKER = MarkerFactory.getMarker('DEVICE') as Marker
+    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Marker MARKER = MarkerManager.getMarker('DEVICE') as Marker
 
     private String id
     private DeviceCategory category

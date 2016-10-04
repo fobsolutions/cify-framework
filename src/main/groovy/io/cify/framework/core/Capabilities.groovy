@@ -3,10 +3,11 @@ package io.cify.framework.core
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.json.internal.LazyMap
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Marker
+import org.apache.logging.log4j.MarkerManager
+import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.remote.DesiredCapabilities
-import groovy.util.logging.Slf4j
-import org.slf4j.Marker
-import org.slf4j.MarkerFactory
 
 /**
  * Created by FOB Solution
@@ -14,10 +15,11 @@ import org.slf4j.MarkerFactory
  * This class holds device capabilities
  */
 
-@Slf4j
+
 class Capabilities {
 
-    private static final Marker MARKER = MarkerFactory.getMarker('CAPABILITIES') as Marker
+    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Marker MARKER = MarkerManager.getMarker('CAPABILITIES') as Marker
 
     private LazyMap android = [:]
     private LazyMap ios = [:]

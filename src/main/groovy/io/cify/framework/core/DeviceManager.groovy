@@ -1,10 +1,11 @@
 package io.cify.framework.core
 
 import io.cify.framework.core.interfaces.IDeviceManager
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Marker
+import org.apache.logging.log4j.MarkerManager
+import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.remote.DesiredCapabilities
-import groovy.util.logging.Slf4j
-import org.slf4j.Marker
-import org.slf4j.MarkerFactory
 
 import static java.util.UUID.randomUUID
 
@@ -14,10 +15,10 @@ import static java.util.UUID.randomUUID
  * This class is responsible for managing Devices
  */
 
-@Slf4j
 class DeviceManager implements IDeviceManager {
 
-    private static final Marker MARKER = MarkerFactory.getMarker('DEVICE MANAGER') as Marker
+    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Marker MARKER = MarkerManager.getMarker('DEVICE MANAGER') as Marker
 
     /**
      * System property to be used to pass capabilities to Device Manager

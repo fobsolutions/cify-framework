@@ -3,22 +3,23 @@ package io.cify.framework
 import io.cify.framework.annotations.Title
 import io.cify.framework.core.CifyFrameworkException
 import io.cify.framework.core.Device
-import org.slf4j.Marker
-import org.slf4j.MarkerFactory
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
-import groovy.util.logging.Slf4j
+import org.apache.logging.log4j.Marker
+import org.apache.logging.log4j.MarkerManager
+import org.apache.logging.log4j.core.Logger
+import org.apache.logging.log4j.LogManager
 
 /**
  * Factory class for getting page objects
  */
 
-@Slf4j
 public class Factory implements InvocationHandler {
 
-    private static final Marker MARKER = MarkerFactory.getMarker('FACTORY') as Marker
+    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Marker MARKER = MarkerManager.getMarker('FACTORY') as Marker
 
     public static final String CAPABILITY_UI_TYPE = "UIType"
 
