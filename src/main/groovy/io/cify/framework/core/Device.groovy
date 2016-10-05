@@ -17,7 +17,7 @@ import org.openqa.selenium.remote.DesiredCapabilities
 
 class Device implements IDevice {
 
-    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('DEVICE') as Marker
 
     private String id
@@ -34,7 +34,7 @@ class Device implements IDevice {
      * @param capabilities device desired capabilities
      * */
     public Device(String id, DeviceCategory category, DesiredCapabilities capabilities) {
-        log.debug(MARKER, "Create new device with id $id, category $category and capabilities $capabilities")
+        LOG.debug(MARKER, "Create new device with id $id, category $category and capabilities $capabilities")
         this.id = id
         this.category = category
         this.capabilities = capabilities
@@ -47,7 +47,7 @@ class Device implements IDevice {
      * */
     @Override
     public String getId() {
-        log.debug(MARKER, "Get device id")
+        LOG.debug(MARKER, "Get device id")
         return id
     }
 
@@ -58,7 +58,7 @@ class Device implements IDevice {
      * */
     @Override
     public DeviceCategory getCategory() {
-        log.debug(MARKER, "Get device category")
+        LOG.debug(MARKER, "Get device category")
         return this.category
     }
 
@@ -69,7 +69,7 @@ class Device implements IDevice {
      * */
     @Override
     public WebDriver getDriver() {
-        log.debug(MARKER, "Get device driver")
+        LOG.debug(MARKER, "Get device driver")
         return driver
     }
 
@@ -81,7 +81,7 @@ class Device implements IDevice {
      * */
     @Override
     public void setCapability(String key, String value) {
-        log.debug(MARKER, "Set desire capability $key : $value")
+        LOG.debug(MARKER, "Set desire capability $key : $value")
         if (key != null && value != null) {
             capabilities.setCapability(key, value)
         }
@@ -95,7 +95,7 @@ class Device implements IDevice {
      * */
     @Override
     public DesiredCapabilities getCapabilities() {
-        log.debug(MARKER, "Get all desired capabilities")
+        LOG.debug(MARKER, "Get all desired capabilities")
         return capabilities
     }
 
@@ -121,7 +121,7 @@ class Device implements IDevice {
      * */
     @Override
     public void openApp(String app, String appActivity, String appPackage) {
-        log.debug(MARKER, "Open app $app, $appActivity, $appPackage")
+        LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
             if(!validateApp(app, appActivity, appPackage)) {
                 throw new CifyFrameworkException("App in not valid")
@@ -145,7 +145,7 @@ class Device implements IDevice {
      * */
     @Override
     public void openBrowser(String url) {
-        log.debug(MARKER, "Open url $url")
+        LOG.debug(MARKER, "Open url $url")
         try {
             if(!validateUrl(url)){
                 throw new CifyFrameworkException("Url in not valid")
@@ -163,7 +163,7 @@ class Device implements IDevice {
     @Override
     void quit() {
         if(hasDriver()) {
-            log.debug(MARKER, "Quit device driver")
+            LOG.debug(MARKER, "Quit device driver")
             getDriver().quit()
         }
     }
@@ -173,7 +173,7 @@ class Device implements IDevice {
      * Creates webdriver for device
      * */
     private void createDriver() {
-        log.debug(MARKER, "Create new device driver")
+        LOG.debug(MARKER, "Create new device driver")
         LoggingOutputStream.redirectSystemOutAndSystemErrToLogger()
         quit()
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
@@ -184,13 +184,13 @@ class Device implements IDevice {
      * Checks if driver exists
      * */
     private boolean hasDriver() {
-        log.debug(MARKER, "Check if driver exists")
+        LOG.debug(MARKER, "Check if driver exists")
         if (getDriver() == null) {
-            log.debug(MARKER, "No driver found")
+            LOG.debug(MARKER, "No driver found")
             return false
         }
 
-        log.debug(MARKER, "Driver found")
+        LOG.debug(MARKER, "Driver found")
         return true
     }
 

@@ -25,7 +25,7 @@ import org.openqa.selenium.safari.SafariDriver
 
 class DriverFactory {
 
-    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('DRIVER FACTORY') as Marker
 
     public static final String CAPABILITY = "capability"
@@ -52,7 +52,7 @@ class DriverFactory {
      * @return WebDriver
      * */
     static WebDriver getDriver(DesiredCapabilities desiredCapabilities) {
-        log.debug(MARKER, "Create driver with desired capabilities \n $desiredCapabilities")
+        LOG.debug(MARKER, "Create driver with desired capabilities \n $desiredCapabilities")
 
         Capability capability = Capability.valueOf((desiredCapabilities.getCapability(CAPABILITY) as String).toUpperCase())
         String remoteUrl = desiredCapabilities.getCapability(REMOTE) as String
@@ -72,7 +72,7 @@ class DriverFactory {
      * @return WebDriver
      * */
     private static WebDriver createWebDriver(Capability capability, DesiredCapabilities desiredCapabilities) {
-        log.debug(MARKER, "Create $capability web driver with desired capabilities $desiredCapabilities")
+        LOG.debug(MARKER, "Create $capability web driver with desired capabilities $desiredCapabilities")
 
         switch (capability) {
             case Capability.CHROME:
@@ -113,7 +113,7 @@ class DriverFactory {
      * */
     private
     static WebDriver createRemoteDriver(Capability capability, DesiredCapabilities desiredCapabilities, URL url) {
-        log.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
+        LOG.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
 
         switch (capability) {
             case Capability.IPAD:

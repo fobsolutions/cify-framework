@@ -17,7 +17,7 @@ import static java.util.UUID.randomUUID
 
 class DeviceManager implements IDeviceManager {
 
-    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('DEVICE MANAGER') as Marker
 
     /**
@@ -52,7 +52,7 @@ class DeviceManager implements IDeviceManager {
      * Default constructor for Device Manager
      * */
     public DeviceManager() {
-        log.debug(MARKER, 'Create new DeviceManager')
+        LOG.debug(MARKER, 'Create new DeviceManager')
         try {
             String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES, SUPPORTED_CAPABILITIES)
             this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
@@ -67,7 +67,7 @@ class DeviceManager implements IDeviceManager {
      * @return DeviceManager instance
      */
     public static DeviceManager getInstance() {
-        log.debug(MARKER, 'Get instance of DeviceManager')
+        LOG.debug(MARKER, 'Get instance of DeviceManager')
         if (instance == null) {
             synchronized (DeviceManager.class) {
                 if (instance == null) {
@@ -85,7 +85,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     Capabilities getCapabilities() {
-        log.debug(MARKER, 'Get DeviceManager capabilities')
+        LOG.debug(MARKER, 'Get DeviceManager capabilities')
         return capabilities
     }
 
@@ -113,7 +113,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     Device createDevice(DeviceCategory category, String deviceId) {
-        log.debug(MARKER, "Create new device with category $category and device id $deviceId")
+        LOG.debug(MARKER, "Create new device with category $category and device id $deviceId")
         if (deviceId == null || deviceId.isEmpty()) {
             throw new CifyFrameworkException("Failed to create device. Id is null or empty")
         }
@@ -141,17 +141,17 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     boolean hasActiveDevice(DeviceCategory category) {
-        log.debug(MARKER, "Check if device with category $category exists")
+        LOG.debug(MARKER, "Check if device with category $category exists")
         Device device = devices.find { device ->
             device.getCategory() == category
         }
 
         if (device == null) {
-            log.debug(MARKER, "No device with category $category found")
+            LOG.debug(MARKER, "No device with category $category found")
             return false
         }
 
-        log.debug(MARKER, "Device with category $category found")
+        LOG.debug(MARKER, "Device with category $category found")
         return true
     }
 
@@ -164,17 +164,17 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     boolean hasActiveDevice(String deviceId) {
-        log.debug(MARKER, "Check if device with id $deviceId exists")
+        LOG.debug(MARKER, "Check if device with id $deviceId exists")
         Device device = devices.find { device ->
             device.getId() == deviceId
         }
 
         if (device == null) {
-            log.debug(MARKER, "No device with id $deviceId found")
+            LOG.debug(MARKER, "No device with id $deviceId found")
             return false
         }
 
-        log.debug(MARKER, "Device with id $deviceId found")
+        LOG.debug(MARKER, "Device with id $deviceId found")
         return true
     }
 
@@ -185,7 +185,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     List<Device> getAllActiveDevices() {
-        log.debug(MARKER, "Get all active devices")
+        LOG.debug(MARKER, "Get all active devices")
         return devices
     }
 
@@ -198,7 +198,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     List<Device> getAllActiveDevices(DeviceCategory category) {
-        log.debug(MARKER, "Find all active devices of category $category")
+        LOG.debug(MARKER, "Find all active devices of category $category")
         return devices.findAll { device ->
             device.getCategory() == category
         }
@@ -212,7 +212,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     Device getActiveDevice() {
-        log.debug(MARKER, "Get first active device")
+        LOG.debug(MARKER, "Get first active device")
         return devices.first()
     }
 
@@ -226,7 +226,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     Device getActiveDevice(DeviceCategory category) {
-        log.debug(MARKER, "Find first active devices of category $category")
+        LOG.debug(MARKER, "Find first active devices of category $category")
         Device device = devices.find { device ->
             device.getCategory() == category
         }
@@ -248,7 +248,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     Device getActiveDevice(String deviceId) {
-        log.debug(MARKER, "Find active device with id $deviceId")
+        LOG.debug(MARKER, "Find active device with id $deviceId")
         Device device = devices.find { device ->
             device.getId() == deviceId
         }
@@ -268,7 +268,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     void quitDevice(String deviceId) {
-        log.debug(MARKER, "Quit device with id $deviceId")
+        LOG.debug(MARKER, "Quit device with id $deviceId")
         Device device = getActiveDevice(deviceId)
         quitDevice(device)
     }
@@ -280,7 +280,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     void quitDevice(Device device) {
-        log.debug(MARKER, "Quit device $device")
+        LOG.debug(MARKER, "Quit device $device")
         if (device != null) {
             device.quit()
             devices.removeElement(device)
@@ -293,7 +293,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     void quitAllDevices() {
-        log.debug(MARKER, "Quit all active devices")
+        LOG.debug(MARKER, "Quit all active devices")
         devices.each { device ->
             device.quit()
         }
@@ -307,7 +307,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     void quitAllDevices(DeviceCategory category) {
-        log.debug(MARKER, "Quit all active devices of selected category")
+        LOG.debug(MARKER, "Quit all active devices of selected category")
         getAllActiveDevices(category).each { device ->
             quitDevice(device)
         }

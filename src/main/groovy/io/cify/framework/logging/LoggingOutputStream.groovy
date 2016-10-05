@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager
 
 public class LoggingOutputStream extends OutputStream {
 
-    private static final Logger log = LogManager.getLogger(this.class) as Logger
+    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('LOGGING OUTPUT STREAM') as Marker
 
     private final ByteArrayOutputStream baos = new ByteArrayOutputStream(1000);
@@ -43,19 +43,19 @@ public class LoggingOutputStream extends OutputStream {
 
             switch (level) {
                 case LogLevel.TRACE:
-                    log.trace(MARKER, line);
+                    LOG.trace(MARKER, line);
                     break;
                 case LogLevel.DEBUG:
-                    log.debug(MARKER, line);
+                    LOG.debug(MARKER, line);
                     break;
                 case LogLevel.ERROR:
-                    log.error(MARKER, line);
+                    LOG.error(MARKER, line);
                     break;
                 case LogLevel.INFO:
-                    log.info(MARKER, line);
+                    LOG.info(MARKER, line);
                     break;
                 case LogLevel.WARN:
-                    log.warn(MARKER, line);
+                    LOG.warn(MARKER, line);
                     break;
             }
         } else {
