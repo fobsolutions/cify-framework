@@ -151,15 +151,6 @@ class DeviceManagerTest extends GroovyTestCase {
         }
     }
 
-    void testShouldFailCreatingDeviceMissingInCapabilities() {
-        System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, capsWithoutAndroid)
-
-        shouldFail {
-            new DeviceManager().createDevice(DeviceCategory.ANDROID)
-        }
-    }
-
-
     void testShouldHaveActiveDeviceWithCategory() {
         DeviceManager deviceManager = new DeviceManager()
         DeviceCategory category = DeviceCategory.ANDROID

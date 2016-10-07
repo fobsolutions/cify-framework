@@ -57,7 +57,8 @@ class DeviceManager implements IDeviceManager {
             String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES, SUPPORTED_CAPABILITIES)
             this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
         } catch (all) {
-            throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message", all)
+            LOG.debug(MARKER,all.message,all)
+            throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message")
         }
     }
 
@@ -114,20 +115,24 @@ class DeviceManager implements IDeviceManager {
     @Override
     Device createDevice(DeviceCategory category, String deviceId) {
         LOG.debug(MARKER, "Create new device with category $category and device id $deviceId")
-        if (deviceId == null || deviceId.isEmpty()) {
-            throw new CifyFrameworkException("Failed to create device. Id is null or empty")
-        }
-        if (hasActiveDevice(deviceId)) {
-            throw new CifyFrameworkException("Failed to create device. Device with id $deviceId already exists")
-        }
+        try {
 
-        DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category)
-        if (desiredCapabilities.asMap().isEmpty()) {
-            throw new CifyFrameworkException("Failed to create device. No capabilities provided for $category")
-        }
+            if (deviceId == null || deviceId.isEmpty()) {
+                throw new CifyFrameworkException("Failed to create device. Id is null or empty")
+            }
+            if (hasActiveDevice(deviceId)) {
+                throw new CifyFrameworkException("Failed to create device. Device with id $deviceId already exists")
+            }
 
-        Device device = new Device(deviceId, category, desiredCapabilities)
-        devices.add(device)
+            DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category)
+
+            Device device = new Device(deviceId, category, desiredCapabilities)
+            devices.add(device)
+
+        } catch (all)   {
+            LOG.debug(MARKER,all.message,all)
+            throw new CifyFrameworkException("Failed to create device.")
+        }
 
         return getActiveDevice(deviceId)
     }
@@ -213,7 +218,12 @@ class DeviceManager implements IDeviceManager {
     @Override
     Device getActiveDevice() {
         LOG.debug(MARKER, "Get first active device")
-        return devices.first()
+        try {
+            return devices.first()
+        }catch(all){
+            LOG.debug(MARKER,all.message,all)
+            throw new CifyFrameworkException("No active device found")
+        }
     }
 
     /**
@@ -230,11 +240,10 @@ class DeviceManager implements IDeviceManager {
         Device device = devices.find { device ->
             device.getCategory() == category
         }
-
         if (device == null) {
+            LOG.debug(MARKER, "No active device with category $category found")
             throw new CifyFrameworkException("No active device with category $category found")
         }
-
         return device
     }
 
@@ -249,17 +258,15 @@ class DeviceManager implements IDeviceManager {
     @Override
     Device getActiveDevice(String deviceId) {
         LOG.debug(MARKER, "Find active device with id $deviceId")
-        Device device = devices.find { device ->
-            device.getId() == deviceId
-        }
-
-        if (device == null) {
-            throw new CifyFrameworkException("No active device with id $deviceId found")
-        }
-
-        return device
+            Device device = devices.find { device ->
+                device.getId() == deviceId
+            }
+            if (device == null) {
+                LOG.debug(MARKER, "No active device with id $deviceId found")
+                throw new CifyFrameworkException("No active device with id $deviceId found")
+            }
+            return device
     }
-
 
     /**
      * Quits device
