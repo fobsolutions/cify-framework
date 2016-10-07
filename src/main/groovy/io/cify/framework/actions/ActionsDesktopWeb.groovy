@@ -26,7 +26,7 @@ class ActionsDesktopWeb implements IActions {
     @Override
     @Title("Tap - not supported in DesktopWeb")
     public void tap(WebElement element) {
-        //TODO: maybe we call click() here ?
+        //TODO: call click() here
     }
 
     @Override

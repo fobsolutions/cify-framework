@@ -1,5 +1,4 @@
 package io.cify.framework.core
-
 /**
  * Created by FOB Solutions
  */
