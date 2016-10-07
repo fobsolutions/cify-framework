@@ -159,7 +159,6 @@ class DeviceManagerTest extends GroovyTestCase {
         }
     }
 
-
     void testShouldHaveActiveDeviceWithCategory() {
         DeviceManager deviceManager = new DeviceManager()
         DeviceCategory category = DeviceCategory.ANDROID

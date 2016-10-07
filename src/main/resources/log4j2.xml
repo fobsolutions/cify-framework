@@ -7,9 +7,9 @@
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="${PATTERN}"/>
         </Console>
-        <RollingFile name="RollingFile" filename="build/cify/log/cify-framework ${sys:task:-}.log"
-                     filepattern="build/cify/log/cify-framework-%d{yyyy-MM-dd HH:mm:ss.SSS}-${sys:task:-}.log">
-            <PatternLayout pattern="[%-5level] %d{dd.MM.yyyy HH:mm:ss} [%t] %c{1} - %msg%n"/>
+        <RollingFile name="RollingFile" filename="build/cify/framework-log/cify-framework${date:yyyy-MM-dd HH:mm:ss}${sys:task:-}.log"
+                     filepattern="build/cify/framework-log/cify-framework-%d{yyyy-MM-dd HH:mm:ss}${sys:task:-}.log">
+            <PatternLayout pattern="[%-5level] %d{dd.MM.yyyy HH:mm:ss} [%t] %c{1} [%marker] - %msg%n"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
