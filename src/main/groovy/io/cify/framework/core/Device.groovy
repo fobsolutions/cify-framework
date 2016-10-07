@@ -124,14 +124,15 @@ class Device implements IDevice {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
             if(!validateApp(app, appActivity, appPackage)) {
-                throw new CifyFrameworkException("App in not valid")
+                throw new CifyFrameworkException("App is not valid")
             }
             setCapability("app", app)
             setCapability("app_activity", appActivity)
             setCapability("app_package", appPackage)
             createDriver()
         } catch (all) {
-            throw new CifyFrameworkException("Failed to open app $app, $appActivity, $appPackage", all)
+            LOG.debug(MARKER,all.message,all)
+            throw new CifyFrameworkException("Failed to open app $app, $appActivity, $appPackage")
         }
     }
 
@@ -148,12 +149,13 @@ class Device implements IDevice {
         LOG.debug(MARKER, "Open url $url")
         try {
             if(!validateUrl(url)){
-                throw new CifyFrameworkException("Url in not valid")
+                throw new CifyFrameworkException("Url is not valid")
             }
             createDriver()
             getDriver().get(url)
         } catch (all) {
-            throw new CifyFrameworkException("Failed to open url $url", all)
+            LOG.debug(MARKER,all.message,all)
+            throw new CifyFrameworkException("Failed to open url $url")
         }
     }
 
