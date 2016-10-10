@@ -3,6 +3,10 @@ package io.cify.framework.core
 import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.ios.IOSDriver
 import io.github.bonigarcia.wdm.*
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Marker
+import org.apache.logging.log4j.MarkerManager
+import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.edge.EdgeDriver
@@ -12,9 +16,6 @@ import org.openqa.selenium.opera.OperaDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.safari.SafariDriver
-import groovy.util.logging.Slf4j
-import org.slf4j.Marker
-import org.slf4j.MarkerFactory
 
 /**
  * Created by FOB Solutions
@@ -22,10 +23,10 @@ import org.slf4j.MarkerFactory
  * This class is responsible for driver creation
  */
 
-@Slf4j
 class DriverFactory {
 
-    private static final Marker MARKER = MarkerFactory.getMarker('DRIVER FACTORY') as Marker
+    private static final Logger LOG = LogManager.getLogger(this.class) as Logger
+    private static final Marker MARKER = MarkerManager.getMarker('DRIVER FACTORY') as Marker
 
     public static final String CAPABILITY = "capability"
     public static final String REMOTE = "remote"
@@ -51,7 +52,7 @@ class DriverFactory {
      * @return WebDriver
      * */
     static WebDriver getDriver(DesiredCapabilities desiredCapabilities) {
-        log.debug(MARKER, "Create driver with desired capabilities \n $desiredCapabilities")
+        LOG.debug(MARKER, "Create driver with desired capabilities \n $desiredCapabilities")
 
         Capability capability = Capability.valueOf((desiredCapabilities.getCapability(CAPABILITY) as String).toUpperCase())
         String remoteUrl = desiredCapabilities.getCapability(REMOTE) as String
@@ -71,7 +72,7 @@ class DriverFactory {
      * @return WebDriver
      * */
     private static WebDriver createWebDriver(Capability capability, DesiredCapabilities desiredCapabilities) {
-        log.debug(MARKER, "Create $capability web driver with desired capabilities $desiredCapabilities")
+        LOG.debug(MARKER, "Create $capability web driver with desired capabilities $desiredCapabilities")
 
         switch (capability) {
             case Capability.CHROME:
@@ -112,7 +113,7 @@ class DriverFactory {
      * */
     private
     static WebDriver createRemoteDriver(Capability capability, DesiredCapabilities desiredCapabilities, URL url) {
-        log.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
+        LOG.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
 
         switch (capability) {
             case Capability.IPAD:
