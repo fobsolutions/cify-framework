@@ -2,10 +2,13 @@ package io.cify.framework.core
 
 import io.cify.framework.core.interfaces.IDevice
 import io.cify.framework.logging.LoggingOutputStream
+import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
+import org.openqa.selenium.OutputType
+import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
@@ -25,6 +28,8 @@ class Device implements IDevice {
     private DesiredCapabilities capabilities
 
     private WebDriver driver
+
+    private boolean isRecording = false
 
     /**
      * Default constructor for Device
@@ -87,7 +92,6 @@ class Device implements IDevice {
         }
     }
 
-
     /**
      * Gets desired capabilities for device
      *
@@ -109,7 +113,6 @@ class Device implements IDevice {
         openApp(app, "", "");
     }
 
-
     /**
      * Opens app on device
      *
@@ -123,19 +126,23 @@ class Device implements IDevice {
     public void openApp(String app, String appActivity, String appPackage) {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
-            if(!validateApp(app, appActivity, appPackage)) {
+            if (!validateApp(app, appActivity, appPackage)) {
                 throw new CifyFrameworkException("App is not valid")
             }
             setCapability("app", app)
             setCapability("app_activity", appActivity)
             setCapability("app_package", appPackage)
             createDriver()
+
+            if (System.getProperty("record") == "true") {
+                startRecording()
+            }
+
         } catch (all) {
-            LOG.debug(MARKER,all.message,all)
+            LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to open app $app, $appActivity, $appPackage")
         }
     }
-
 
     /**
      * Opens url in device browser
@@ -148,15 +155,54 @@ class Device implements IDevice {
     public void openBrowser(String url) {
         LOG.debug(MARKER, "Open url $url")
         try {
-            if(!validateUrl(url)){
+            if (!validateUrl(url)) {
                 throw new CifyFrameworkException("Url is not valid")
             }
             createDriver()
             getDriver().get(url)
+
+            if (System.getProperty("record") == "true") {
+                startRecording()
+            }
+
         } catch (all) {
-            LOG.debug(MARKER,all.message,all)
+            LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to open url $url")
         }
+    }
+
+    /**
+     * Starts video recording
+     * */
+    @Override
+    void startRecording() {
+        LOG.debug(MARKER, "Start recording...")
+        Thread.start(this.id + "_recorder") {
+            isRecording = true
+            if (new File(getVideoPathForDevice() + "temp/").mkdirs()) {
+                while (hasDriver() && this.isRecording) {
+                    try {
+                        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
+                        FileUtils.copyFile(scrFile, new File(getVideoPathForDevice() + "temp/" + this.id + System.currentTimeMillis() + ".png"))
+                    } catch (all) {
+                        LOG.debug(MARKER, "Recording failed cause: " + all.message)
+                        isRecording = false
+                    }
+                }
+                stopRecording()
+            }
+        }
+    }
+
+    /**
+     * Stops video recording
+     * */
+    @Override
+    void stopRecording() {
+        LOG.debug(MARKER, "Stop recording...")
+        this.isRecording = false
+        // TODO convert images to video
+        deleteTemporaryImages()
     }
 
     /**
@@ -164,12 +210,12 @@ class Device implements IDevice {
      * */
     @Override
     void quit() {
-        if(hasDriver()) {
+        if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
             getDriver().quit()
+            stopRecording()
         }
     }
-
 
     /**
      * Creates webdriver for device
@@ -206,23 +252,22 @@ class Device implements IDevice {
      * @return boolean
      * */
     private boolean validateApp(String app, String appActivity, String appPackage) {
-        if(app == null || app.isEmpty()) {
+        if (app == null || app.isEmpty()) {
             return false
         }
-        if(getCategory() == DeviceCategory.BROWSER) {
+        if (getCategory() == DeviceCategory.BROWSER) {
             return false
         }
-        if(getCategory() == DeviceCategory.IOS && app.endsWith(".apk")) {
+        if (getCategory() == DeviceCategory.IOS && app.endsWith(".apk")) {
             return false
         }
 
-        if(getCategory() == DeviceCategory.ANDROID && (app.endsWith(".ipa") || app.endsWith(".app"))) {
+        if (getCategory() == DeviceCategory.ANDROID && (app.endsWith(".ipa") || app.endsWith(".app"))) {
             return false
         }
 
         return true
     }
-
 
     /**
      * Validates app
@@ -232,13 +277,32 @@ class Device implements IDevice {
      * @return boolean
      * */
     private boolean validateUrl(String url) {
-        if(url == null || url.isEmpty()) {
+        if (url == null || url.isEmpty()) {
             return false
         }
-        if(getCategory() != DeviceCategory.BROWSER) {
+        if (getCategory() != DeviceCategory.BROWSER) {
             return false
         }
 
         return true
+    }
+
+    /**
+     * Gets video path
+     * */
+    private String getVideoPathForDevice() {
+        return System.getProperty("videoPath", "build/cify/videos/") +
+                System.getProperty("task", "plug-and-play") +
+                "/" +
+                this.id +
+                "/";
+    }
+
+    /**
+     * Delete temporary screenshots
+     * */
+    private void deleteTemporaryImages() {
+        File screenshotFolder = new File(getVideoPathForDevice() + "temp")
+        screenshotFolder.deleteDir()
     }
 }
