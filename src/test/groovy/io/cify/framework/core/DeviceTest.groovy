@@ -25,6 +25,28 @@ class DeviceTest extends GroovyTestCase {
         browserDevice = new Device(browserDeviceId, DeviceCategory.BROWSER, browserCaps)
     }
 
+    void testRecord() {
+        DesiredCapabilities caps = new DesiredCapabilities()
+        caps.setCapability("capability", "chrome")
+        caps.setCapability("platform", "ANY")
+        caps.setCapability("version", "")
+        caps.setCapability("deviceName", "Chrome")
+
+        Device device = new Device("chrome", DeviceCategory.BROWSER, caps)
+        device.openBrowser("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.getDriver().get("http://www.fob-solutions.com/")
+        device.quit()
+    }
 
     void testShouldHaveCorrectId() {
         assert androidDevice.getId().is(androidDeviceId)

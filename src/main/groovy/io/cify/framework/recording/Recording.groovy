@@ -1,16 +1,15 @@
 package io.cify.framework.recording
 
+import io.humble.video.*
+import io.humble.video.awt.MediaPictureConverter
+import io.humble.video.awt.MediaPictureConverterFactory
 
-import io.humble.video.*;
-import io.humble.video.awt.MediaPictureConverter;
-import io.humble.video.awt.MediaPictureConverterFactory;
+import javax.imageio.ImageIO
+import java.awt.*
+import java.awt.image.BufferedImage
+import java.util.List
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
-
-import static io.humble.video.awt.MediaPictureConverterFactory.findDescriptor;
+import static io.humble.video.awt.MediaPictureConverterFactory.findDescriptor
 
 /**
  *  Class responsible for creating video from screenshots
@@ -110,8 +109,8 @@ public class Recording {
         /** Create and set video encoder using YUV420P format and incoming image dimensions */
         final PixelFormat.Type pixelformat = PixelFormat.Type.PIX_FMT_YUV420P;
         Encoder encoder = Encoder.make(codec);
-        encoder.setWidth(screenbounds.width);
-        encoder.setHeight(screenbounds.height);
+        encoder.setWidth(screenbounds.width as int);
+        encoder.setHeight(screenbounds.height as int);
         encoder.setPixelFormat(pixelformat);
         encoder.setTimeBase(framerate);
 

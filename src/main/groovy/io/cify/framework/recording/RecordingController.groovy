@@ -53,6 +53,7 @@ class RecordingController {
         LOG.debug(MARKER, "Video duration was " + getRecordingDuration(device) + " for device " + device.id)
         device.isRecording = false
         // TODO convert images to video
+        Recording.screenshotsToVideo(getVideoPathForDevice(device) + "temp", getRecordingDuration(device), getVideoPathForDevice(device), "demo_video.mp4")
         deleteTemporaryImages(device)
     }
 
