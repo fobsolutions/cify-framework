@@ -19,7 +19,6 @@ class DeviceTest extends GroovyTestCase {
     private Device iOSDevice
     private Device browserDevice
 
-
     void setUp() {
         androidDevice = new Device(androidDeviceId, DeviceCategory.ANDROID, androidCaps)
         iOSDevice = new Device(iOSDeviceId, DeviceCategory.IOS, iOSCaps)
@@ -40,7 +39,7 @@ class DeviceTest extends GroovyTestCase {
         assert browserDevice.getCapabilities().is(browserCaps)
     }
 
-    void testShouldHaveCorrectCapability(){
+    void testShouldHaveCorrectCapability() {
         browserDevice.setCapability('version', '52.0')
         assert browserDevice.getCapabilities().getCapability('version') == '52.0'
     }
@@ -109,6 +108,9 @@ class DeviceTest extends GroovyTestCase {
         }
     }
 
+    void testHasDriver() {
+        assert !iOSDevice.hasDriver()
+    }
 
     void tearDown() {
         androidDevice.quit()

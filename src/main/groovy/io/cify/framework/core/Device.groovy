@@ -2,6 +2,7 @@ package io.cify.framework.core
 
 import io.cify.framework.core.interfaces.IDevice
 import io.cify.framework.logging.LoggingOutputStream
+import io.cify.framework.recording.RecordingController
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
@@ -25,6 +26,8 @@ class Device implements IDevice {
     private DesiredCapabilities capabilities
 
     private WebDriver driver
+
+    public boolean isRecording = false
 
     /**
      * Default constructor for Device
@@ -87,7 +90,6 @@ class Device implements IDevice {
         }
     }
 
-
     /**
      * Gets desired capabilities for device
      *
@@ -109,7 +111,6 @@ class Device implements IDevice {
         openApp(app, "", "");
     }
 
-
     /**
      * Opens app on device
      *
@@ -123,19 +124,23 @@ class Device implements IDevice {
     public void openApp(String app, String appActivity, String appPackage) {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
-            if(!validateApp(app, appActivity, appPackage)) {
+            if (!validateApp(app, appActivity, appPackage)) {
                 throw new CifyFrameworkException("App is not valid")
             }
             setCapability("app", app)
             setCapability("app_activity", appActivity)
             setCapability("app_package", appPackage)
             createDriver()
+
+            //if (System.getProperty("record") == "true") {
+            startRecording()
+            //}
+
         } catch (all) {
-            LOG.debug(MARKER,all.message,all)
+            LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to open app $app, $appActivity, $appPackage")
         }
     }
-
 
     /**
      * Opens url in device browser
@@ -148,15 +153,36 @@ class Device implements IDevice {
     public void openBrowser(String url) {
         LOG.debug(MARKER, "Open url $url")
         try {
-            if(!validateUrl(url)){
+            if (!validateUrl(url)) {
                 throw new CifyFrameworkException("Url is not valid")
             }
             createDriver()
             getDriver().get(url)
+
+            //if (System.getProperty("record") == "true") {
+            startRecording()
+            //}
+
         } catch (all) {
-            LOG.debug(MARKER,all.message,all)
+            LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to open url $url")
         }
+    }
+
+    /**
+     * Starts video recording
+     * */
+    @Override
+    void startRecording() {
+        RecordingController.startRecording(this)
+    }
+
+    /**
+     * Stops video recording
+     * */
+    @Override
+    void stopRecording() {
+        RecordingController.stopRecording(this)
     }
 
     /**
@@ -164,12 +190,26 @@ class Device implements IDevice {
      * */
     @Override
     void quit() {
-        if(hasDriver()) {
+        if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
             getDriver().quit()
+            stopRecording()
         }
     }
 
+    /**
+     * Checks if driver exists
+     * */
+    public boolean hasDriver() {
+        LOG.debug(MARKER, "Check if driver exists")
+        if (getDriver() == null) {
+            LOG.debug(MARKER, "No driver found")
+            return false
+        }
+
+        LOG.debug(MARKER, "Driver found")
+        return true
+    }
 
     /**
      * Creates webdriver for device
@@ -183,20 +223,6 @@ class Device implements IDevice {
     }
 
     /**
-     * Checks if driver exists
-     * */
-    private boolean hasDriver() {
-        LOG.debug(MARKER, "Check if driver exists")
-        if (getDriver() == null) {
-            LOG.debug(MARKER, "No driver found")
-            return false
-        }
-
-        LOG.debug(MARKER, "Driver found")
-        return true
-    }
-
-    /**
      * Validates app
      *
      * @param app
@@ -206,23 +232,22 @@ class Device implements IDevice {
      * @return boolean
      * */
     private boolean validateApp(String app, String appActivity, String appPackage) {
-        if(app == null || app.isEmpty()) {
+        if (app == null || app.isEmpty()) {
             return false
         }
-        if(getCategory() == DeviceCategory.BROWSER) {
+        if (getCategory() == DeviceCategory.BROWSER) {
             return false
         }
-        if(getCategory() == DeviceCategory.IOS && app.endsWith(".apk")) {
+        if (getCategory() == DeviceCategory.IOS && app.endsWith(".apk")) {
             return false
         }
 
-        if(getCategory() == DeviceCategory.ANDROID && (app.endsWith(".ipa") || app.endsWith(".app"))) {
+        if (getCategory() == DeviceCategory.ANDROID && (app.endsWith(".ipa") || app.endsWith(".app"))) {
             return false
         }
 
         return true
     }
-
 
     /**
      * Validates app
@@ -232,10 +257,10 @@ class Device implements IDevice {
      * @return boolean
      * */
     private boolean validateUrl(String url) {
-        if(url == null || url.isEmpty()) {
+        if (url == null || url.isEmpty()) {
             return false
         }
-        if(getCategory() != DeviceCategory.BROWSER) {
+        if (getCategory() != DeviceCategory.BROWSER) {
             return false
         }
 

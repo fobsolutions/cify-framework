@@ -25,5 +25,9 @@ interface IDevice {
 
     void openBrowser(String url)
 
+    void startRecording()
+
+    void stopRecording()
+
     void quit()
 }
