@@ -1,15 +1,19 @@
-package io.cify.framework.recording
+package io.cify.framework.recording;
 
-import io.humble.video.*
-import io.humble.video.awt.MediaPictureConverter
-import io.humble.video.awt.MediaPictureConverterFactory
 
-import javax.imageio.ImageIO
-import java.awt.*
-import java.awt.image.BufferedImage
-import java.util.List
+import io.humble.video.*;
+import io.humble.video.awt.MediaPictureConverter;
+import io.humble.video.awt.MediaPictureConverterFactory;
 
-import static io.humble.video.awt.MediaPictureConverterFactory.findDescriptor
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.humble.video.awt.MediaPictureConverterFactory.findDescriptor;
 
 /**
  *  Class responsible for creating video from screenshots
@@ -33,10 +37,13 @@ public class Recording {
 
         List<BufferedImage> bufferedImageList = getBufferedImageListFromDir(screenshotsDir);
 
-        new File(outputMediaDirectory).mkdirs()
+        try {
 
-        imageListToMediaFile(bufferedImageList, outputMediaDirectory + outputMediaFile, null,null, mediaFileDuration);
+            imageListToMediaFile(bufferedImageList, outputMediaDirectory + outputMediaFile, null,null, mediaFileDuration);
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -109,8 +116,8 @@ public class Recording {
         /** Create and set video encoder using YUV420P format and incoming image dimensions */
         final PixelFormat.Type pixelformat = PixelFormat.Type.PIX_FMT_YUV420P;
         Encoder encoder = Encoder.make(codec);
-        encoder.setWidth(screenbounds.width as int);
-        encoder.setHeight(screenbounds.height as int);
+        encoder.setWidth(screenbounds.width);
+        encoder.setHeight(screenbounds.height);
         encoder.setPixelFormat(pixelformat);
         encoder.setTimeBase(framerate);
 
@@ -149,21 +156,21 @@ public class Recording {
             converter.toPicture(picture, screen, i);
 
             /** Encode */
-            while (packet.isComplete()) {
+            do {
                 encoder.encode(packet, picture);
                 if (packet.isComplete())
                     muxer.write(packet, false);
-            } ;
+            } while (packet.isComplete());
 
             i++;
         }
 
         /** Flush encoder */
-        while (packet.isComplete()){
+        do {
             encoder.encode(packet, null);
             if (packet.isComplete())
                 muxer.write(packet,  false);
-        } ;
+        } while (packet.isComplete());
 
         muxer.close();
     }
