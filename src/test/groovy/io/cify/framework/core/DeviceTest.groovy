@@ -25,22 +25,6 @@ class DeviceTest extends GroovyTestCase {
         browserDevice = new Device(browserDeviceId, DeviceCategory.BROWSER, browserCaps)
     }
 
-    void testRecord() {
-        DesiredCapabilities caps = new DesiredCapabilities()
-        caps.setCapability("capability", "firefox")
-        caps.setCapability("platform", "ANY")
-        caps.setCapability("version", "")
-        caps.setCapability("deviceName", "Firefox")
-
-        Device device = new Device("firefox", DeviceCategory.BROWSER, caps)
-        device.openBrowser("http://www.fob-solutions.com/")
-        device.getDriver().get("http://www.google.com");
-        device.getDriver().get("http://discourse.clipbucket.com/t/mp4box-not-found/1255");
-        device.getDriver().get("http://stackoverflow.com/questions/22049212/docker-copy-file-from-container-to-host");
-        device.getDriver().get("http://discourse.clipbucket.com/t/mp4box-not-found/1255");
-        device.quit()
-    }
-
     void testShouldHaveCorrectId() {
         assert androidDevice.getId().is(androidDeviceId)
     }

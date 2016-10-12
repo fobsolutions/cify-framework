@@ -38,7 +38,6 @@ class RecordingController {
                         device.isRecording = false
                     }
                 }
-                stopRecording(device)
             }
         }
     }
@@ -49,12 +48,21 @@ class RecordingController {
      * @param device - device to stop recording
      * */
     public static void stopRecording(Device device) {
-        LOG.debug(MARKER, "Stop recording...")
-        LOG.debug(MARKER, "Video duration was " + getRecordingDuration(device) + " for device " + device.id)
-        device.isRecording = false
-        // TODO convert images to video
-        Recording.screenshotsToVideo(getVideoPathForDevice(device) + "temp", getRecordingDuration(device), getVideoPathForDevice(device), "demo_video.mp4")
-        deleteTemporaryImages(device)
+        try {
+            LOG.debug(MARKER, "Stop recording...")
+            LOG.debug(MARKER, "Video duration was " + getRecordingDuration(device) + " for device " + device.id)
+            device.isRecording = false
+
+            Recording.screenshotsToVideo(
+                    getVideoPathForDevice(device) + "temp",
+                    getRecordingDuration(device),
+                    getVideoPathForDevice(device),
+                    device.id + new Date().time + ".mp4"
+            )
+
+            deleteTemporaryImages(device)
+        } catch (ignored) {
+        }
     }
 
     /**
