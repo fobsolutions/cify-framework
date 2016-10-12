@@ -2,13 +2,11 @@ package io.cify.framework.core
 
 import io.cify.framework.core.interfaces.IDevice
 import io.cify.framework.logging.LoggingOutputStream
-import org.apache.commons.io.FileUtils
+import io.cify.framework.recording.RecordingController
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
-import org.openqa.selenium.OutputType
-import org.openqa.selenium.TakesScreenshot
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
@@ -29,7 +27,7 @@ class Device implements IDevice {
 
     private WebDriver driver
 
-    private boolean isRecording = false
+    public boolean isRecording = false
 
     /**
      * Default constructor for Device
@@ -134,9 +132,9 @@ class Device implements IDevice {
             setCapability("app_package", appPackage)
             createDriver()
 
-            if (System.getProperty("record") == "true") {
-                startRecording()
-            }
+            //if (System.getProperty("record") == "true") {
+            startRecording()
+            //}
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
@@ -161,9 +159,9 @@ class Device implements IDevice {
             createDriver()
             getDriver().get(url)
 
-            if (System.getProperty("record") == "true") {
-                startRecording()
-            }
+            //if (System.getProperty("record") == "true") {
+            startRecording()
+            //}
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
@@ -176,22 +174,7 @@ class Device implements IDevice {
      * */
     @Override
     void startRecording() {
-        LOG.debug(MARKER, "Start recording...")
-        Thread.start(this.id + "_recorder") {
-            isRecording = true
-            if (new File(getVideoPathForDevice() + "temp/").mkdirs()) {
-                while (hasDriver() && this.isRecording) {
-                    try {
-                        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE)
-                        FileUtils.copyFile(scrFile, new File(getVideoPathForDevice() + "temp/" + this.id + System.currentTimeMillis() + ".png"))
-                    } catch (all) {
-                        LOG.debug(MARKER, "Recording failed cause: " + all.message)
-                        isRecording = false
-                    }
-                }
-                stopRecording()
-            }
-        }
+        RecordingController.startRecording(this)
     }
 
     /**
@@ -199,10 +182,7 @@ class Device implements IDevice {
      * */
     @Override
     void stopRecording() {
-        LOG.debug(MARKER, "Stop recording...")
-        this.isRecording = false
-        // TODO convert images to video
-        deleteTemporaryImages()
+        RecordingController.stopRecording(this)
     }
 
     /**
@@ -218,20 +198,9 @@ class Device implements IDevice {
     }
 
     /**
-     * Creates webdriver for device
-     * */
-    private void createDriver() {
-        LOG.debug(MARKER, "Create new device driver")
-        LoggingOutputStream.redirectSystemOutAndSystemErrToLogger()
-        quit()
-        WebDriver driver = DriverFactory.getDriver(getCapabilities())
-        this.driver = driver
-    }
-
-    /**
      * Checks if driver exists
      * */
-    private boolean hasDriver() {
+    public boolean hasDriver() {
         LOG.debug(MARKER, "Check if driver exists")
         if (getDriver() == null) {
             LOG.debug(MARKER, "No driver found")
@@ -240,6 +209,17 @@ class Device implements IDevice {
 
         LOG.debug(MARKER, "Driver found")
         return true
+    }
+
+    /**
+     * Creates webdriver for device
+     * */
+    private void createDriver() {
+        LOG.debug(MARKER, "Create new device driver")
+        LoggingOutputStream.redirectSystemOutAndSystemErrToLogger()
+        quit()
+        WebDriver driver = DriverFactory.getDriver(getCapabilities())
+        this.driver = driver
     }
 
     /**
@@ -285,24 +265,5 @@ class Device implements IDevice {
         }
 
         return true
-    }
-
-    /**
-     * Gets video path
-     * */
-    private String getVideoPathForDevice() {
-        return System.getProperty("videoPath", "build/cify/videos/") +
-                System.getProperty("task", "plug-and-play") +
-                "/" +
-                this.id +
-                "/";
-    }
-
-    /**
-     * Delete temporary screenshots
-     * */
-    private void deleteTemporaryImages() {
-        File screenshotFolder = new File(getVideoPathForDevice() + "temp")
-        screenshotFolder.deleteDir()
     }
 }
