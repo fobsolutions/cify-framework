@@ -25,9 +25,7 @@ import static io.humble.video.awt.MediaPictureConverterFactory.findDescriptor;
 
 public class Recording {
 
-    private static final Logger LOG = LogManager.getLogger(Recording.class);
-    private static final Marker MARKER = MarkerManager.getMarker("RECORDING");
-
+    private static final String MARKER = "RECORDING: ";
     private static int imageWidth = 0;
     private static int imageHeight = 0;
 
@@ -40,14 +38,25 @@ public class Recording {
      * @param outputMediaFile      - output media file name
      */
     public static void imagesToMedia(String imagesDir, int mediaFileDuration, String outputMediaDirectory, String outputMediaFile) {
-        LOG.debug(MARKER, "Images to media with parameters: images directory " + imagesDir + " ,output " + outputMediaDirectory + "/" + outputMediaFile + " ,duration " + mediaFileDuration);
+
+        System.out.println(MARKER + " - images to media started.");
+        System.out.println(MARKER + " - parameters: incoming images directory " + imagesDir);
+        System.out.println(MARKER + " - parameters: output directory " + outputMediaDirectory);
+        System.out.println(MARKER + " - parameters: output media file " + outputMediaFile);
+        System.out.println(MARKER + " - parameters: duration " + mediaFileDuration);
+
+        if (!outputMediaDirectory.endsWith("/")) {
+            outputMediaDirectory = outputMediaDirectory + "/";
+        }
 
         try {
             List<BufferedImage> bufferedImageList = getBufferedImageListFromDir(imagesDir);
-            imageListToMediaFile(bufferedImageList, outputMediaDirectory + "/" + outputMediaFile, null, null, mediaFileDuration);
+            imageListToMediaFile(bufferedImageList, outputMediaDirectory + outputMediaFile, null, null, mediaFileDuration);
         } catch (Exception e) {
-            LOG.debug(MARKER, "Failed to create media file from images cause: " + e.getMessage());
+            System.out.println(MARKER + " - failed to create media file from images cause: " + e.getMessage());
         }
+
+        System.out.println(MARKER + " - images to media finished.");
     }
 
     /**
@@ -57,6 +66,8 @@ public class Recording {
      * @return bufferedImageList - list of BufferedImage objects
      */
     private static List<BufferedImage> getBufferedImageListFromDir(String directory) throws IOException {
+        System.out.println(MARKER + " - get BufferedImage list from directory "+ directory);
+
         List<BufferedImage> bufferedImageList = new ArrayList<>();
         File[] listOfFiles = new File(directory).listFiles();
 
@@ -86,6 +97,8 @@ public class Recording {
      */
     private static void imageListToMediaFile(List<BufferedImage> bufferedImageList, String fileName, String formatName,
                                              String codecName, int duration) throws AWTException, InterruptedException, IOException {
+
+        System.out.println(MARKER + " - image list to media file");
 
         /* Set expected dimensions basing on first image from list */
         BufferedImage firstScreenshotImage = bufferedImageList.get(0);

@@ -36,7 +36,7 @@ class Device implements IDevice {
      * @param category device category
      * @param capabilities device desired capabilities
      * */
-    public Device(String id, DeviceCategory category, DesiredCapabilities capabilities) {
+    protected Device(String id, DeviceCategory category, DesiredCapabilities capabilities) {
         LOG.debug(MARKER, "Create new device with id $id, category $category and capabilities $capabilities")
         this.id = id
         this.category = category
@@ -182,12 +182,7 @@ class Device implements IDevice {
      * */
     @Override
     void quit() {
-
-        if (isRecording) {
-            RecordingController.takeScreenshot(this)
-        }
-        stopRecording()
-
+        isRecording=false
         if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
             getDriver().quit()
