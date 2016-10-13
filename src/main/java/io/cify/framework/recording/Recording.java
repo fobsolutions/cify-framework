@@ -4,10 +4,6 @@ package io.cify.framework.recording;
 import io.humble.video.*;
 import io.humble.video.awt.MediaPictureConverter;
 import io.humble.video.awt.MediaPictureConverterFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,9 +21,10 @@ import static io.humble.video.awt.MediaPictureConverterFactory.findDescriptor;
 
 public class Recording {
 
-    private static final String MARKER = "RECORDING: ";
-    private static int imageWidth = 0;
-    private static int imageHeight = 0;
+    private static final String MARKER = "[RECORDING]";
+
+    private static int outputMediaWidth = 0;
+    private static int outputMediaHeight = 0;
 
     /**
      * Takes images from directory and converts them to media file
@@ -37,13 +34,13 @@ public class Recording {
      * @param outputMediaDirectory - output media file directory
      * @param outputMediaFile      - output media file name
      */
-    public static void imagesToMedia(String imagesDir, int mediaFileDuration, String outputMediaDirectory, String outputMediaFile) {
+    public static boolean imagesToMedia(String imagesDir, int mediaFileDuration, String outputMediaDirectory, String outputMediaFile) {
 
-        System.out.println(MARKER + " - images to media started.");
-        System.out.println(MARKER + " - parameters: incoming images directory " + imagesDir);
-        System.out.println(MARKER + " - parameters: output directory " + outputMediaDirectory);
-        System.out.println(MARKER + " - parameters: output media file " + outputMediaFile);
-        System.out.println(MARKER + " - parameters: duration " + mediaFileDuration);
+        System.out.println(MARKER + " Images to media started.");
+        System.out.println(MARKER + " Parameters: incoming images directory " + imagesDir);
+        System.out.println(MARKER + " Parameters: output directory " + outputMediaDirectory);
+        System.out.println(MARKER + " Parameters: output media file " + outputMediaFile);
+        System.out.println(MARKER + " Parameters: duration " + mediaFileDuration);
 
         if (!outputMediaDirectory.endsWith("/")) {
             outputMediaDirectory = outputMediaDirectory + "/";
@@ -53,10 +50,12 @@ public class Recording {
             List<BufferedImage> bufferedImageList = getBufferedImageListFromDir(imagesDir);
             imageListToMediaFile(bufferedImageList, outputMediaDirectory + outputMediaFile, null, null, mediaFileDuration);
         } catch (Exception e) {
-            System.out.println(MARKER + " - failed to create media file from images cause: " + e.getMessage());
+            System.out.println(MARKER + " Failed to create media file from images cause: " + e.getMessage());
+            return false;
         }
 
-        System.out.println(MARKER + " - images to media finished.");
+        System.out.println(MARKER + " Images to media finished.");
+        return true;
     }
 
     /**
@@ -66,7 +65,7 @@ public class Recording {
      * @return bufferedImageList - list of BufferedImage objects
      */
     private static List<BufferedImage> getBufferedImageListFromDir(String directory) throws IOException {
-        System.out.println(MARKER + " - get BufferedImage list from directory "+ directory);
+        System.out.println(MARKER + " Get BufferedImage list from directory "+ directory);
 
         List<BufferedImage> bufferedImageList = new ArrayList<>();
         File[] listOfFiles = new File(directory).listFiles();
@@ -98,21 +97,12 @@ public class Recording {
     private static void imageListToMediaFile(List<BufferedImage> bufferedImageList, String fileName, String formatName,
                                              String codecName, int duration) throws AWTException, InterruptedException, IOException {
 
-        System.out.println(MARKER + " - image list to media file");
+        System.out.println(MARKER + " Image list to media file");
 
-        /* Set expected dimensions basing on first image from list */
-        BufferedImage firstScreenshotImage = bufferedImageList.get(0);
-        imageWidth = firstScreenshotImage.getWidth();
-        imageHeight = firstScreenshotImage.getHeight();
-        if (imageWidth % 2 != 0) {
-            imageWidth++;
-        }
-        if (imageHeight % 2 != 0) {
-            imageHeight++;
-        }
+        setMediaDimensions(bufferedImageList);
 
         /* Define video frame rate and frame size  */
-        final Rectangle screenbounds = new Rectangle(0, 0, imageWidth, imageHeight);
+        final Rectangle screenbounds = new Rectangle(0, 0, getOutputMediaWidth(), getOutputMediaHeight());
         int ratio = 1;
         int imagesCount = bufferedImageList.size();
         if (duration != 0 && imagesCount != 0) {
@@ -174,7 +164,7 @@ public class Recording {
             if (converter == null) {
                 String converterDescriptor = findDescriptor(screen);
                 converter = MediaPictureConverterFactory.createConverter(converterDescriptor, picture.getFormat(),
-                        imageWidth, imageHeight);
+                        getOutputMediaWidth(), getOutputMediaHeight());
             }
             converter.toPicture(picture, screen, i);
 
@@ -198,6 +188,32 @@ public class Recording {
         muxer.close();
     }
 
+    /**
+     *  Set output media dimension basing on biggest dimension from images list
+     */
+    private static void setMediaDimensions(List<BufferedImage> bufferedImageList) throws AWTException, InterruptedException, IOException {
+
+        System.out.println(MARKER + " Set media dimensions");
+
+        int tempWidth = 0;
+        int tempHeight = 0;
+        for(BufferedImage bi : bufferedImageList){
+            if(bi.getWidth() > tempWidth) {tempWidth = bi.getWidth();}
+            if(bi.getHeight() > tempHeight) {tempHeight = bi.getHeight();}
+        }
+
+        if (tempWidth % 2 != 0) {
+            tempWidth++;
+        }
+        if (tempHeight % 2 != 0) {
+            tempHeight++;
+        }
+
+        setOutputMediaWidth(tempWidth);
+        setOutputMediaHeight(tempHeight);
+
+        System.out.println(MARKER + " Media width " + tempWidth + ", height = " + tempHeight);
+    }
 
     /**
      * Convert BufferedImage to specified type.
@@ -213,10 +229,26 @@ public class Recording {
         if (sourceImage.getType() == targetType) {
             image = sourceImage;
         } else {
-            image = new BufferedImage(imageWidth,
-                    imageHeight, targetType);
+            image = new BufferedImage(getOutputMediaWidth(),
+                    getOutputMediaHeight(), targetType);
             image.getGraphics().drawImage(sourceImage, 0, 0, null);
         }
         return image;
+    }
+
+    private static int getOutputMediaWidth() {
+        return outputMediaWidth;
+    }
+
+    private static void setOutputMediaWidth(int outputMediaWidth) {
+        Recording.outputMediaWidth = outputMediaWidth;
+    }
+
+    private static int getOutputMediaHeight() {
+        return outputMediaHeight;
+    }
+
+    private static void setOutputMediaHeight(int outputMediaHeight) {
+        Recording.outputMediaHeight = outputMediaHeight;
     }
 }

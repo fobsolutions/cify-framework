@@ -62,14 +62,14 @@ class RecordingController {
             LOG.debug(MARKER, "Stop recording...")
             device.isRecording = false
 
-            Recording.imagesToMedia(
+            boolean success = Recording.imagesToMedia(
                     getVideoDirForDevice(device) + TEMP,
                     getRecordingDuration(device),
                     getVideoDirForDevice(device),
                     device.id + new Date() + OUTPUT_MEDIA_FORMAT
             )
 
-            deleteTemporaryImages(device)
+            if(success){deleteTemporaryImages(device)}
         } catch (ignored) {
         }
     }
