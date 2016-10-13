@@ -42,7 +42,10 @@ class RecordingController {
                         LOG.debug(MARKER, "Recording stopped cause: " + all.message)
                         device.isRecording = false
                     }
+
                 }
+
+                stopRecording(device)
             }
         }
     }

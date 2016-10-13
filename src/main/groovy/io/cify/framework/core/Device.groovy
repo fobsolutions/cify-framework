@@ -132,10 +132,6 @@ class Device implements IDevice {
             setCapability("app_package", appPackage)
             createDriver()
 
-            if (System.getProperty("videoRecord") == "true") {
-                startRecording()
-            }
-
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to open app $app, $appActivity, $appPackage")
@@ -158,10 +154,6 @@ class Device implements IDevice {
             }
             createDriver()
             getDriver().get(url)
-
-            if (System.getProperty("videoRecord") == "true") {
-                startRecording()
-            }
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
@@ -190,15 +182,15 @@ class Device implements IDevice {
      * */
     @Override
     void quit() {
+
+        if (isRecording) {
+            RecordingController.takeScreenshot(this)
+        }
+        stopRecording()
+
         if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
-
-            if (isRecording) {
-                RecordingController.takeScreenshot(this)
-            }
-
             getDriver().quit()
-            stopRecording()
         }
     }
 
@@ -225,6 +217,10 @@ class Device implements IDevice {
         quit()
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
+
+        if (System.getProperty("videoRecord") == "true") {
+            startRecording()
+        }
     }
 
     /**

@@ -303,6 +303,7 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     void quitAllDevices() {
+        LOG.debug(MARKER, "Quit all active devices -------- !!!!!! ")
         LOG.debug(MARKER, "Quit all active devices")
         devices.each { device ->
             device.quit()
