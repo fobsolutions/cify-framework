@@ -77,7 +77,7 @@ class RecordingController {
     public static void takeScreenshot(Device device) {
         try {
             File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-            FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + device.id + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+            FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + device.id + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
         } catch (all) {
             LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
         }
@@ -87,10 +87,15 @@ class RecordingController {
      * Get recording time
      * */
     public static int getRecordingDuration(Device device) {
-        File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
-        File[] screenshots = screenshotFolder.listFiles()
-        long duration = screenshots.last().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong() - screenshots.first().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong()
-        return TimeUnit.MILLISECONDS.toSeconds(duration)
+        try {
+            File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
+            File[] screenshots = screenshotFolder.listFiles()
+            long duration = screenshots.last().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong() - screenshots.first().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong()
+            return TimeUnit.MILLISECONDS.toSeconds(duration)
+        } catch (all) {
+            LOG.debug("Failed to get video duration from screenshots cause: " + all.message)
+            return 0
+        }
     }
 
     /**
