@@ -31,8 +31,7 @@ class RecordingController {
             if (new File(getVideoPathForDevice(device) + "temp/").mkdirs()) {
                 while (device.hasDriver() && device.isRecording) {
                     try {
-                        File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-                        FileUtils.copyFile(scrFile, new File(getVideoPathForDevice(device) + "temp/" + device.id + System.currentTimeMillis() + ".png"))
+                        takeScreenshot(device)
                     } catch (all) {
                         LOG.debug(MARKER, "Recording stopped cause: " + all.message)
                         device.isRecording = false
@@ -62,6 +61,20 @@ class RecordingController {
 
             deleteTemporaryImages(device)
         } catch (ignored) {
+        }
+    }
+
+    /**
+     * Take screenshot
+     *
+     * @param device - device to stop recording
+     * */
+    public static void takeScreenshot(Device device) {
+        try {
+            File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
+            FileUtils.copyFile(scrFile, new File(getVideoPathForDevice(device) + "temp/" + device.id + System.currentTimeMillis() + ".png"))
+        } catch (all) {
+            LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
         }
     }
 
