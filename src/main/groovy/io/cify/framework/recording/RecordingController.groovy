@@ -9,6 +9,8 @@ import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.TakesScreenshot
 
+import java.nio.file.Files
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.TimeUnit
 
 /**
@@ -42,7 +44,10 @@ class RecordingController {
                         LOG.debug(MARKER, "Recording stopped cause: " + all.message)
                         device.isRecording = false
                     }
+
                 }
+
+                stopRecording(device)
             }
         }
     }
@@ -61,7 +66,7 @@ class RecordingController {
                     getVideoDirForDevice(device) + TEMP,
                     getRecordingDuration(device),
                     getVideoDirForDevice(device),
-                    device.id + new Date().time + OUTPUT_MEDIA_FORMAT
+                    device.id + new Date() + OUTPUT_MEDIA_FORMAT
             )
 
             deleteTemporaryImages(device)
