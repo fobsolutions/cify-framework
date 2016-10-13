@@ -132,9 +132,9 @@ class Device implements IDevice {
             setCapability("app_package", appPackage)
             createDriver()
 
-            //if (System.getProperty("record") == "true") {
-            startRecording()
-            //}
+            if (System.getProperty("videoRecord") == "true") {
+                startRecording()
+            }
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
@@ -159,9 +159,9 @@ class Device implements IDevice {
             createDriver()
             getDriver().get(url)
 
-            //if (System.getProperty("record") == "true") {
-            startRecording()
-            //}
+            if (System.getProperty("videoRecord") == "true") {
+                startRecording()
+            }
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
@@ -192,6 +192,11 @@ class Device implements IDevice {
     void quit() {
         if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
+
+            if (isRecording) {
+                RecordingController.takeScreenshot(this)
+            }
+
             getDriver().quit()
             stopRecording()
         }

@@ -25,7 +25,6 @@ class DeviceTest extends GroovyTestCase {
         browserDevice = new Device(browserDeviceId, DeviceCategory.BROWSER, browserCaps)
     }
 
-
     void testShouldHaveCorrectId() {
         assert androidDevice.getId().is(androidDeviceId)
     }
