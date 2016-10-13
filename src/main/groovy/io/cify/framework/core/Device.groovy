@@ -10,6 +10,7 @@ import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
+
 /**
  * Created by FOB Solutions
  *
@@ -213,7 +214,7 @@ class Device implements IDevice {
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
 
-        if (System.getProperty("videoRecord") == "true") {
+        if (DeviceManager.getConfiguration().videoRecord) {
             startRecording()
         }
     }

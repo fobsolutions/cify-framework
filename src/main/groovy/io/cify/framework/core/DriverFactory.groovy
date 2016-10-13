@@ -65,6 +65,40 @@ class DriverFactory {
     }
 
     /**
+     * Merge capabilities provided by user with default capabilities
+     *
+     * @param desiredCapabilities provided capabilities
+     *
+     * @return DesiredCapabilities
+     * */
+    private static DesiredCapabilities mergeCapabilitiesWithDefault(DesiredCapabilities desiredCapabilities) {
+        Capability capability = Capability.valueOf((desiredCapabilities.getCapability(CAPABILITY) as String).toUpperCase())
+
+        switch (capability) {
+            case Capability.CHROME:
+                return DesiredCapabilities.chrome().merge(desiredCapabilities)
+            case Capability.FIREFOX:
+                return DesiredCapabilities.firefox().merge(desiredCapabilities)
+            case Capability.OPERA:
+                return DesiredCapabilities.operaBlink().merge(desiredCapabilities)
+            case Capability.SAFARI:
+                return DesiredCapabilities.safari().merge(desiredCapabilities)
+            case Capability.ANDROID:
+                return DesiredCapabilities.android().merge(desiredCapabilities)
+            case Capability.IPHONE:
+                return DesiredCapabilities.iphone().merge(desiredCapabilities)
+            case Capability.IPAD:
+                return DesiredCapabilities.ipad().merge(desiredCapabilities)
+            case Capability.INTERNETEXPLORER:
+                return DesiredCapabilities.internetExplorer().merge(desiredCapabilities)
+            case Capability.EDGE:
+                return DesiredCapabilities.edge().merge(desiredCapabilities)
+            default:
+                throw new CifyFrameworkException("Not supported capability $capability")
+        }
+    }
+
+    /**
      * Creates web driver for given capabilities
      *
      * @param capability capability
@@ -73,6 +107,8 @@ class DriverFactory {
      * */
     private static WebDriver createWebDriver(Capability capability, DesiredCapabilities desiredCapabilities) {
         LOG.debug(MARKER, "Create $capability web driver with desired capabilities $desiredCapabilities")
+
+        desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)
 
         switch (capability) {
             case Capability.CHROME:
@@ -114,6 +150,8 @@ class DriverFactory {
     private
     static WebDriver createRemoteDriver(Capability capability, DesiredCapabilities desiredCapabilities, URL url) {
         LOG.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
+
+        desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)
 
         switch (capability) {
             case Capability.IPAD:

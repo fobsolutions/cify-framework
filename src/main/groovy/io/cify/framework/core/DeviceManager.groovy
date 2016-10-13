@@ -1,5 +1,8 @@
 package io.cify.framework.core
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import groovy.json.internal.LazyMap
 import io.cify.framework.core.interfaces.IDeviceManager
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -24,26 +27,9 @@ class DeviceManager implements IDeviceManager {
      * System property to be used to pass capabilities to Device Manager
      * */
     public static final String SYSTEM_PROPERTY_CAPABILITIES = "capabilities"
+    public static Configuration configuration
 
-    /**
-     * Json string of supported capabilities
-     * */
-    public static final String SUPPORTED_CAPABILITIES = '''
-        {
-            "browser" : {
-                "capability" : "chrome",
-            },
-            "android" : {
-                "capability" : "android",
-                "version" : ""
-            },
-            "ios" : {
-                "capability" : "iphone",
-                "version" : ""
-            }
-        }
-    '''
-
+    private static final String CONFIGURATION_FILE = "configuration.json"
     private Capabilities capabilities
     private List<Device> devices = []
     private static volatile DeviceManager instance
@@ -54,10 +40,11 @@ class DeviceManager implements IDeviceManager {
     public DeviceManager() {
         LOG.debug(MARKER, 'Create new DeviceManager')
         try {
-            String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES, SUPPORTED_CAPABILITIES)
+            configuration = readFrameworkConfiguration()
+            String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES, JsonOutput.toJson(configuration.capabilities))
             this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
         } catch (all) {
-            LOG.debug(MARKER,all.message,all)
+            LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message")
         }
     }
@@ -77,6 +64,18 @@ class DeviceManager implements IDeviceManager {
             }
         }
         return instance
+    }
+
+    /**
+     * Get Framework configuration
+     *
+     * @return Configuration
+     */
+    public static Configuration getConfiguration() {
+        if (configuration.is(null)) {
+            getInstance()
+        }
+        return configuration
     }
 
     /**
@@ -132,8 +131,8 @@ class DeviceManager implements IDeviceManager {
             Device device = new Device(deviceId, category, desiredCapabilities)
             devices.add(device)
 
-        } catch (all)   {
-            LOG.debug(MARKER,all.message,all)
+        } catch (all) {
+            LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to create device.")
         }
 
@@ -212,7 +211,6 @@ class DeviceManager implements IDeviceManager {
         }
     }
 
-
     /**
      * Returns first active device
      *
@@ -223,8 +221,8 @@ class DeviceManager implements IDeviceManager {
         LOG.debug(MARKER, "Get first active device")
         try {
             return devices.first()
-        }catch(all){
-            LOG.debug(MARKER,all.message,all)
+        } catch (all) {
+            LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("No active device found")
         }
     }
@@ -261,14 +259,14 @@ class DeviceManager implements IDeviceManager {
     @Override
     Device getActiveDevice(String deviceId) {
         LOG.debug(MARKER, "Find active device with id $deviceId")
-            Device device = devices.find { device ->
-                device.getId() == deviceId
-            }
-            if (device == null) {
-                LOG.debug(MARKER, "No active device with id $deviceId found")
-                throw new CifyFrameworkException("No active device with id $deviceId found")
-            }
-            return device
+        Device device = devices.find { device ->
+            device.getId() == deviceId
+        }
+        if (device == null) {
+            LOG.debug(MARKER, "No active device with id $deviceId found")
+            throw new CifyFrameworkException("No active device with id $deviceId found")
+        }
+        return device
     }
 
     /**
@@ -331,5 +329,17 @@ class DeviceManager implements IDeviceManager {
     private static String generateRandomDeviceId() {
         def uuid = randomUUID() as String
         return uuid.toUpperCase()
+    }
+
+    /**
+     * Read configuration json
+     * */
+    private static Configuration readFrameworkConfiguration() {
+        File configurationFile = new File(CONFIGURATION_FILE)
+        if (!configurationFile.exists()) {
+            throw new FileNotFoundException("Cannot find configuration file! Please add configuration.json to project root!")
+        }
+        LazyMap configurationMap = new JsonSlurper().parseText(configurationFile.text) as LazyMap
+        return new Configuration(configurationMap)
     }
 }
