@@ -13,11 +13,17 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Created by FOB Solutions
+ *
+ * Responsible for recording activities
  */
 class RecordingController {
 
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
-    private static final Marker MARKER = MarkerManager.getMarker('RECORDING') as Marker
+    private static final Marker MARKER = MarkerManager.getMarker('RECORDING CONTROLLER') as Marker
+
+    private static final String OUTPUT_MEDIA_FORMAT = ".mp4"
+    private static final String OUTPUT_SCREENSHOT_FORMAT = ".png"
+    private static final String TEMP = "temp"
 
     /**
      * Start recording
@@ -28,7 +34,7 @@ class RecordingController {
         LOG.debug(MARKER, "Start recording...")
         Thread.start(device.id + "_recorder") {
             device.isRecording = true
-            if (new File(getVideoPathForDevice(device) + "temp/").mkdirs()) {
+            if (new File(getVideoDirForDevice(device) + TEMP).mkdirs()) {
                 while (device.hasDriver() && device.isRecording) {
                     try {
                         takeScreenshot(device)
@@ -49,14 +55,13 @@ class RecordingController {
     public static void stopRecording(Device device) {
         try {
             LOG.debug(MARKER, "Stop recording...")
-            LOG.debug(MARKER, "Video duration was " + getRecordingDuration(device) + " for device " + device.id)
             device.isRecording = false
 
-            Recording.screenshotsToVideo(
-                    getVideoPathForDevice(device) + "temp",
+            Recording.imagesToMedia(
+                    getVideoDirForDevice(device) + TEMP,
                     getRecordingDuration(device),
-                    getVideoPathForDevice(device),
-                    device.id + new Date().time + ".mp4"
+                    getVideoDirForDevice(device),
+                    device.id + new Date().time + OUTPUT_MEDIA_FORMAT
             )
 
             deleteTemporaryImages(device)
@@ -67,12 +72,12 @@ class RecordingController {
     /**
      * Take screenshot
      *
-     * @param device - device to stop recording
+     * @param device - device to take screenshot
      * */
     public static void takeScreenshot(Device device) {
         try {
             File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-            FileUtils.copyFile(scrFile, new File(getVideoPathForDevice(device) + "temp/" + device.id + System.currentTimeMillis() + ".png"))
+            FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + device.id + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
         } catch (all) {
             LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
         }
@@ -82,17 +87,17 @@ class RecordingController {
      * Get recording time
      * */
     public static int getRecordingDuration(Device device) {
-        File screenshotFolder = new File(getVideoPathForDevice(device) + "temp")
+        File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
         File[] screenshots = screenshotFolder.listFiles()
-        long duration = screenshots.last().getName().replace(device.id, "").replace(".png", "").toLong() - screenshots.first().getName().replace(device.id, "").replace(".png", "").toLong()
+        long duration = screenshots.last().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong() - screenshots.first().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong()
         return TimeUnit.MILLISECONDS.toSeconds(duration)
     }
 
     /**
      * Gets video path
      * */
-    private static String getVideoPathForDevice(Device device) {
-        return System.getProperty("videoPath", "build/cify/videos/") +
+    private static String getVideoDirForDevice(Device device) {
+        return System.getProperty("videoDir", "build/cify/videos/") +
                 System.getProperty("task", "plug-and-play") +
                 "/" +
                 device.id +
@@ -103,7 +108,7 @@ class RecordingController {
      * Delete temporary screenshots
      * */
     private static void deleteTemporaryImages(Device device) {
-        File screenshotFolder = new File(getVideoPathForDevice(device) + "temp")
+        File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
         screenshotFolder.deleteDir()
     }
 }

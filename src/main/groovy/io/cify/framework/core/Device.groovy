@@ -132,7 +132,7 @@ class Device implements IDevice {
             setCapability("app_package", appPackage)
             createDriver()
 
-            if (System.getProperty("record") == "true") {
+            if (System.getProperty("videoRecord") == "true") {
                 startRecording()
             }
 
@@ -159,7 +159,7 @@ class Device implements IDevice {
             createDriver()
             getDriver().get(url)
 
-            if (System.getProperty("record") == "true") {
+            if (System.getProperty("videoRecord") == "true") {
                 startRecording()
             }
 
