@@ -219,7 +219,7 @@ class Device implements IDevice {
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
 
-        if (DeviceManager.getConfiguration().videoRecord) {
+        if (System.getProperty("videoRecord") == "true") {
             startRecording()
         }
     }

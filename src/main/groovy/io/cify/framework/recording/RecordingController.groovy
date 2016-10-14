@@ -1,7 +1,6 @@
 package io.cify.framework.recording
 
 import io.cify.framework.core.Device
-import io.cify.framework.core.DeviceManager
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -104,7 +103,7 @@ class RecordingController {
      * Gets video path
      * */
     private static String getVideoDirForDevice(Device device) {
-        return DeviceManager.getConfiguration().videoDir +
+        return System.getProperty("videoDir") +
                 System.getProperty("task", "plug-and-play") +
                 "/" +
                 device.id +
