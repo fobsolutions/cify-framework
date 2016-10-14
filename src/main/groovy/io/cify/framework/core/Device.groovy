@@ -183,9 +183,14 @@ class Device implements IDevice {
      * */
     @Override
     void quit() {
-        isRecording=false
+        if (isRecording) {
+            RecordingController.takeScreenshot(this)
+            isRecording = false
+        }
+
         if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
+            stopRecording()
             getDriver().quit()
         }
     }
@@ -214,7 +219,7 @@ class Device implements IDevice {
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
 
-        if (DeviceManager.getConfiguration().videoRecord) {
+        if (System.getProperty("videoRecord") == "true") {
             startRecording()
         }
     }

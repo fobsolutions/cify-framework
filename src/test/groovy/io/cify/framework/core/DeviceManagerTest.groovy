@@ -310,10 +310,6 @@ class DeviceManagerTest extends GroovyTestCase {
         assert deviceManager.getAllActiveDevices(category1).size() == 0
     }
 
-    void testGetConfiguration() {
-        assert !DeviceManager.getConfiguration().is(null)
-    }
-
     void tearDown() {
         System.clearProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES)
     }

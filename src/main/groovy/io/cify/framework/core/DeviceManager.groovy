@@ -1,8 +1,5 @@
 package io.cify.framework.core
 
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
-import groovy.json.internal.LazyMap
 import io.cify.framework.core.interfaces.IDeviceManager
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -27,9 +24,7 @@ class DeviceManager implements IDeviceManager {
      * System property to be used to pass capabilities to Device Manager
      * */
     public static final String SYSTEM_PROPERTY_CAPABILITIES = "capabilities"
-    public static Configuration configuration
 
-    private static final String CONFIGURATION_FILE = "configuration.json"
     private Capabilities capabilities
     private List<Device> devices = []
     private static volatile DeviceManager instance
@@ -40,8 +35,8 @@ class DeviceManager implements IDeviceManager {
     public DeviceManager() {
         LOG.debug(MARKER, 'Create new DeviceManager')
         try {
-            configuration = readFrameworkConfiguration()
-            String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES, JsonOutput.toJson(configuration.capabilities))
+            Configuration.setupFrameworkConfiguration()
+            String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES)
             this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
@@ -64,18 +59,6 @@ class DeviceManager implements IDeviceManager {
             }
         }
         return instance
-    }
-
-    /**
-     * Get Framework configuration
-     *
-     * @return Configuration
-     */
-    public static Configuration getConfiguration() {
-        if (configuration.is(null)) {
-            getInstance()
-        }
-        return configuration
     }
 
     /**
@@ -329,17 +312,5 @@ class DeviceManager implements IDeviceManager {
     private static String generateRandomDeviceId() {
         def uuid = randomUUID() as String
         return uuid.toUpperCase()
-    }
-
-    /**
-     * Read configuration json
-     * */
-    private static Configuration readFrameworkConfiguration() {
-        File configurationFile = new File(CONFIGURATION_FILE)
-        if (!configurationFile.exists()) {
-            throw new FileNotFoundException("Cannot find configuration file! Please add configuration.json to project root!")
-        }
-        LazyMap configurationMap = new JsonSlurper().parseText(configurationFile.text) as LazyMap
-        return new Configuration(configurationMap)
     }
 }
