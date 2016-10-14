@@ -65,13 +65,12 @@ public class Recording {
      * @return bufferedImageList - list of BufferedImage objects
      */
     private static List<BufferedImage> getBufferedImageListFromDir(String directory) throws IOException {
-        System.out.println(MARKER + " Get BufferedImage list from directory "+ directory);
+        System.out.println(MARKER + " Get BufferedImage list from directory " + directory);
 
         List<BufferedImage> bufferedImageList = new ArrayList<>();
         File[] listOfFiles = new File(directory).listFiles();
 
-        assert listOfFiles != null;
-        for (File listOfFile : listOfFiles) {
+        for (File listOfFile : listOfFiles != null ? listOfFiles : new File[0]) {
             if (listOfFile.isFile()) {
                 String filename = listOfFile.getName();
 
@@ -189,7 +188,7 @@ public class Recording {
     }
 
     /**
-     *  Set output media dimension basing on biggest dimension from images list
+     * Set output media dimension basing on biggest dimension from images list
      */
     private static void setMediaDimensions(List<BufferedImage> bufferedImageList) throws AWTException, InterruptedException, IOException {
 
@@ -197,9 +196,13 @@ public class Recording {
 
         int tempWidth = 0;
         int tempHeight = 0;
-        for(BufferedImage bi : bufferedImageList){
-            if(bi.getWidth() > tempWidth) {tempWidth = bi.getWidth();}
-            if(bi.getHeight() > tempHeight) {tempHeight = bi.getHeight();}
+        for (BufferedImage bi : bufferedImageList) {
+            if (bi.getWidth() > tempWidth) {
+                tempWidth = bi.getWidth();
+            }
+            if (bi.getHeight() > tempHeight) {
+                tempHeight = bi.getHeight();
+            }
         }
 
         if (tempWidth % 2 != 0) {
