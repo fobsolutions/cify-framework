@@ -43,10 +43,7 @@ class RecordingController {
                         LOG.debug(MARKER, "Recording stopped cause: " + all.message)
                         device.isRecording = false
                     }
-
                 }
-
-                stopRecording(device)
             }
         }
     }
@@ -67,8 +64,9 @@ class RecordingController {
                     getVideoDirForDevice(device),
                     device.id + new Date() + OUTPUT_MEDIA_FORMAT
             )
-
-            if(success){deleteTemporaryImages(device)}
+            if (success) {
+                deleteTemporaryImages(device)
+            }
         } catch (ignored) {
         }
     }

@@ -183,9 +183,14 @@ class Device implements IDevice {
      * */
     @Override
     void quit() {
-        isRecording=false
+        if (isRecording) {
+            RecordingController.takeScreenshot(this)
+            isRecording = false
+        }
+
         if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
+            stopRecording()
             getDriver().quit()
         }
     }
