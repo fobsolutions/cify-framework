@@ -1,8 +1,8 @@
 package io.cify.framework
 
 import io.appium.java_client.pagefactory.AppiumFieldDecorator
-import io.cify.framework.core.DeviceManager
 import io.cify.framework.core.Device
+import io.cify.framework.core.DeviceManager
 import org.openqa.selenium.support.PageFactory
 
 import java.util.concurrent.TimeUnit

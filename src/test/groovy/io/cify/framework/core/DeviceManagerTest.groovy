@@ -28,15 +28,6 @@ class DeviceManagerTest extends GroovyTestCase {
 
     private String capsBadJson = '!!!!!!'
 
-
-    void testShouldUseSupportedCapabilities() {
-        Capabilities capabilities = new DeviceManager().getCapabilities()
-        Capabilities supportedCapabilities = new JsonSlurper().parseText(DeviceManager.SUPPORTED_CAPABILITIES) as Capabilities
-
-        assert capabilities.toPrettyString() == supportedCapabilities.toPrettyString()
-    }
-
-
     void testShouldUseProvidedCapabilities() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
@@ -45,7 +36,6 @@ class DeviceManagerTest extends GroovyTestCase {
 
         assert capabilities.toPrettyString() == systemProperties.toPrettyString()
     }
-
 
     void testShouldFailUsingIncorrectCapabilities() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, capsBadJson)
@@ -320,6 +310,9 @@ class DeviceManagerTest extends GroovyTestCase {
         assert deviceManager.getAllActiveDevices(category1).size() == 0
     }
 
+    void testGetConfiguration() {
+        assert !DeviceManager.getConfiguration().is(null)
+    }
 
     void tearDown() {
         System.clearProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES)

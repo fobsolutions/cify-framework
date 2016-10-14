@@ -40,7 +40,7 @@ class DeviceTest extends GroovyTestCase {
 
     void testShouldHaveCorrectCapability() {
         browserDevice.setCapability('version', '52.0')
-        assert browserDevice.getCapabilities().getCapability('version') == '52.0'
+        assert browserDevice.getCapabilities().getCapability('version').is('52.0')
     }
 
     void testShouldFailToOpenEmptyAppOnDevice() {

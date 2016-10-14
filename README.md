@@ -24,6 +24,41 @@ dependencies {
 }
 ```
 
+### Framework configuration
+
+When framework is used as a standalone project, then user should provide framework configuration.
+
+Framework configuration must be defined in configuration.json file located in project root.
+Configuration must contain all needed devices and their capabilities.
+Optionally, configuration could contain framework parameters. 
+
+configuration.json example:
+```
+{
+  "videoRecord": false,
+  "videoDir": "build/cify/videos/",
+  "capabilities": {
+    "android": {
+      "capability": "android"
+    },
+    "browser": {
+      "capability": "firefox"
+    },
+    "ios": {
+      "capability": "iphone"
+    }
+  }
+}
+
+```
+
+
+**videoRecord** - Enable web driver video recording.
+
+**videoDir** - Directory where videos are saved.
+
+**capabilities** - Are used when user right clicks on scenarios or feature and press run. Capability with given category is taken and triggered.
+
 ### Actions
 
 Actions are activities that user can do on specific page. To make it work on different platforms and screen sizes user can make interface for actions and implement it for every device group if needed.
