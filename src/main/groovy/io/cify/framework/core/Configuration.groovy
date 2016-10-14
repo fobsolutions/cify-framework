@@ -26,7 +26,12 @@ class Configuration {
     private static void mergeCommandLindAndFileContent() {
         LazyMap configMap = readFrameworkConfigurationFile()
         configMap.each {
-            String value = System.getProperty(it.getKey() as String, JsonOutput.toJson(it.getValue()))
+            String value
+            if (it.getKey() == "capabilities") {
+                value = System.getProperty(it.getKey() as String, JsonOutput.toJson(it.getValue()))
+            } else {
+                value = System.getProperty(it.getKey() as String, it.getValue() as String)
+            }
             System.setProperty(it.getKey() as String, value)
         }
     }
