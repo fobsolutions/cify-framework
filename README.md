@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.cify:cify-framework:1.0.0'
+    compile 'io.cify:cify-framework:1.1.0'
 }
 ```
 
