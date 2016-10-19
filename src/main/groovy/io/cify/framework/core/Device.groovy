@@ -129,8 +129,8 @@ class Device implements IDevice {
                 throw new CifyFrameworkException("App is not valid")
             }
             setCapability("app", app)
-            setCapability("app_activity", appActivity)
-            setCapability("app_package", appPackage)
+            setCapability("appActivity", appActivity)
+            setCapability("appPackage", appPackage)
             createDriver()
 
         } catch (all) {
