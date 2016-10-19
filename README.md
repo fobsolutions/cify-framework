@@ -37,6 +37,9 @@ configuration.json example:
 {
   "videoRecord": false,
   "videoDir": "build/cify/videos/",
+  "credentials": {
+    "testdroid_apiKey": "secret"
+  },
   "capabilities": {
     "android": {
       "capability": "android"
@@ -58,6 +61,8 @@ configuration.json example:
 **videoDir** - Directory where videos are saved.
 
 **capabilities** - Are used when user right clicks on scenarios or feature and press run. Capability with given category is taken and triggered.
+
+**credentials** - Remote device farm providers credentials to be added to capabilities. Optional.
 
 ### Actions
 
