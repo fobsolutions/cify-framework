@@ -51,11 +51,11 @@ class Configuration {
      * @return LazyMap - Configuration map
      * */
     private static LazyMap readFrameworkConfigurationFile() {
-        File configurationFile = new File(CONFIGURATION_FILE)
         if (System.getProperty(TASK_NAME)) {
             LOG.warn(MARKER, "Using configuration parameters from Cify-Runner...")
             return [:]
         } else {
+            File configurationFile = new File(CONFIGURATION_FILE)
             if (!configurationFile.exists()) {
                 throw new FileNotFoundException("Cannot find configuration file! Please add configuration.json to project root!")
             }
