@@ -1,5 +1,7 @@
 package io.cify.framework.core
 
+import groovy.json.JsonSlurper
+import groovy.json.internal.LazyMap
 import io.cify.framework.core.interfaces.IDeviceManager
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -25,9 +27,15 @@ class DeviceManager implements IDeviceManager {
      * */
     public static final String SYSTEM_PROPERTY_CAPABILITIES = "capabilities"
 
+    /**
+     * System property to be used to pass credentials of device farm providers to Device Manager
+     */
+    public static final String SYSTEM_PROPERTY_CREDENTIALS = "credentials"
+
     private Capabilities capabilities
     private List<Device> devices = []
     private static volatile DeviceManager instance
+    private LazyMap credentials
 
     /**
      * Default constructor for Device Manager
@@ -36,8 +44,12 @@ class DeviceManager implements IDeviceManager {
         LOG.debug(MARKER, 'Create new DeviceManager')
         try {
             Configuration.setupFrameworkConfiguration()
+
             String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES)
             this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
+
+            String credentialsRaw = System.getProperty(SYSTEM_PROPERTY_CREDENTIALS)
+            this.credentials = new JsonSlurper().parseText(credentialsRaw) as LazyMap
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message")
@@ -107,8 +119,13 @@ class DeviceManager implements IDeviceManager {
             }
 
             DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category)
+
             if (desiredCapabilities.asMap().isEmpty()) {
                 throw new CifyFrameworkException("Failed to create device. No capabilities provided for $category")
+            }
+
+            credentials.each { key, value ->
+                desiredCapabilities.setCapability(key, value)
             }
 
             Device device = new Device(deviceId, category, desiredCapabilities)

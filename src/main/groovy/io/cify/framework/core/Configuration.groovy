@@ -27,7 +27,7 @@ class Configuration {
         LazyMap configMap = readFrameworkConfigurationFile()
         configMap.each {
             String value
-            if (it.getKey() == "capabilities") {
+            if (it.getKey() == DeviceManager.SYSTEM_PROPERTY_CAPABILITIES ||it.getKey() == DeviceManager.SYSTEM_PROPERTY_CREDENTIALS) {
                 value = System.getProperty(it.getKey() as String, JsonOutput.toJson(it.getValue()))
             } else {
                 value = System.getProperty(it.getKey() as String, it.getValue() as String)
