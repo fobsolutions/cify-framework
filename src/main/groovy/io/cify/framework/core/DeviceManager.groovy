@@ -48,7 +48,7 @@ class DeviceManager implements IDeviceManager {
             String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES)
             this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
 
-            String credentialsRaw = System.getProperty(SYSTEM_PROPERTY_CREDENTIALS)
+            String credentialsRaw = System.getProperty(SYSTEM_PROPERTY_CREDENTIALS, "{}")
             this.credentials = new JsonSlurper().parseText(credentialsRaw) as LazyMap
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
