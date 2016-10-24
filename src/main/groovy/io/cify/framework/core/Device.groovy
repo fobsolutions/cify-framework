@@ -185,12 +185,11 @@ class Device implements IDevice {
     void quit() {
         if (isRecording) {
             RecordingController.takeScreenshot(this)
-            isRecording = false
+            stopRecording()
         }
 
         if (hasDriver()) {
             LOG.debug(MARKER, "Quit device driver")
-            stopRecording()
             getDriver().quit()
         }
     }
