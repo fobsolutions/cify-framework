@@ -103,6 +103,20 @@ class Device implements IDevice {
     }
 
     /**
+     * Opens app on device without extra parameters
+     * */
+    @Override
+    void openApp() {
+        LOG.debug(MARKER, "Open app without extra parameters")
+        try {
+            createDriver()
+        } catch (all) {
+            LOG.debug(MARKER, all.message, all)
+            throw new CifyFrameworkException("Failed to open app")
+        }
+    }
+
+    /**
      * Opens app on device
      *
      * @param app
@@ -125,7 +139,7 @@ class Device implements IDevice {
     public void openApp(String app, String appActivity, String appPackage) {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
-            if (!validateApp(app, appActivity, appPackage)) {
+            if (!validateApp(app)) {
                 throw new CifyFrameworkException("App is not valid")
             }
             setCapability("app", app)
@@ -232,7 +246,7 @@ class Device implements IDevice {
      *
      * @return boolean
      * */
-    private boolean validateApp(String app, String appActivity, String appPackage) {
+    private boolean validateApp(String app) {
         if (app == null || app.isEmpty()) {
             return false
         }
