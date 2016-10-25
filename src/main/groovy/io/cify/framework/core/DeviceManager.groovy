@@ -93,7 +93,33 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     Device createDevice(DeviceCategory category) {
-        return createDevice(category, generateRandomDeviceId())
+        return createDevice(category, generateRandomDeviceId(), new DesiredCapabilities())
+    }
+
+    /**
+     * Creates device of selected category and extra capabilities
+     *
+     * @param category device category
+     * @param extraCapabilities extra capabilities provided by user
+     *
+     * @return Device
+     */
+    @Override
+    Device createDevice(DeviceCategory category, DesiredCapabilities extraCapabilities) {
+        return createDevice(category, generateRandomDeviceId(), extraCapabilities)
+    }
+
+    /**
+     * Creates device of selected category and device id
+     *
+     * @param category device category
+     * @param deviceId unique device id
+     *
+     * @return Device
+     */
+    @Override
+    Device createDevice(DeviceCategory category, String deviceId) {
+        return createDevice(category, deviceId, new DesiredCapabilities())
     }
 
     /**
@@ -101,13 +127,14 @@ class DeviceManager implements IDeviceManager {
      *
      * @param category device category
      * @param deviceId unique device id
+     * @param extraCapabilities extra capabilities provided by user
      *
      * @return Device
      * @throws CifyFrameworkException  if device id is null or empty
      * @throws CifyFrameworkException  if active device with same id already exists
      */
     @Override
-    Device createDevice(DeviceCategory category, String deviceId) {
+    Device createDevice(DeviceCategory category, String deviceId, DesiredCapabilities extraCapabilities) {
         LOG.debug(MARKER, "Create new device with category $category and device id $deviceId")
         try {
 
@@ -118,7 +145,7 @@ class DeviceManager implements IDeviceManager {
                 throw new CifyFrameworkException("Failed to create device. Device with id $deviceId already exists")
             }
 
-            DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category)
+            DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category).merge(extraCapabilities)
 
             if (desiredCapabilities.asMap().isEmpty()) {
                 throw new CifyFrameworkException("Failed to create device. No capabilities provided for $category")
@@ -137,6 +164,18 @@ class DeviceManager implements IDeviceManager {
         }
 
         return getActiveDevice(deviceId)
+    }
+
+    /**
+     * Get desired capabilities for device category
+     *
+     * @param category device category
+     *
+     * @return DesiredCapabilities
+     */
+    @Override
+    DesiredCapabilities getCapabilities(DeviceCategory category) {
+        return capabilities.toDesiredCapabilities(category)
     }
 
     /**

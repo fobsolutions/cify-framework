@@ -1,6 +1,7 @@
 package io.cify.framework.core
 
 import groovy.json.JsonSlurper
+import org.openqa.selenium.remote.DesiredCapabilities
 
 class DeviceManagerTest extends GroovyTestCase {
 
@@ -90,6 +91,16 @@ class DeviceManagerTest extends GroovyTestCase {
         assert device.getId().is(deviceId)
     }
 
+    void testCreateDeviceWithExtraCapabilities() {
+        DeviceCategory category = DeviceCategory.ANDROID
+        Device device = new DeviceManager().createDevice(category, new DesiredCapabilities(["newParam": "newnew"]))
+        device.getCapabilities().getCapability("newParam") == "newnew"
+    }
+
+    void testGetCapabilitiesByDeviceType() {
+        DeviceCategory category = DeviceCategory.ANDROID
+        assert !DeviceManager.getInstance().getCapabilities(category).asMap().isEmpty()
+    }
 
     void testShouldCreateMultipleUniqueDevicesWithSameCategory() {
         DeviceManager deviceManager = new DeviceManager()

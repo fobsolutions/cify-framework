@@ -3,6 +3,7 @@ package io.cify.framework.core.interfaces
 import io.cify.framework.core.Capabilities
 import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceCategory
+import org.openqa.selenium.remote.DesiredCapabilities
 
 /**
  * Created by FOB Solutions
@@ -13,7 +14,13 @@ interface IDeviceManager {
 
     Device createDevice(DeviceCategory category)
 
+    Device createDevice(DeviceCategory category, DesiredCapabilities extraCapabilities)
+
     Device createDevice(DeviceCategory category, String deviceId)
+
+    Device createDevice(DeviceCategory category, String deviceId, DesiredCapabilities extraCapabilities)
+
+    DesiredCapabilities getCapabilities(DeviceCategory category)
 
     boolean hasActiveDevice(DeviceCategory category)
 
