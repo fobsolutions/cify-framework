@@ -147,22 +147,35 @@ class DriverFactory {
      *
      * @retun DesiredCapabilities
      * */
-    public static DesiredCapabilities replaceCapabilities(DesiredCapabilities capabilities) {
-        DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
+    private static DesiredCapabilities replaceCapabilities(DesiredCapabilities capabilities) {
         capabilities.asMap().each { key, value ->
-
-            def capabilityValue
-
-            if (System.getenv(key)) {
-                capabilityValue = System.getenv(key)
-            } else if (System.getProperty(key)) {
-                capabilityValue = System.getProperty(key)
-            } else {
-                capabilityValue = value
+            List<String> replaceList = value.findAll(/<replaceProperty:(.*?)>/)
+            replaceList.each {
+                value = value.toString().replace(it, getPropertyValue(it))
+                capabilities.setCapability(key, value)
             }
-            desiredCapabilities[key] = capabilityValue
         }
-        return desiredCapabilities
+        return capabilities
+    }
+
+    /**
+     * Gets property value from environment or system properties
+     *
+     * @param property
+     *
+     * @return String
+     * */
+    private static String getPropertyValue(String property) {
+
+        String value = property.toString().replace("<replaceProperty:", "").replace(">", "")
+
+        if (System.getenv(value)) {
+            return System.getenv(value)
+        } else if (System.getProperty(value)) {
+            return System.getProperty(value)
+        } else {
+            throw new CifyFrameworkException("Cannot find property named $value from System properties or Environment variables")
+        }
     }
 
     /**

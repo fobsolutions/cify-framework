@@ -72,7 +72,17 @@ User can override capability values with environment variables or system propert
 
  - Environment variable
  - System property
- - Capability value
+ 
+Example of replaceable capability
+
+```
+    "remote": "http://<replaceProperty:SAUCELABS_USERNAME>:<replaceProperty:SAUCELABS_ACCESSKEY>@ondemand.saucelabs.com:80/wd/hub"
+```
+
+In this case system will look for SAUCELABS_USERNAME, SAUCELABS_ACCESSKEY properties from environment or system properties and replaces the value.
+
+If there are no matches, then exception is thrown.
+
 
 ### Actions
 
