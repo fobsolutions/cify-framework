@@ -78,7 +78,7 @@ class RecordingController {
     public static void takeScreenshot(Device device) {
         try {
             File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-            FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + device.id + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+            FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
         } catch (all) {
             LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
         }

@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.humble.video.awt.MediaPictureConverterFactory.findDescriptor;
@@ -69,15 +70,19 @@ public class Recording {
 
         List<BufferedImage> bufferedImageList = new ArrayList<>();
         File[] listOfFiles = new File(directory).listFiles();
+        if (listOfFiles != null && listOfFiles.length > 0) {
 
-        for (File listOfFile : listOfFiles != null ? listOfFiles : new File[0]) {
-            if (listOfFile.isFile()) {
-                String filename = listOfFile.getName();
+            Arrays.sort(listOfFiles);
 
-                if (!directory.endsWith("/")) {
-                    directory = directory + "/";
+            for (File listOfFile : listOfFiles) {
+                if (listOfFile.isFile()) {
+                    String filename = listOfFile.getName();
+
+                    if (!directory.endsWith("/")) {
+                        directory = directory + "/";
+                    }
+                    bufferedImageList.add(ImageIO.read(new File(directory + filename)));
                 }
-                bufferedImageList.add(ImageIO.read(new File(directory + filename)));
             }
         }
         return bufferedImageList;
