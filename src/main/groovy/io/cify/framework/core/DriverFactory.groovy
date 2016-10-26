@@ -58,7 +58,7 @@ class DriverFactory {
         String remoteUrl = desiredCapabilities.getCapability(REMOTE) as String
 
         if (remoteUrl != null && !remoteUrl.isEmpty()) {
-            return createRemoteDriver(capability, desiredCapabilities, new URL(remoteUrl))
+            return createRemoteDriver(capability, desiredCapabilities)
         } else {
             return createWebDriver(capability, desiredCapabilities)
         }
@@ -183,15 +183,17 @@ class DriverFactory {
      *
      * @param capability capability
      * @param desiredCapabilities DesiredCapabilities
-     * @param url remote url
      * @return WebDriver
      * */
     private
-    static WebDriver createRemoteDriver(Capability capability, DesiredCapabilities desiredCapabilities, URL url) {
-        LOG.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
+    static WebDriver createRemoteDriver(Capability capability, DesiredCapabilities desiredCapabilities) {
+        LOG.debug(MARKER, "Create $capability remote driver desired capabilities \n $desiredCapabilities")
 
         desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)
         desiredCapabilities = replaceCapabilities(desiredCapabilities)
+
+        String remoteUrl = desiredCapabilities.getCapability(REMOTE) as String
+        URL url = new URL(remoteUrl)
 
         switch (capability) {
             case Capability.IPAD:
