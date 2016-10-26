@@ -19,6 +19,8 @@ interface IDevice {
 
     DesiredCapabilities getCapabilities()
 
+    void openApp()
+
     void openApp(String app)
 
     void openApp(String app, String appActivity, String appPackage)

@@ -104,6 +104,14 @@ class Device implements IDevice {
 
     /**
      * Opens app on device
+     * */
+    @Override
+    public void openApp() {
+        openApp("", "", "")
+    }
+
+    /**
+     * Opens app on device
      *
      * @param app
      * */
@@ -125,12 +133,9 @@ class Device implements IDevice {
     public void openApp(String app, String appActivity, String appPackage) {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
-            if (!validateApp(app, appActivity, appPackage)) {
-                throw new CifyFrameworkException("App is not valid")
-            }
-            setCapability("app", app)
-            setCapability("appActivity", appActivity)
-            setCapability("appPackage", appPackage)
+            app ? setCapability("app", app) : null
+            appActivity ? setCapability("appActivity", appActivity) : null
+            appPackage ? setCapability("appPackage", appPackage) : null
             createDriver()
 
         } catch (all) {
@@ -224,34 +229,7 @@ class Device implements IDevice {
     }
 
     /**
-     * Validates app
-     *
-     * @param app
-     * @param appActivity
-     * @param appPackage
-     *
-     * @return boolean
-     * */
-    private boolean validateApp(String app, String appActivity, String appPackage) {
-        if (app == null || app.isEmpty()) {
-            return false
-        }
-        if (getCategory() == DeviceCategory.BROWSER) {
-            return false
-        }
-        if (getCategory() == DeviceCategory.IOS && app.endsWith(".apk")) {
-            return false
-        }
-
-        if (getCategory() == DeviceCategory.ANDROID && (app.endsWith(".ipa") || app.endsWith(".app"))) {
-            return false
-        }
-
-        return true
-    }
-
-    /**
-     * Validates app
+     * Validates url
      *
      * @param url
      *

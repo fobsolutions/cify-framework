@@ -109,6 +109,7 @@ class DriverFactory {
         LOG.debug(MARKER, "Create $capability web driver with desired capabilities $desiredCapabilities")
 
         desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)
+        desiredCapabilities = replaceCapabilities(desiredCapabilities)
 
         switch (capability) {
             case Capability.CHROME:
@@ -140,6 +141,44 @@ class DriverFactory {
     }
 
     /**
+     * Replaces capabilities values with environment and properties values
+     *
+     * @param capabilities DesiredCapabilities
+     *
+     * @retun DesiredCapabilities
+     * */
+    private static DesiredCapabilities replaceCapabilities(DesiredCapabilities capabilities) {
+        capabilities.asMap().each { key, value ->
+            List<String> replaceList = value.findAll(/<replaceProperty:(.*?)>/)
+            replaceList.each {
+                value = value.toString().replace(it, getPropertyValue(it))
+                capabilities.setCapability(key, value)
+            }
+        }
+        return capabilities
+    }
+
+    /**
+     * Gets property value from environment or system properties
+     *
+     * @param property
+     *
+     * @return String
+     * */
+    private static String getPropertyValue(String property) {
+
+        String value = property.toString().replace("<replaceProperty:", "").replace(">", "")
+
+        if (System.getenv(value)) {
+            return System.getenv(value)
+        } else if (System.getProperty(value)) {
+            return System.getProperty(value)
+        } else {
+            throw new CifyFrameworkException("Cannot find property named $value from System properties or Environment variables")
+        }
+    }
+
+    /**
      * Creates remote driver for given capabilities
      *
      * @param capability capability
@@ -152,6 +191,7 @@ class DriverFactory {
         LOG.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
 
         desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)
+        desiredCapabilities = replaceCapabilities(desiredCapabilities)
 
         switch (capability) {
             case Capability.IPAD:
