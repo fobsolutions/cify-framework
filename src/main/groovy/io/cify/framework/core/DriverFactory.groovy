@@ -149,7 +149,7 @@ class DriverFactory {
      * */
     private static DesiredCapabilities replaceCapabilities(DesiredCapabilities capabilities) {
         capabilities.asMap().each { key, value ->
-            List<String> replaceList = value.findAll(/<replaceProperty:(.*?)>/)
+            List<String> replaceList = value.toString().findAll(/<replaceProperty:(.*?)>/)
             replaceList.each {
                 value = value.toString().replace(it, getPropertyValue(it))
                 capabilities.setCapability(key, value)

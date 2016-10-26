@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.cify'
-version '1.2.2'
+version '1.2.3'
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
@@ -38,7 +38,7 @@ publishing {
 
 bintray {
     user = project.hasProperty('bintrayUser') ? project.bintrayUser : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayKey') ? project.bintrayKey : System.getenv('BINTRAY_KEY')
+    key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : System.getenv('BINTRAY_API_KEY')
     publications = ['mavenJava']
     pkg {
         repo = group
