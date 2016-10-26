@@ -109,6 +109,7 @@ class DriverFactory {
         LOG.debug(MARKER, "Create $capability web driver with desired capabilities $desiredCapabilities")
 
         desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)
+        desiredCapabilities = replaceCapabilities(desiredCapabilities)
 
         switch (capability) {
             case Capability.CHROME:
@@ -140,6 +141,31 @@ class DriverFactory {
     }
 
     /**
+     * Replaces capabilities values with environment and properties values
+     *
+     * @param capabilities DesiredCapabilities
+     *
+     * @retun DesiredCapabilities
+     * */
+    public static DesiredCapabilities replaceCapabilities(DesiredCapabilities capabilities) {
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
+        capabilities.asMap().each { key, value ->
+
+            def capabilityValue
+
+            if (System.getenv(key)) {
+                capabilityValue = System.getenv(key)
+            } else if (System.getProperty(key)) {
+                capabilityValue = System.getProperty(key)
+            } else {
+                capabilityValue = value
+            }
+            desiredCapabilities[key] = capabilityValue
+        }
+        return desiredCapabilities
+    }
+
+    /**
      * Creates remote driver for given capabilities
      *
      * @param capability capability
@@ -152,6 +178,7 @@ class DriverFactory {
         LOG.debug(MARKER, "Create $capability remote driver with remote $url and desired capabilities \n $desiredCapabilities")
 
         desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)
+        desiredCapabilities = replaceCapabilities(desiredCapabilities)
 
         switch (capability) {
             case Capability.IPAD:

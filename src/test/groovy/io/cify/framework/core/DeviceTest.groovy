@@ -43,6 +43,12 @@ class DeviceTest extends GroovyTestCase {
         assert browserDevice.getCapabilities().getCapability('version').is('52.0')
     }
 
+    void testShouldFailToOpenAppWithoutParams() {
+        shouldFail {
+            androidDevice.openApp()
+        }
+    }
+
     void testShouldFailToOpenEmptyAppOnDevice() {
         String appName = ""
 

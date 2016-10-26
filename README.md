@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.cify:cify-framework:1.2.1'
+    compile 'io.cify:cify-framework:1.2.2'
 }
 ```
 
@@ -63,6 +63,16 @@ configuration.json example:
 **capabilities** - Are used when user right clicks on scenarios or feature and press run. Capability with given category is taken and triggered.
 
 **credentials** - Remote device farm providers credentials to be added to capabilities. Optional.
+
+#### Override capabilities values with system/environment variables
+
+User can override capability values with environment variables or system properties.
+
+**Priority level:**
+
+ - Environment variable
+ - System property
+ - Capability value
 
 ### Actions
 
