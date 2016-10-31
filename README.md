@@ -1,3 +1,5 @@
+[ ![Download](https://api.bintray.com/packages/fobsolutions/io.cify/cify-framework/images/download.svg) ](https://bintray.com/fobsolutions/io.cify/cify-framework/_latestVersion)
+
 1. <a href="#what">What Is Cify Framework?</a>
 2. <a href="#usage">How To Use Cify Framework</a>
 
@@ -20,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    compile 'io.cify:cify-framework:1.2.4'
+    compile 'io.cify:cify-framework:1.2.5'
 }
 ```
 
