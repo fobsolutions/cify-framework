@@ -7,9 +7,10 @@
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="${PATTERN}"/>
         </Console>
-        <RollingFile name="RollingFile" filename="build/cify/framework-log/cify-framework${date:yyyy-MM-dd HH:mm:ss}${sys:task:-}.log"
-                     filepattern="build/cify/framework-log/cify-framework-%d{yyyy-MM-dd HH:mm:ss}${sys:task:-}.log">
-            <PatternLayout pattern="[%-5level] %d{dd.MM.yyyy HH:mm:ss} [%t] %c{1} [%marker] - %replace{%msg}{testdroid_(password|apiKey)=(.*?)(,\s|\u007D)}{testdroid_$1=***$3}%n"/>
+        <RollingFile name="RollingFile"
+                     filename="build/cify/framework-log/cify-framework${date:yyyyMMdd_HHmmss}${sys:task:-}.log"
+                     filepattern="build/cify/framework-log/cify-framework-%d{yyyyMMdd_HHmmss}${sys:task:-}.log">
+            <PatternLayout pattern="[%-5level] %d{yyyyMMdd_HHmmss} [%t] %c{1} [%marker] - %msg%n"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
@@ -17,7 +18,7 @@
     </Appenders>
     <Loggers>
         <Root level="debug">
-            <AppenderRef ref="RollingFile" />
+            <AppenderRef ref="RollingFile"/>
             <AppenderRef ref="STDOUT" level="${sys:console:-ERROR}"/>
         </Root>
     </Loggers>

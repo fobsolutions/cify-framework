@@ -9,6 +9,7 @@ import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.OutputType
 import org.openqa.selenium.TakesScreenshot
 
+import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
 /**
@@ -55,13 +56,12 @@ class RecordingController {
     public static void stopRecording(Device device) {
         try {
             LOG.debug(MARKER, "Stop recording...")
-            device.isRecording = false
 
             boolean success = Recording.imagesToMedia(
                     getVideoDirForDevice(device) + TEMP,
                     getRecordingDuration(device),
                     getVideoDirForDevice(device),
-                    device.id + new Date() + OUTPUT_MEDIA_FORMAT
+                    device.id + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + OUTPUT_MEDIA_FORMAT
             )
             if (success) {
                 deleteTemporaryImages(device)

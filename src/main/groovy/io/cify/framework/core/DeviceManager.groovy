@@ -1,6 +1,7 @@
 package io.cify.framework.core
 
 import groovy.json.JsonSlurper
+import groovy.json.StringEscapeUtils
 import groovy.json.internal.LazyMap
 import io.cify.framework.core.interfaces.IDeviceManager
 import org.apache.logging.log4j.LogManager
@@ -45,7 +46,7 @@ class DeviceManager implements IDeviceManager {
         try {
             Configuration.setupFrameworkConfiguration()
 
-            String capabilitiesJson = System.getProperty(SYSTEM_PROPERTY_CAPABILITIES)
+            String capabilitiesJson = StringEscapeUtils.unescapeJava(System.getProperty(SYSTEM_PROPERTY_CAPABILITIES))
             this.capabilities = Capabilities.parseFromJsonString(capabilitiesJson)
 
             String credentialsRaw = System.getProperty(SYSTEM_PROPERTY_CREDENTIALS, "{}")
