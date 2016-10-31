@@ -133,6 +133,10 @@ class Device implements IDevice {
     public void openApp(String app, String appActivity, String appPackage) {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
+            File appFile = new File(app)
+            if (appFile.isFile()) {
+                app = appFile.getParentFile().getPath().toLowerCase() + File.separator + appFile.getName()
+            }
             app ? setCapability("app", app) : null
             appActivity ? setCapability("appActivity", appActivity) : null
             appPackage ? setCapability("appPackage", appPackage) : null
@@ -180,6 +184,7 @@ class Device implements IDevice {
      * */
     @Override
     void stopRecording() {
+        isRecording = false
         RecordingController.stopRecording(this)
     }
 
