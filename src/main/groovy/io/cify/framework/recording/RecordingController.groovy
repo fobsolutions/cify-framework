@@ -76,6 +76,7 @@ class RecordingController {
      * @param device - device to take screenshot
      * */
     public static void takeScreenshot(Device device) {
+        if(device.isRecording)
         try {
             File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
             FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
