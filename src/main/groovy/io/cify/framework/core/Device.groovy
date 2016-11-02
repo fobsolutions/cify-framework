@@ -10,7 +10,6 @@ import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
-
 /**
  * Created by FOB Solutions
  *
@@ -135,7 +134,9 @@ class Device implements IDevice {
         try {
             File appFile = new File(app)
             if (appFile.isFile()) {
-                app = appFile.getParentFile().getPath().toLowerCase() + File.separator + appFile.getName()
+                String fileName = appFile.getName()
+                String path = appFile.toURI().getRawPath().replace(fileName, "").replace(":", "").toLowerCase()
+                app = path + fileName
             }
             app ? setCapability("app", app) : null
             appActivity ? setCapability("appActivity", appActivity) : null
