@@ -25,6 +25,7 @@ class RecordingController {
     private static final String OUTPUT_MEDIA_FORMAT = ".mp4"
     private static final String OUTPUT_SCREENSHOT_FORMAT = ".png"
     private static final String TEMP = "temp"
+    private static final int FPS = 2
 
     /**
      * Start recording
@@ -43,6 +44,7 @@ class RecordingController {
                         LOG.debug(MARKER, "Recording stopped cause: " + all.message)
                         device.isRecording = false
                     }
+                    sleep((Long)(1000/FPS))
                 }
             }
         }
