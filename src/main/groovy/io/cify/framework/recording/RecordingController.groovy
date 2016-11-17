@@ -1,6 +1,7 @@
 package io.cify.framework.recording
 
 import io.cify.framework.core.Device
+import io.cify.framework.core.RecordingEventListener
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -25,7 +26,6 @@ class RecordingController {
     private static final String OUTPUT_MEDIA_FORMAT = ".mp4"
     private static final String OUTPUT_SCREENSHOT_FORMAT = ".png"
     private static final String TEMP = "temp"
-    private static final int FPS = 2
 
     /**
      * Start recording
@@ -34,20 +34,9 @@ class RecordingController {
      * */
     public static void startRecording(Device device) {
         LOG.debug(MARKER, "Start recording...")
-        Thread.start(device.id + "_recorder") {
-            device.isRecording = true
-            if (new File(getVideoDirForDevice(device) + TEMP).mkdirs()) {
-                while (device.hasDriver() && device.isRecording) {
-                    try {
-                        takeScreenshot(device)
-                    } catch (all) {
-                        LOG.debug(MARKER, "Recording stopped cause: " + all.message)
-                        device.isRecording = false
-                    }
-                    sleep((Long)(1000/FPS))
-                }
-            }
-        }
+        device.isRecording = true
+        new File(getVideoDirForDevice(device) + TEMP).mkdirs()
+        device.getDriver().register(new RecordingEventListener(device))
     }
 
     /**
@@ -78,13 +67,13 @@ class RecordingController {
      * @param device - device to take screenshot
      * */
     public static void takeScreenshot(Device device) {
-        if(device.isRecording)
-        try {
-            File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-            FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
-        } catch (all) {
-            LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
-        }
+        if (device.isRecording)
+            try {
+                File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
+                FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+            } catch (all) {
+                LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
+            }
     }
 
     /**

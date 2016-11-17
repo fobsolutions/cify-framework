@@ -9,6 +9,7 @@ import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
+import org.openqa.selenium.support.events.EventFiringWebDriver
 
 /**
  * Created by FOB Solutions
@@ -25,7 +26,7 @@ class Device implements IDevice {
     private DeviceCategory category
     private DesiredCapabilities capabilities
 
-    private WebDriver driver
+    public EventFiringWebDriver driver
 
     public boolean isRecording = false
 
@@ -68,10 +69,10 @@ class Device implements IDevice {
     /**
      * Gets driver from Device
      *
-     * @return WebDriver
+     * @return EventFiringWebDriver
      * */
     @Override
-    public WebDriver getDriver() {
+    public EventFiringWebDriver getDriver() {
         LOG.debug(MARKER, "Get device driver")
         return driver
     }
@@ -226,8 +227,8 @@ class Device implements IDevice {
         LOG.debug(MARKER, "Create new device driver")
         LoggingOutputStream.redirectSystemOutAndSystemErrToLogger()
         quit()
-        WebDriver driver = DriverFactory.getDriver(getCapabilities())
-        this.driver = driver
+        WebDriver webDriver = DriverFactory.getDriver(getCapabilities())
+        driver = new EventFiringWebDriver(webDriver)
 
         if (System.getProperty("videoRecord") == "true") {
             startRecording()

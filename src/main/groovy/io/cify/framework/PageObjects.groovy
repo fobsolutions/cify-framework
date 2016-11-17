@@ -2,6 +2,7 @@ package io.cify.framework
 
 import io.appium.java_client.pagefactory.AppiumFieldDecorator
 import io.cify.framework.core.Device
+import io.cify.framework.core.DeviceCategory
 import io.cify.framework.core.DeviceManager
 import org.openqa.selenium.support.PageFactory
 
@@ -62,6 +63,14 @@ public class PageObjects {
      * @param timeOutInSeconds - timeout
      * */
     private void initElements(Device device, long timeOutInSeconds) {
-        PageFactory.initElements(new AppiumFieldDecorator(device.getDriver(), timeOutInSeconds, TimeUnit.SECONDS), this)
+
+        switch (device.getCategory()) {
+            case DeviceCategory.BROWSER:
+                PageFactory.initElements(device.getDriver(), this)
+                break
+            default:
+                PageFactory.initElements(new AppiumFieldDecorator(device.getDriver(), timeOutInSeconds, TimeUnit.SECONDS), this)
+                break
+        }
     }
 }
