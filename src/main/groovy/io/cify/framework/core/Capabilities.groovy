@@ -15,7 +15,6 @@ import org.openqa.selenium.remote.DesiredCapabilities
  * This class holds device capabilities
  */
 
-
 class Capabilities {
 
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
@@ -65,5 +64,29 @@ class Capabilities {
                 return new DesiredCapabilities(ios)
         }
         throw new CifyFrameworkException("Unsupported device category $category")
+    }
+
+    /**
+     * Adds to desired capabilities
+     * @param category - Device category
+     * @param key - key to add
+     * @param value - value to add
+     */
+    public void addToDesiredCapabilities(DeviceCategory category, String key, String value) {
+        LOG.debug(MARKER, "Add to desired capabilities for category $category")
+        switch (category) {
+            case DeviceCategory.BROWSER:
+                browser.put(key, value)
+                break
+            case DeviceCategory.ANDROID:
+                android.put(key, value)
+                break
+            case DeviceCategory.IOS:
+                ios.put(key, value)
+                break
+            default:
+                throw new CifyFrameworkException("Unsupported device category $category")
+
+        }
     }
 }
