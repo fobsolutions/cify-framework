@@ -8,6 +8,8 @@
 
 Cify Framework is part of an open source test automation tool called Cify. Framework is responsible for managing communication with devices, and handling device actions (click, touch, tap, fillIn, sendKeys etc.) independently from device platform.
 
+All examples are written in Groovy, optionally users can use Java.
+
 <a name="usage" />
 ## How To Use Cify Framework
 
@@ -22,38 +24,53 @@ repositories {
 }
 
 dependencies {
-    compile 'io.cify:cify-framework:1.2.5'
+    // Check the latest version above
+    compile 'io.cify:cify-framework:1.2.8'
 }
 ```
 
 ### Framework configuration
 
-When framework is used as a standalone project, then user should provide framework configuration.
+When framework is used as a standalone project, then user must provide framework configuration.
 
-Framework configuration must be defined in configuration.json file located in project root.
+Framework configuration must be defined in **configuration.json** file located in project root.
 Configuration must contain all needed devices and their capabilities.
 Optionally, configuration could contain framework parameters. 
 
-configuration.json example:
+**configuration.json** example:
 ```
 {
-  "videoRecord": false,
-  "videoDir": "build/cify/videos/",
-  "credentials": {
-    "testdroid_apiKey": "secret"
-  },
-  "capabilities": {
-    "android": {
-      "capability": "android"
-    },
-    "browser": {
-      "capability": "firefox"
-    },
-    "ios": {
-      "capability": "iphone"
-    }
-  }
-}
+ {
+   "videoRecord": true,
+   "videoDir": "build/cify/videos/",
+   "capabilities": {
+     "android": {
+       "capability": "android",
+       "UIType": "MobileAndroidApp",
+       "deviceName": "Android Device",
+       "app": "src/test/resources/applications/DemoApplication.apk",
+       "fullReset": "true",
+       "remote": "http://192.168.99.100:4444/wd/hub"
+     },
+     "browser": {
+       "UIType": "DesktopWeb",
+       "capability": "chrome"
+     },
+     "ios": {
+       "capability": "iphone",
+       "automationName": "XCUITest",
+       "browserName": "",
+       "UIType": "MobileIOSApp",
+       "deviceName": "iOS Device",
+       "app": "src/test/resources/applications/DemoApplication.ipa",
+       "fullReset": "true",
+       "autoAcceptAlerts": "true",
+       "realDeviceLogger": "/usr/local/lib/node_modules/deviceconsole/deviceconsole",
+       "showXcodeLog": "true",
+       "remote": "http://192.168.99.100:4444/wd/hub"
+     }
+   }
+ }
 
 ```
 
@@ -63,8 +80,6 @@ configuration.json example:
 **videoDir** - Directory where videos are saved.
 
 **capabilities** - Are used when user right clicks on scenarios or feature and press run. Capability with given category is taken and triggered.
-
-**credentials** - Remote device farm providers credentials to be added to capabilities. Optional.
 
 #### Override capabilities values with system/environment variables
 
@@ -93,7 +108,7 @@ Actions are activities that user can do on specific page. To make it work on dif
 #### Action interface example
 
 ```
-  public interface ILoginActions {
+  interface ILoginActions {
      
      /**
      * Login with given credentials
@@ -101,24 +116,17 @@ Actions are activities that user can do on specific page. To make it work on dif
      * @param username username
      * @param password password
      */
-    void login(String username, String password);
-
-}
-```
-
-### Matchers
-
-Matchers are assertions that user can do on specific page. To make it work on different platforms and screen sizes user can make interface for matchers and implement it for every device group if needed.
-
-#### Matchers interface example
-
-```
-  public interface ILoginMatchers {
-     
+    void login(String username, String password)
+    
+    /**
+    * Checks if user is logged in
+    */
+    boolean isUserLoggedIn()
+    
      /**
-     * Checks if login error is displayed
+     * Checks if error is visible
      */
-    void shouldHaveLoginError();
+    boolean isLoginErrorVisible()
 
 }
 ```
@@ -136,8 +144,8 @@ Let's say that user have 3 different device groups: Desktop, Mobile, OldMobile. 
      *
      * @return ILoginActions
      */
-    public static ILoginActions getLoginActivities(Device device) {
-        return (ILoginActions) Factory.get(device, "com.path.to.your.implementation.package.LoginActions");
+    static ILoginActions getLoginActivities(Device device) {
+        (ILoginActions) Factory.get(device, "com.path.to.your.implementation.package.LoginActions")
     }
 ```
 
@@ -146,19 +154,31 @@ The framework will automatically search for one of the following classes LoginAc
 If no UIType specified the framework will search for LoginActions class.
 
 
-### Actions/Matchers Implementation
+### Actions Implementation
 
 When using implementation classes for different platforms or screen sizes based on device UIType parameter, each class should have constructor with Device parameter. The framework will provided correct device automatically.
 
 ```
-    public UserActions (Device device) {
-        this.device = device
-    }
-    
-    @Override
-    @Title("User navigates back")
-    public void back() {
-        device.getDriver().navigate().back();
+   class AccountActionsDesktopWeb implements IAccountActions {
+   
+       private Device device
+       private SignInPageObjects signInPageObjects
+   
+       AccountActionsDesktopWeb(Device device) {
+           this.device = device
+           this.signInPageObjects = new SignInPageObjects(device)
+       }
+   
+       /**
+        * Clicks on email field and enters given email
+        * @param email users email
+        */
+       @Override
+       @Title("Enter email")
+       void enterEmail(String email) {
+           click(signInPageObjects.getEmailField())
+           sendKeys(signInPageObjects.getEmailField(), email)
+       }
     }
     
 ```
@@ -216,47 +236,31 @@ Page objects describe elements of native applications and web pages. All element
 
 #### Example of a PageObject class
 ```
-public class LoginPage extends PageObjects {
+class LoginPage extends PageObjects {
 
     public LoginPage(Device device) {
-        super(device);
+        super(device)
     }
 
     @FindBy(id = "loginSubmit")
     @AndroidFindBy(id = "android.examples.cify.io.android_native_app:id/sign_in_button")
     @iOSFindBy(xpath = "//UIAApplication[1]/UIAWindow[1]/UIAButton[1]")
-    private WebElement loginSubmit;
+    WebElement loginSubmit
 
     @FindBy(id = "loginError")
     @AndroidFindBy(id = "android.examples.cify.io.android_native_app:id/errorText")
     @iOSFindBy(xpath = "//UIAApplication[1]/UIAWindow[1]/UIATextView[1]")
-    private WebElement loginError;
+    WebElement loginError
 
     @FindBy(id = "loginUsername")
     @AndroidFindBy(id = "android.examples.cify.io.android_native_app:id/username")
     @iOSFindBy(xpath = "//UIATextField[1]")
-    private WebElement loginUsername;
+    WebElement loginUsername
 
     @FindBy(id = "loginPassword")
     @AndroidFindBy(id = "android.examples.cify.io.android_naitive_app:id/password")
     @iOSFindBy(xpath = "//UIATextField[2]")
-    private WebElement loginPassword;
-
-    public WebElement getLoginSubmit() {
-        return loginSubmit;
-    }
-
-    public WebElement getLoginError() {
-        return loginError;
-    }
-
-    public WebElement getLoginUsername() {
-        return loginUsername;
-    }
-
-    public WebElement getLoginPassword() {
-        return loginPassword;
-    }
+    WebElement loginPassword
 }
 ```
 

@@ -145,7 +145,7 @@ class Device implements IDevice {
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
-            throw new CifyFrameworkException("Failed to open app $app, $appActivity, $appPackage")
+            throw new CifyFrameworkException("Failed to open application cause $all.message")
         }
     }
 
@@ -168,7 +168,7 @@ class Device implements IDevice {
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
-            throw new CifyFrameworkException("Failed to open url $url")
+            throw new CifyFrameworkException("Failed to open browser cause $all.message")
         }
     }
 
@@ -241,14 +241,7 @@ class Device implements IDevice {
      *
      * @return boolean
      * */
-    private boolean validateUrl(String url) {
-        if (url == null || url.isEmpty()) {
-            return false
-        }
-        if (getCategory() != DeviceCategory.BROWSER) {
-            return false
-        }
-
-        return true
+    private static boolean validateUrl(String url) {
+        !(url == null || url.isEmpty())
     }
 }

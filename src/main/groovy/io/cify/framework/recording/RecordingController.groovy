@@ -68,7 +68,8 @@ class RecordingController {
             if (success) {
                 deleteTemporaryImages(device)
             }
-        } catch (ignored) {
+        } catch (all) {
+            LOG.debug("Stop recording failed cause $all.message")
         }
     }
 
