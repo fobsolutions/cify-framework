@@ -17,7 +17,6 @@ class FactoryTest extends GroovyTestCase {
     private String className = 'io.cify.framework.factory.FactoryTestClass'
     private String classNameBad = 'FactoryTestClass'
 
-
     void setUp() {
         device = new Device('phone', DeviceCategory.ANDROID, new DesiredCapabilities([:]))
         deviceAndroidUIType = new Device('phone', DeviceCategory.ANDROID, new DesiredCapabilities(['UIType': 'Android']))

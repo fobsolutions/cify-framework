@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.cify'
-version '1.2.8'
+version '1.2.9'
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
@@ -17,7 +17,6 @@ dependencies {
     compile localGroovy()
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.6.2'
-
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '3.0.1'
     compile group: 'io.appium', name: 'java-client', version: '4.1.2'
     compile 'io.github.bonigarcia:webdrivermanager:1.4.8'

@@ -134,7 +134,7 @@ class DeviceManager implements IDeviceManager {
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
-            throw new CifyFrameworkException("Failed to create device.")
+            throw new CifyFrameworkException("Failed to create device cause $all.message")
         }
 
         return getActiveDevice(deviceId)
