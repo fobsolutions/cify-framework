@@ -2,7 +2,11 @@ package io.cify.framework.reporting
 
 class Scenario extends TestRun {
 
-    Step activeStep
+    public long duration
+    public String errorMessage
+    public String deviceId
+    public String deviceCategory
+
     List<Step> stepList = new ArrayList<>()
 
     public Scenario(){}
