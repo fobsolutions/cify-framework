@@ -5,12 +5,16 @@ import static java.util.UUID.randomUUID
 class TestRunManager {
 
     public String id
+    public Date startDate
+    public Date endDate
+
     TestRun activeTestRun
     static List<TestRun> testRunList
     private static volatile TestRunManager instance
 
     private TestRunManager(){
         this.id = generateId()
+        this.startDate = new Date()
         testRunList = new ArrayList<>()
     }
 
@@ -33,22 +37,22 @@ class TestRunManager {
         return getInstance()
     }
 
-    public static void testSuiteFinished(){
-        if(getInstance().testRunList == null) {return}
+    public void testSuiteFinished(){
+        if(testRunList == null) {return}
+        endDate = new Date()
 
-        // add test suite end time
         println("TODO: report here.................................................................")
-        println("test suite id:"+ getInstance().id)
-        getInstance().testRunList.each {
+        println("id:" + getInstance().id + " - test suite started")
+        testRunList.each {
             testRunList.each {
-                println("- feature name:" + it.name + " id:" + it.id)
+                println("id:" + it.id + " " + it.result + " - - feature name: " + it.name)
                 it.scenarioList.each {
-                    println("-- scenario name:" + it.name + " id:" + it.id)
+                    println("id:" + it.id + " " + it.result +  " - - - scenario name: " + it.name)
                     it.stepList.each {
                         if (it.deviceId != null) {
-                            println("--- step name:" + it.name + " id:" + it.id + " category:" + it.deviceCategory + " deviceId:" + it.deviceId)
+                            println("id:" + it.id + " " + it.result +  " - - - - step name: " + it.name + " category:" + it.deviceCategory + " deviceId:" + it.deviceId)
                         } else {
-                            println("--- step name:" + it.name + " id:" + it.id)
+                            println("id:" + it.id + " " + it.result +  " - - - - step name: " + it.name)
                         }
                     }
                 }
@@ -61,20 +65,12 @@ class TestRunManager {
         activeTestRun = testRunList.last()
     }
 
-    public void testRunFinished(){
-        activeTestRun = null
-    }
-
     public void scenarioStarted(String name){
         TestRun testrun = getInstance().activeTestRun
         if( testrun == null) {return}
 
         testrun.scenarioList.add(new Scenario(name))
         testrun.activeScenario = testrun.scenarioList.last()
-    }
-
-    public void scenarioFinished(){
-        getInstance().activeTestRun.activeScenario = null
     }
 
     public void stepStarted(String name){
@@ -85,11 +81,29 @@ class TestRunManager {
         scenario.activeStep = scenario.stepList.last()
     }
 
-    public void stepFinished(){
-        getInstance().activeTestRun.activeScenario.activeStep = null
+    public void testRunFinished(String result){
+        activeTestRun.endDate = new Date()
+        activeTestRun.result = result
+        activeTestRun = null
     }
 
-    public Step getActiveStep(){
+    public void scenarioFinished(String result){
+        Scenario scenario = getInstance().activeTestRun.activeScenario
+        if(scenario == null) {return}
+        scenario.endDate = new Date()
+        scenario.result = result
+        scenario = null
+    }
+
+    public void stepFinished(String result){
+        Step step = getInstance().activeTestRun.activeScenario.activeStep
+        if(step == null) {return}
+        step.endDate = new Date()
+        step.result = result
+        step = null
+    }
+
+    public static Step getActiveStep(){
         return getInstance().activeTestRun.activeScenario.activeStep
     }
 
