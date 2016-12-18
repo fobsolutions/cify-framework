@@ -2,10 +2,11 @@ package io.cify.framework.reporting
 
 class TestRun {
 
-    public String id
+    public String testRunId
     public String name
-    public Date startDate
-    public Date endDate
+    public long startDate
+    public long endDate
+    public long duration
     public String result
 
     Scenario activeScenario
@@ -15,7 +16,7 @@ class TestRun {
 
     public TestRun (String name) {
         this.name = name
-        this.id = TestRunManager.generateId()
-        this.startDate = new Date()
+        this.testRunId = TestRunManager.generateId()
+        this.startDate = System.currentTimeMillis()
     }
 }

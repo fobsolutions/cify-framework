@@ -1,25 +1,17 @@
 package io.cify.framework.reporting
 
+import groovy.json.JsonBuilder
+
+import java.text.DecimalFormat
 import static java.util.UUID.randomUUID
 
 class TestRunManager {
 
-    public String id
-    public Date startDate
-    public Date endDate
-
-    TestRun activeTestRun
-    static List<TestRun> testRunList
+    public testSuiteId
+    static TestRun activeTestRun
     private static volatile TestRunManager instance
 
-    private TestRunManager(){
-        this.id = generateId()
-        this.startDate = new Date()
-        testRunList = new ArrayList<>()
-    }
-
-    public static String generateId(){
-        return randomUUID() as String
+    public TestRunManager(){
     }
 
     public static TestRunManager getInstance() {
@@ -33,96 +25,108 @@ class TestRunManager {
         return instance
     }
 
-    public static TestRunManager testSuiteStarted(){
-        println("testSuiteStarted")
+    public static TestRunManager getTestRunManager(){
         return getInstance()
     }
 
-    public void testSuiteFinished(){
-        println("testSuiteFinished")
-        if(testRunList == null) {return}
-        endDate = new Date()
-
-        println("TODO: report here.................................................................")
-        println("id:" + getInstance().id + " - test suite started")
-        testRunList.each {
-            testRunList.each {
-                println("id:" + it.id +  " - - feature start: " + it.name)
-                it.scenarioList.each {
-                    println("id:" + it.id + " - - - scenario start: " + it.name)
-                    it.stepList.each {
-                        if (it.deviceId != null) {
-                            println("id:" + it.id +  " - - - - step: " + it.name + " category:" + it.deviceCategory + " deviceId:" + it.deviceId)
-                        } else {
-                            println("id:" + it.id +  " - - - - step: " + it.name)
-                        }
-                        println("id:" + it.id + " " + it.result + " duration:"+it.duration)
-                    }
-                    println("id:" + it.id + " - - - scenario end: " + it.name)
-                    println("id:" + it.id + " " + it.result +  " duration:"+it.duration)
-                }
-                println("id:" + it.id + " - - feature end: " + it.name)
-                println("id:" + it.id + " " + it.result)
-            }
-        }
+    public static void testRunStarted(String name, String testSuiteId){
+        getInstance().testSuiteId = testSuiteId
+        activeTestRun = new TestRun(name)
     }
 
-    public void testRunStarted(String name){
-        println("testRunStarted - feature: "+ name)
-        getInstance().testRunList.add(new TestRun(name))
-        activeTestRun = testRunList.last()
-    }
-
-    public void scenarioStarted(String name){
-        println("scenarioStarted " + name)
-        TestRun testrun = getInstance().activeTestRun
+    public static void scenarioStarted(String name){
+        TestRun testrun = activeTestRun
         if( testrun == null) {return}
-
         testrun.scenarioList.add(new Scenario(name))
         testrun.activeScenario = testrun.scenarioList.last()
     }
 
-    public void stepStarted(String name){
-        println("stepStarted " + name)
-        Scenario scenario = getInstance().activeTestRun.activeScenario
+    public static void stepStarted(String name){
+        Scenario scenario = activeTestRun.activeScenario
         if(scenario == null) {return}
         scenario.stepList.add(new Step(name))
     }
 
-    public void testRunFinished(String result){
-        println("testRunFinished - result " + result)
-        activeTestRun.endDate = new Date()
-        activeTestRun.result = result
+    public static void testRunFinished(){
+        activeTestRun.endDate = System.currentTimeMillis()
+        activeTestRun.duration = activeTestRun.endDate - activeTestRun.startDate
+        activeTestRun.result = activeTestRun.scenarioList.findResult { Scenario s ->
+            if(s.result == "failed"){ return "failed"}
+            else { return "passed"}
+        }
+        Report.reportTestRun(activeTestRun)
         activeTestRun = null
     }
 
-    public void scenarioFinished(String result, long duration, String errorMessage){
-        println("scenarioFinished - result " + result)
-        Scenario scenario = getInstance().activeTestRun.activeScenario
-        if(scenario == null) {return}
-        scenario.endDate = new Date()
-        scenario.duration = duration
-        scenario.errorMessage = errorMessage
-        scenario.result = result
-        scenario = null
-    }
-
-    public void stepFinished(String result, long duration, String errorMessage){
-        println("stepFinished - result " + result )
-        Step currentStep = getInstance().activeTestRun.activeScenario.stepList.findResult { Step s ->
-            if(s.result == null){ return s }
+    public static void scenarioFinished(String result, String errorMessage){
+        Scenario scenario = activeTestRun.activeScenario
+        if(scenario != null) {
+            scenario.endDate = System.currentTimeMillis()
+            scenario.duration = scenario.endDate - scenario.startDate
+            scenario.errorMessage = errorMessage
+            scenario.result = result
+            Report.reportScenario(scenario)
         }
-        if(currentStep == null) {return}
-        currentStep.duration = duration
-        currentStep.result = result
-        currentStep = null
     }
 
-    public static Scenario getActiveScenario(){
-        if(getInstance().activeTestRun == null ) {return null}
-        Scenario scenario = getInstance().activeTestRun.activeScenario
-        println("getActiveScenario - name " + scenario.name)
+    public static void stepFinished(String result, long duration, String errorMessage){
+        Scenario currentScenario = activeTestRun.activeScenario
+        Step currentStep = currentScenario.stepList.findResult { Step s ->
+            if(s.result == null){ return s }
+            else{ return null }
+        }
+        if(currentStep != null) {
+            currentStep.errorMessage = errorMessage
+            currentStep.duration = duration
+            currentStep.result = result
+            Report.reportStep(currentStep,currentScenario.scenarioId)
+        }
+    }
+
+    public static addDeviceToTestReport(String deviceId, String deviceCategory){
+        Scenario scenario = getActiveScenario()
+        if(scenario != null ) {
+            Map<String, String> device = new HashMap<>()
+            device.put("deviceId", deviceId)
+            device.put("deviceCategory", deviceCategory)
+            scenario.deviceList.add(device)
+        }
+    }
+
+    private static Scenario getActiveScenario(){
+        if(activeTestRun == null ) {return null}
+        Scenario scenario = activeTestRun.activeScenario
         return scenario
     }
 
+    void report(){
+        long nanos = 1000000000
+        long millis = 1000
+        DecimalFormat df = new DecimalFormat("#.00");
+
+        println("TODO: report here.................................................................")
+        println("testSuiteId:"+ testSuiteId)
+        activeTestRun.with {
+            println("testRunId:" + it.testRunId + " - - feature start: " + it.name + " date:" + new Date(it.startDate))
+            it.scenarioList.each {
+                println("scenarioId:" + it.scenarioId + " - - - scenario start: " + it.name)
+                it.deviceList.each {
+                    println(" - - - scenario device category: " + it.deviceCategory + " deviceId: " + it.deviceId)
+                }
+                it.stepList.each {
+                    println("stepId:" + it.stepId + " - - - - step: " + it.name)
+                    println("stepId:" + it.stepId + " " + it.result + " duration(sec):" + df.format(it.duration / nanos) + "message: "+ it.errorMessage)
+                }
+                println("scenarioId:" + it.scenarioId + " - - - scenario end: " + it.name)
+                println("scenarioId:" + it.scenarioId + " " + it.result + " duration(sec):" + df.format(it.duration / millis))
+            }
+            println("testRunId:" + it.testRunId + " - - feature end: " + it.name)
+            println("testRunId:" + it.testRunId + " " + it.result + " duration(sec):" + df.format(it.duration / millis) + " date:" + new Date(it.endDate))
+        }
+
+    }
+
+    public static String generateId(){
+        return randomUUID() as String
+    }
 }

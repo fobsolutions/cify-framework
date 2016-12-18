@@ -139,7 +139,7 @@ class DeviceManager implements IDeviceManager {
             throw new CifyFrameworkException("Failed to create device cause $all.message")
         }
 
-        addDeviceToScenarioReport(deviceId,category.toString())
+        addDeviceToTestReport(deviceId,category.toString())
         return getActiveDevice(deviceId)
     }
 
@@ -150,11 +150,8 @@ class DeviceManager implements IDeviceManager {
      *
      * @param String device category
      */
-    private static void addDeviceToScenarioReport(String deviceId, String category){
-        Scenario scenario = TestRunManager.getActiveScenario()
-        if(scenario == null) {return}
-        scenario.deviceId = deviceId
-        scenario.deviceCategory = category
+    private static void addDeviceToTestReport(String deviceId, String category){
+        TestRunManager.addDeviceToTestReport(deviceId,category)
     }
 
     /**
