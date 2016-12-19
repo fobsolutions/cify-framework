@@ -24,6 +24,7 @@ class Report extends TestRunManager{
         jsonBuilder.scenario(testSuiteId:getInstance().testSuiteId, testRunId:activeTestRun.testRunId,
                 scenarioId:scenario.scenarioId, name: scenario.name,
                 devices:deviceList.collect {[deviceId:it.deviceId, deviceCategory:it.deviceCategory]},
+                startDate: new Date(scenario.startDate), endDate: new Date(scenario.endDate),
                 duration: df.format(scenario.duration / millis), result: scenario.result, errorMessage: scenario.errorMessage)
         println(jsonBuilder.toPrettyString())
     }
@@ -31,7 +32,8 @@ class Report extends TestRunManager{
     public static void reportTestRun(TestRun testRun){
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.testrun(testSuiteId:getInstance().testSuiteId, testRunId:testRun.testRunId,
-                name: testRun.name, duration: df.format(testRun.duration / millis), result: testRun.result)
+                name: testRun.name, startDate: new Date(testRun.startDate), endDate: new Date(testRun.endDate),
+                duration: df.format(testRun.duration / millis), result: testRun.result)
         println(jsonBuilder.toPrettyString())
     }
 }
