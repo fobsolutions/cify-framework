@@ -4,8 +4,7 @@ import groovy.json.JsonSlurper
 import groovy.json.StringEscapeUtils
 import groovy.json.internal.LazyMap
 import io.cify.framework.core.interfaces.IDeviceManager
-import io.cify.framework.reporting.Scenario
-import io.cify.framework.reporting.TestRunManager
+import io.cify.framework.reporting.TestReportManager
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
@@ -151,7 +150,7 @@ class DeviceManager implements IDeviceManager {
      * @param String device category
      */
     private static void addDeviceToTestReport(String deviceId, String category){
-        TestRunManager.addDeviceToTestReport(deviceId,category)
+        TestReportManager.addDeviceToTestReport(deviceId,category)
     }
 
     /**

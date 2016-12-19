@@ -16,7 +16,7 @@ class TestRun {
 
     public TestRun (String name) {
         this.name = name
-        this.testRunId = TestRunManager.generateId()
+        this.testRunId = TestReportManager.generateId()
         this.startDate = System.currentTimeMillis()
     }
 }

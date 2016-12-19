@@ -3,6 +3,8 @@ package io.cify.framework
 import io.cify.framework.annotations.Title
 import io.cify.framework.core.CifyFrameworkException
 import io.cify.framework.core.Device
+import io.cify.framework.reporting.TestReportManager
+
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -71,6 +73,7 @@ public class Factory implements InvocationHandler {
         Method annotationMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes())
         if (annotationMethod.getAnnotation(Title.class) != null) {
             LOG.debug(MARKER, "Title: {}", annotationMethod.getAnnotation(Title.class).value())
+            addMethodTitleToTestReport(annotationMethod.getAnnotation(Title.class).value())
         }
 
         if (args != null && args.length > 0) {
@@ -86,5 +89,9 @@ public class Factory implements InvocationHandler {
         }
 
         return result
+    }
+
+    private static addMethodTitleToTestReport(String name){
+        TestReportManager.addStepActionsToTestReport(name)
     }
 }

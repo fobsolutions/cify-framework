@@ -4,7 +4,7 @@ import groovy.json.JsonBuilder
 
 import java.text.DecimalFormat
 
-class Report extends TestRunManager{
+class Report extends TestReportManager{
 
     static long nanos = 1000000000
     static long millis = 1000
@@ -14,6 +14,7 @@ class Report extends TestRunManager{
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.step(testSuiteId:getInstance().testSuiteId, testRunId:activeTestRun.testRunId,
                 scenarioId:scenarioId, stepId: step.stepId, name: step.name,
+                actionsDone:step.stepActionsList.collect {[actionId:it.actionId,name:it.name]},
                 duration: df.format(step.duration / nanos), result: step.result, errorMessage: step.errorMessage)
         println(jsonBuilder.toPrettyString())
     }

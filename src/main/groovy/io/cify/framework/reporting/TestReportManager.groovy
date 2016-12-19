@@ -1,31 +1,29 @@
 package io.cify.framework.reporting
 
-import groovy.json.JsonBuilder
-
 import java.text.DecimalFormat
 import static java.util.UUID.randomUUID
 
-class TestRunManager {
+class TestReportManager {
 
     public testSuiteId
     static TestRun activeTestRun
-    private static volatile TestRunManager instance
+    private static volatile TestReportManager instance
 
-    public TestRunManager(){
+    public TestReportManager(){
     }
 
-    public static TestRunManager getInstance() {
+    public static TestReportManager getInstance() {
         if (instance == null) {
-            synchronized (TestRunManager.class) {
+            synchronized (TestReportManager.class) {
                 if (instance == null) {
-                    instance = new TestRunManager()
+                    instance = new TestReportManager()
                 }
             }
         }
         return instance
     }
 
-    public static TestRunManager getTestRunManager(){
+    public static TestReportManager getTestRunManager(){
         return getInstance()
     }
 
@@ -42,7 +40,7 @@ class TestRunManager {
     }
 
     public static void stepStarted(String name){
-        Scenario scenario = activeTestRun.activeScenario
+        Scenario scenario = getActiveScenario()
         if(scenario == null) {return}
         scenario.stepList.add(new Step(name))
     }
@@ -59,7 +57,7 @@ class TestRunManager {
     }
 
     public static void scenarioFinished(String result, String errorMessage){
-        Scenario scenario = activeTestRun.activeScenario
+        Scenario scenario = getActiveScenario()
         if(scenario != null) {
             scenario.endDate = System.currentTimeMillis()
             scenario.duration = scenario.endDate - scenario.startDate
@@ -70,16 +68,12 @@ class TestRunManager {
     }
 
     public static void stepFinished(String result, long duration, String errorMessage){
-        Scenario currentScenario = activeTestRun.activeScenario
-        Step currentStep = currentScenario.stepList.findResult { Step s ->
-            if(s.result == null){ return s }
-            else{ return null }
-        }
+        Step currentStep = getActiveStep()
         if(currentStep != null) {
             currentStep.errorMessage = errorMessage
             currentStep.duration = duration
             currentStep.result = result
-            Report.reportStep(currentStep,currentScenario.scenarioId)
+            Report.reportStep(currentStep,getActiveScenario().scenarioId)
         }
     }
 
@@ -93,37 +87,24 @@ class TestRunManager {
         }
     }
 
-    private static Scenario getActiveScenario(){
-        if(activeTestRun == null ) {return null}
-        Scenario scenario = activeTestRun.activeScenario
-        return scenario
+    public static void addStepActionsToTestReport(String name){
+        Step currentStep = getActiveStep()
+        if( currentStep == null) {return}
+        currentStep.stepActionsList.add(new StepActions(name))
     }
 
-    void report(){
-        long nanos = 1000000000
-        long millis = 1000
-        DecimalFormat df = new DecimalFormat("#.00");
+    private static Scenario getActiveScenario(){
+        if(activeTestRun == null ) {return null}
+        return activeTestRun.activeScenario
+    }
 
-        println("TODO: report here.................................................................")
-        println("testSuiteId:"+ testSuiteId)
-        activeTestRun.with {
-            println("testRunId:" + it.testRunId + " - - feature start: " + it.name + " date:" + new Date(it.startDate))
-            it.scenarioList.each {
-                println("scenarioId:" + it.scenarioId + " - - - scenario start: " + it.name)
-                it.deviceList.each {
-                    println(" - - - scenario device category: " + it.deviceCategory + " deviceId: " + it.deviceId)
-                }
-                it.stepList.each {
-                    println("stepId:" + it.stepId + " - - - - step: " + it.name)
-                    println("stepId:" + it.stepId + " " + it.result + " duration(sec):" + df.format(it.duration / nanos) + "message: "+ it.errorMessage)
-                }
-                println("scenarioId:" + it.scenarioId + " - - - scenario end: " + it.name)
-                println("scenarioId:" + it.scenarioId + " " + it.result + " duration(sec):" + df.format(it.duration / millis))
-            }
-            println("testRunId:" + it.testRunId + " - - feature end: " + it.name)
-            println("testRunId:" + it.testRunId + " " + it.result + " duration(sec):" + df.format(it.duration / millis) + " date:" + new Date(it.endDate))
+    private static Step getActiveStep(){
+        if(getActiveScenario() == null || getActiveScenario().stepList.size() == 0 ) {return null}
+        Step currentStep = getActiveScenario().stepList.findResult { Step s ->
+            if(s.result == null){ return s }
+            else{ return null }
         }
-
+        return currentStep
     }
 
     public static String generateId(){

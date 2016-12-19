@@ -2,16 +2,16 @@ package io.cify.framework
 
 import io.cify.framework.core.DeviceCategory
 import io.cify.framework.core.DeviceManager
-import io.cify.framework.reporting.TestRunManager
+import io.cify.framework.reporting.TestReportManager
 
 import java.text.DecimalFormat
 
 class ReportingTest extends GroovyTestCase {
 
-    TestRunManager trm
+    TestReportManager trm
 
     void testFlow() {
-        trm = TestRunManager.getTestRunManager()
+        trm = TestReportManager.getTestRunManager()
 
         trm.testRunStarted("TestAccount","runId12334")
         trm.scenarioStarted("User creates a new account with iOS")
