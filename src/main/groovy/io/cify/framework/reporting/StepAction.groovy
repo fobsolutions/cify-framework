@@ -1,11 +1,12 @@
 package io.cify.framework.reporting
 
-class StepActions extends Step{
+class StepAction extends Step{
 
     public String actionId
 
-    public StepActions(String name){
+    public StepAction(String name){
         this.name = name
         this.actionId = TestReportManager.generateId()
+        this.startDate = System.currentTimeMillis()
     }
 }

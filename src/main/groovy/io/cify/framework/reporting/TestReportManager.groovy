@@ -1,6 +1,5 @@
 package io.cify.framework.reporting
 
-import java.text.DecimalFormat
 import static java.util.UUID.randomUUID
 
 class TestReportManager {
@@ -45,6 +44,13 @@ class TestReportManager {
         scenario.stepList.add(new Step(name))
     }
 
+    public static String stepActionStarted(String name){
+        Step currentStep = getActiveStep()
+        if( currentStep == null) {return}
+        currentStep.stepActionsList.add(new StepAction(name))
+        return currentStep.stepActionsList.last().actionId
+    }
+
     public static void testRunFinished(){
         activeTestRun.endDate = System.currentTimeMillis()
         activeTestRun.duration = activeTestRun.endDate - activeTestRun.startDate
@@ -77,6 +83,14 @@ class TestReportManager {
         }
     }
 
+    public static void stepActionFinished(){
+        StepAction stepAction = getActiveStepAction()
+        if(stepAction != null) {
+            stepAction.endDate = System.currentTimeMillis()
+            stepAction.duration = stepAction.endDate - stepAction.startDate
+        }
+    }
+
     public static addDeviceToTestReport(String deviceId, String deviceCategory){
         Scenario scenario = getActiveScenario()
         if(scenario != null ) {
@@ -85,12 +99,6 @@ class TestReportManager {
             device.put("deviceCategory", deviceCategory)
             scenario.deviceList.add(device)
         }
-    }
-
-    public static void addStepActionsToTestReport(String name){
-        Step currentStep = getActiveStep()
-        if( currentStep == null) {return}
-        currentStep.stepActionsList.add(new StepActions(name))
     }
 
     private static Scenario getActiveScenario(){
@@ -107,7 +115,12 @@ class TestReportManager {
         return currentStep
     }
 
+    private static StepAction getActiveStepAction(){
+        if(getActiveStep() == null || getActiveStep().stepActionsList.size() == 0) {return null}
+        return getActiveStep().stepActionsList.last()
+    }
+
     public static String generateId(){
-        return randomUUID() as String
+        return ((new Date().format("yyyy-MM-dd'T'HH:mm:ss")) + "_"+randomUUID()) as String
     }
 }

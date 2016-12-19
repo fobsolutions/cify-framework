@@ -73,7 +73,7 @@ public class Factory implements InvocationHandler {
         Method annotationMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes())
         if (annotationMethod.getAnnotation(Title.class) != null) {
             LOG.debug(MARKER, "Title: {}", annotationMethod.getAnnotation(Title.class).value())
-            addMethodTitleToTestReport(annotationMethod.getAnnotation(Title.class).value())
+            TestReportManager.stepActionStarted(annotationMethod.getAnnotation(Title.class).value())
         }
 
         if (args != null && args.length > 0) {
@@ -88,10 +88,9 @@ public class Factory implements InvocationHandler {
             throw e.getTargetException()
         }
 
+        if (annotationMethod.getAnnotation(Title.class) != null) {
+            TestReportManager.stepActionFinished()
+        }
         return result
-    }
-
-    private static addMethodTitleToTestReport(String name){
-        TestReportManager.addStepActionsToTestReport(name)
     }
 }

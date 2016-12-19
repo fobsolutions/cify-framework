@@ -3,7 +3,7 @@ package io.cify.framework.reporting
 class Step extends Scenario {
 
     public String stepId
-    public List<StepActions> stepActionsList = new ArrayList<>()
+    public List<StepAction> stepActionsList = new ArrayList<>()
 
     public Step(){}
 
