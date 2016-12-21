@@ -68,7 +68,7 @@ public class Factory implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) {
         LOG.debug(MARKER, "Invoke method $method with args $args")
 
-        Object result
+        Object result = null
 
         Method annotationMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes())
         if (annotationMethod.getAnnotation(Title.class) != null) {
@@ -86,11 +86,12 @@ public class Factory implements InvocationHandler {
             result = method.invoke(obj, args)
         } catch (InvocationTargetException e) {
             throw e.getTargetException()
+        } finally {
+            if (annotationMethod.getAnnotation(Title.class) != null) {
+                TestReportManager.stepActionFinished()
+            }
         }
 
-        if (annotationMethod.getAnnotation(Title.class) != null) {
-            TestReportManager.stepActionFinished()
-        }
         return result
     }
 }

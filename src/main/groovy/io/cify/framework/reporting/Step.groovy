@@ -1,13 +1,15 @@
 package io.cify.framework.reporting
 
+/**
+ * This class is responsible to keep reporting information about test step
+ */
 class Step extends Scenario {
 
-    public String stepId
-    public List<StepAction> stepActionsList = new ArrayList<>()
+    String stepId
+    List<StepAction> stepActionsList = new ArrayList<>()
 
-    public Step(){}
-
-    public Step(String name){
+    Step(){}
+    Step(String name){
         this.name = name
         this.stepId = TestReportManager.generateId()
     }
