@@ -23,7 +23,7 @@ class Report extends TestReportManager{
     private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
 
     /**
-     * Builds and save json object with test step report information
+     * Builds and export json object with test step report information
      * @param step
      * @param scenarioId
      */
@@ -37,12 +37,18 @@ class Report extends TestReportManager{
         exportReport(jsonBuilder, testSuiteId, step.stepId)
     }
 
+    /**
+     * Exporting json report to local file
+     * @param jsonReport
+     * @param testSuiteId
+     * @param id
+     */
     public static void exportReport(JsonBuilder jsonReport, String testSuiteId, String id){
         saveReportToFile(jsonReport.toPrettyString(),reportingDirectory + testSuiteId + "/" + id + ".json")
     }
 
     /**
-     * Builds and save json object with test scenario report information
+     * Builds and export json object with test scenario report information
      * @param scenario
      */
     static void reportScenario(Scenario scenario){
@@ -59,7 +65,7 @@ class Report extends TestReportManager{
     }
 
     /**
-     * Builds and save json object with test run report information
+     * Builds and export json object with test run report information
      * @param testRun
      */
     static void reportTestRun(TestRun testRun){
