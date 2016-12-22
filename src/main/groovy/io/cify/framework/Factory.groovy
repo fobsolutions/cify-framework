@@ -3,6 +3,8 @@ package io.cify.framework
 import io.cify.framework.annotations.Title
 import io.cify.framework.core.CifyFrameworkException
 import io.cify.framework.core.Device
+import io.cify.framework.reporting.TestReportManager
+
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -66,11 +68,12 @@ public class Factory implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) {
         LOG.debug(MARKER, "Invoke method $method with args $args")
 
-        Object result
+        Object result = null
 
         Method annotationMethod = obj.getClass().getMethod(method.getName(), method.getParameterTypes())
         if (annotationMethod.getAnnotation(Title.class) != null) {
             LOG.debug(MARKER, "Title: {}", annotationMethod.getAnnotation(Title.class).value())
+            TestReportManager.stepActionStarted(annotationMethod.getAnnotation(Title.class).value())
         }
 
         if (args != null && args.length > 0) {
@@ -83,6 +86,10 @@ public class Factory implements InvocationHandler {
             result = method.invoke(obj, args)
         } catch (InvocationTargetException e) {
             throw e.getTargetException()
+        } finally {
+            if (annotationMethod.getAnnotation(Title.class) != null) {
+                TestReportManager.stepActionFinished()
+            }
         }
 
         return result

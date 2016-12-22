@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import groovy.json.StringEscapeUtils
 import groovy.json.internal.LazyMap
 import io.cify.framework.core.interfaces.IDeviceManager
+import io.cify.framework.reporting.TestReportManager
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
@@ -137,7 +138,19 @@ class DeviceManager implements IDeviceManager {
             throw new CifyFrameworkException("Failed to create device cause $all.message")
         }
 
+        addDeviceToTestReport(deviceId,category.toString())
         return getActiveDevice(deviceId)
+    }
+
+    /**
+     * Add device info to test scenario report
+     *
+     * @param String device id
+     *
+     * @param String device category
+     */
+    private static void addDeviceToTestReport(String deviceId, String category){
+        TestReportManager.addDeviceToTestReport(deviceId,category)
     }
 
     /**
