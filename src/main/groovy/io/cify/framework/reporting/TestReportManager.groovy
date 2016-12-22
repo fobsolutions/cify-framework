@@ -9,7 +9,7 @@ import static java.util.UUID.randomUUID
  */
 class TestReportManager {
 
-    private testSuiteId
+    public static testSuiteId
     public static TestRun activeTestRun
     private static volatile TestReportManager instance
 
@@ -31,7 +31,7 @@ class TestReportManager {
      * Returning instance of TestReportManager class object
      * @return  TestReportManager
      */
-    public static TestReportManager getTestRunManager(){
+    public static TestReportManager getTestReportManager(){
         return getInstance()
     }
 
@@ -158,7 +158,7 @@ class TestReportManager {
      * Returns current active scenario
      * @return Scenario object
      */
-    private static Scenario getActiveScenario(){
+    public static Scenario getActiveScenario(){
         return activeTestRun?.activeScenario
     }
 
@@ -166,7 +166,7 @@ class TestReportManager {
      * Returns current active step
      * @return Step object
      */
-    private static Step getActiveStep(){
+    public static Step getActiveStep(){
         return getActiveScenario()?.stepList?.find { !it.result }
     }
 
@@ -174,7 +174,7 @@ class TestReportManager {
      * Returns current active step action
      * @return StepAction object
      */
-    private static StepAction getActiveStepAction(){
+    public static StepAction getActiveStepAction(){
         return getActiveStep()?.stepActionsList?.last()
     }
 
