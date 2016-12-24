@@ -8,6 +8,7 @@ import groovy.json.internal.LazyMap
 class Scenario extends TestRun {
 
     String scenarioId
+    String cucumberScenarioId
     String errorMessage
     List<LazyMap> deviceList = []
     List<Step> stepList = new ArrayList<>()
@@ -16,7 +17,8 @@ class Scenario extends TestRun {
 
     Scenario(String name, String scenarioId) {
         this.name = name
-        this.scenarioId = scenarioId
+        this.cucumberScenarioId = scenarioId
+        this.scenarioId = TestReportManager.generateId()
         this.startDate = System.currentTimeMillis()
     }
 }

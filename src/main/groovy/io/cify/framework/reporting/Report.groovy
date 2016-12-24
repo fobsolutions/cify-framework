@@ -72,11 +72,19 @@ class Report extends TestReportManager {
      */
     static void reportTestRun(TestRun testRun) {
         def jsonBuilder = new JsonBuilder()
-        jsonBuilder.testrun(testSuiteId: testSuiteId, testRunId: testRun.testRunId,
+        jsonBuilder.testrun(
+                testSuiteId: testSuiteId,
+                testRunId: testRun.testRunId,
                 name: testRun.name, startDate: formatDate(testRun.startDate),
                 projectName: testRun.projectName,
+                suiteName: testRun.suiteName,
                 scenarios: testRun.scenarioList.collect {
-                    [scenarioId: it.scenarioId, scenarioName: it.name, scenarioResult: it.result]
+                    [
+                            scenarioId    : it.scenarioId,
+                            scenarioName  : it.name,
+                            scenarioResult: it.result,
+                            cucumberId    : it.cucumberScenarioId
+                    ]
                 },
                 endDate: formatDate(testRun.endDate),
                 duration: formatDuration(testRun.duration), result: testRun.result)

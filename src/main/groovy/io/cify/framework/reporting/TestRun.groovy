@@ -6,6 +6,7 @@ package io.cify.framework.reporting
 class TestRun {
 
     String projectName
+    String suiteName
     String testRunId
     String name
     String result
@@ -16,9 +17,11 @@ class TestRun {
     Scenario activeScenario
     List<Scenario> scenarioList = new ArrayList<>()
 
-    TestRun(){}
-    TestRun (String name) {
+    TestRun() {}
+
+    TestRun(String name) {
         this.name = name
+        this.suiteName = System.getProperty("suiteName")
         this.projectName = System.getProperty("projectName")
         this.testRunId = TestReportManager.generateId()
         this.startDate = System.currentTimeMillis()
