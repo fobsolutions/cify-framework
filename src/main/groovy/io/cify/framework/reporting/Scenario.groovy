@@ -1,5 +1,7 @@
 package io.cify.framework.reporting
 
+import groovy.json.internal.LazyMap
+
 /**
  * This class is responsible to keep reporting information about test scenario
  */
@@ -7,7 +9,7 @@ class Scenario extends TestRun {
 
     String scenarioId
     String errorMessage
-    List<Map<String, String>> deviceList = new ArrayList<Map<String, String>>()
+    List<LazyMap> deviceList = []
     List<Step> stepList = new ArrayList<>()
 
     Scenario() {}

@@ -1,5 +1,8 @@
 package io.cify.framework.reporting
 
+import groovy.json.internal.LazyMap
+import io.cify.framework.core.DeviceManager
+
 import static java.util.UUID.randomUUID
 
 /**
@@ -148,9 +151,10 @@ class TestReportManager {
      * @param deviceCategory
      */
     public static void addDeviceToTestReport(String deviceId, String deviceCategory) {
-        Map<String, String> device = new HashMap<>()
+        LazyMap device = [:]
         device.put("deviceId", deviceId)
         device.put("deviceCategory", deviceCategory)
+        device.putAll(DeviceManager.getInstance().getActiveDevice(deviceId).getCapabilities().asMap())
         getActiveScenario()?.deviceList?.add(device)
     }
 
