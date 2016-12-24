@@ -8,6 +8,7 @@ class TestRun {
     String projectName
     String suiteName
     String testRunId
+    String featureId
     String name
     String result
     String capabilitiesId
@@ -20,11 +21,12 @@ class TestRun {
 
     TestRun() {}
 
-    TestRun(String name) {
+    TestRun(String name, String featureId) {
         this.name = name
         this.capabilitiesId = System.getProperty("capabilitiesId")
         this.suiteName = System.getProperty("suiteName")
         this.projectName = System.getProperty("projectName")
+        this.featureId = featureId
         this.testRunId = TestReportManager.generateId()
         this.startDate = System.currentTimeMillis()
     }

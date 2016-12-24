@@ -44,9 +44,9 @@ class TestReportManager {
      * @param name
      * @param testSuiteId
      */
-    public static void testRunStarted(String name, String testSuiteId) {
+    public static void testRunStarted(String name, String testSuiteId, String cucumberFeatureId) {
         getInstance().testSuiteId = testSuiteId
-        activeTestRun = new TestRun(name)
+        activeTestRun = new TestRun(name, cucumberFeatureId)
     }
 
     /**
