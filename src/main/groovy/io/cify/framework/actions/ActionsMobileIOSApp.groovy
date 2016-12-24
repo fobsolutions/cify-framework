@@ -10,9 +10,7 @@ import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceCategory
 import io.cify.framework.core.DeviceManager
 import org.openqa.selenium.Dimension
-import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
-import org.openqa.selenium.support.ui.ExpectedCondition
 
 /**
  * Created by FOB Solutions
@@ -135,32 +133,6 @@ trait ActionsMobileIOSApp implements IActions {
     void pinch(WebElement element) {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         (device.getDriver() as AppiumDriver).pinch(element)
-    }
-
-    /**
-     * Automatically dismiss alerts
-     * */
-    void autoAcceptAlerts() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
-
-        boolean accept = true
-
-        while (accept) {
-            try {
-                waitForCondition(device, new ExpectedCondition<Boolean>() {
-                    public Boolean apply(WebDriver d) {
-                        try {
-                            (device.getDriver() as MobileDriver).switchTo().alert().accept()
-                            return true
-                        } catch (ignored) {
-                            return false
-                        }
-                    }
-                }, 10)
-            } catch (ignored) {
-                accept = false
-            }
-        }
     }
 
     /**
