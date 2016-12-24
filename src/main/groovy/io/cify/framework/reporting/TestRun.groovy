@@ -10,6 +10,7 @@ class TestRun {
     String testRunId
     String name
     String result
+    String capabilitiesId
     long startDate
     long endDate
     long duration
@@ -21,6 +22,7 @@ class TestRun {
 
     TestRun(String name) {
         this.name = name
+        this.capabilitiesId = System.getProperty("capabilitiesId")
         this.suiteName = System.getProperty("suiteName")
         this.projectName = System.getProperty("projectName")
         this.testRunId = TestReportManager.generateId()

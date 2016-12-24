@@ -78,6 +78,7 @@ class Report extends TestReportManager {
                 name: testRun.name, startDate: formatDate(testRun.startDate),
                 projectName: testRun.projectName,
                 suiteName: testRun.suiteName,
+                capabilitiesId: testRun.capabilitiesId,
                 scenarios: testRun.scenarioList.collect {
                     [
                             scenarioId    : it.scenarioId,
