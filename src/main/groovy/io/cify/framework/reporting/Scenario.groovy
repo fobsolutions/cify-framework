@@ -12,9 +12,9 @@ class Scenario extends TestRun {
 
     Scenario() {}
 
-    Scenario(String name) {
+    Scenario(String name, String scenarioId) {
         this.name = name
-        this.scenarioId = TestReportManager.generateId()
+        this.scenarioId = scenarioId
         this.startDate = System.currentTimeMillis()
     }
 }

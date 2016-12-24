@@ -49,9 +49,9 @@ class TestReportManager {
      * Creating new Scenario object when test scenario is started
      * @param name
      */
-    public static void scenarioStarted(String name) {
+    public static void scenarioStarted(String name, String scenarioId) {
         activeTestRun?.with {
-            scenarioList.add(new Scenario(name))
+            scenarioList.add(new Scenario(name, scenarioId))
             activeScenario = scenarioList.last()
         }
     }
