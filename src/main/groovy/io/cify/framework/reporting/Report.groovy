@@ -34,7 +34,7 @@ class Report extends TestReportManager{
                 actions:step.stepActionsList.collect {[actionId:it.actionId, name:it.name, duration:formatDuration(it.duration)]},
                 duration: formatDuration(step.duration), result: step.result, errorMessage: formatErrorMessage(step.errorMessage))
         LOG.info(MARKER, jsonBuilder.toPrettyString())
-        exportReport(jsonBuilder, testSuiteId, step.stepId)
+        exportReport(jsonBuilder, testSuiteId as String, step.stepId)
     }
 
     /**
@@ -61,7 +61,7 @@ class Report extends TestReportManager{
                 endDate: formatDate(scenario.endDate),
                 duration: formatDuration(scenario.duration), result: scenario.result, errorMessage: formatErrorMessage(scenario.errorMessage))
         LOG.info(MARKER, jsonBuilder.toPrettyString())
-        exportReport(jsonBuilder, testSuiteId, scenario.scenarioId)
+        exportReport(jsonBuilder, testSuiteId as String, scenario.scenarioId)
     }
 
     /**
@@ -72,11 +72,12 @@ class Report extends TestReportManager{
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.testrun(testSuiteId:testSuiteId, testRunId:testRun.testRunId,
                 name: testRun.name, startDate: formatDate(testRun.startDate),
+                projectName: testRun.projectName,
                 scenarios:testRun.scenarioList.collect {[scenarioId:it.scenarioId, scenarioName:it.name, scenarioResult:it.result]},
                 endDate: formatDate(testRun.endDate),
                 duration: formatDuration(testRun.duration), result: testRun.result)
         LOG.info(MARKER, jsonBuilder.toPrettyString())
-        exportReport(jsonBuilder, testSuiteId, testRun.testRunId)
+        exportReport(jsonBuilder, testSuiteId as String, testRun.testRunId)
     }
 
     private static String formatDate(long dateInMillisecends){

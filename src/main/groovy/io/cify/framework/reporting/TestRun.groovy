@@ -5,6 +5,7 @@ package io.cify.framework.reporting
  */
 class TestRun {
 
+    String projectName
     String testRunId
     String name
     String result
@@ -18,6 +19,7 @@ class TestRun {
     TestRun(){}
     TestRun (String name) {
         this.name = name
+        this.projectName = System.getProperty("projectName")
         this.testRunId = TestReportManager.generateId()
         this.startDate = System.currentTimeMillis()
     }
