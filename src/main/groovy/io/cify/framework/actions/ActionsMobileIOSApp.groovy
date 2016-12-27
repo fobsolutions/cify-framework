@@ -23,25 +23,25 @@ trait ActionsMobileIOSApp implements IActions {
     /**
      * Swipe right on an element
      * @param element WebElement to swipe on
-     * @param duration duration of the swipe in ms
+     * @param duration duration of the swipe in milliseconds
      */
-    void swipeRight(WebElement element, Integer durationInSeconds) {
+    void swipeRight(WebElement element, Integer durationInMs) {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         List rightTopCoordinates = [element.getLocation().getX() + element.getSize().getWidth(), element.getLocation().getY()]
         List leftTopCoordinates = [element.getLocation().getX(), element.getLocation().getY()]
-        (device.getDriver() as IOSDriver).swipe(leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1, rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1, durationInSeconds)
+        (device.getDriver() as IOSDriver).swipe(leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1, rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1, durationInMs)
     }
 
     /**
      * Swipe left on an element
      * @param element WebElement to swipe on
-     * @param duration duration of the swipe in ms
+     * @param duration duration of the swipe in milliseconds
      */
-    void swipeLeft(WebElement element, Integer durationInSeconds) {
+    void swipeLeft(WebElement element, Integer durationInMs) {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         List rightTopCoordinates = [element.getLocation().getX() + element.getSize().getWidth(), element.getLocation().getY()]
         List leftTopCoordinates = [element.getLocation().getX(), element.getLocation().getY()]
-        (device.getDriver() as IOSDriver).swipe(rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1, leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1, durationInSeconds)
+        (device.getDriver() as IOSDriver).swipe(rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1, leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1, durationInMs)
     }
 
     /**
