@@ -44,7 +44,7 @@ class RecordingController {
                         LOG.debug(MARKER, "Recording stopped cause: " + all.message)
                         device.isRecording = false
                     }
-                    sleep((Long)(1000/FPS))
+                    sleep((Long) (1000 / FPS))
                 }
             }
         }
@@ -79,13 +79,13 @@ class RecordingController {
      * @param device - device to take screenshot
      * */
     public static void takeScreenshot(Device device) {
-        if(device.isRecording)
-        try {
-            File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-            FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
-        } catch (all) {
-            LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
-        }
+        if (device.isRecording)
+            try {
+                File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
+                FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+            } catch (all) {
+                LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
+            }
     }
 
     /**

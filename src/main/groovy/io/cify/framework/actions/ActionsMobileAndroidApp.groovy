@@ -46,7 +46,6 @@ trait ActionsMobileAndroidApp implements IActions {
 
     /**
      * Tilts the map
-     * @param device Device
      */
     void tilt() {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.ANDROID)
@@ -73,7 +72,6 @@ trait ActionsMobileAndroidApp implements IActions {
 
     /**
      * Swipes from right to left
-     * @param device
      */
     void swipeRightToLeft() {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.ANDROID)
@@ -86,7 +84,6 @@ trait ActionsMobileAndroidApp implements IActions {
     }
     /**
      * Taps in the middle of the screen (X*Y/2)
-     * @param device
      */
     void tapInTheMiddleOfScreen() {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.ANDROID)
@@ -99,7 +96,6 @@ trait ActionsMobileAndroidApp implements IActions {
     /**
      * Double taps element
      *
-     * @param device - device to perform the tap
      * @param element - element to double tap
      * */
     void doubleTapElement(WebElement element) {
@@ -116,7 +112,6 @@ trait ActionsMobileAndroidApp implements IActions {
 
     /**
      * Zooms in on given element
-     * @param device
      * @param element
      */
     void zoom(WebElement element) {
@@ -126,7 +121,6 @@ trait ActionsMobileAndroidApp implements IActions {
 
     /**
      * Zooms out on given element
-     * @param device
      * @param element
      */
     void pinch(WebElement element) {
@@ -137,7 +131,6 @@ trait ActionsMobileAndroidApp implements IActions {
     /**
      * Long tap on element
      *
-     * @param device - device to perform the long tap
      * @param element - element to long tap
      */
     static void longTap(WebElement element) {

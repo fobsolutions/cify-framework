@@ -17,7 +17,8 @@ import org.openqa.selenium.support.ui.Select
 trait ActionsDesktopWeb implements IActions {
 
     /**
-     * Opens URL
+     * Opens given URL
+     * @param url
      */
     void open(String url) {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
@@ -45,9 +46,9 @@ trait ActionsDesktopWeb implements IActions {
     }
 
     /**
-     * Scrolls to element, gets coordinates based on element
+     * Scrolls to element
      *
-     * @param element element to scroll to
+     * @param element to scroll to
      */
     void scrollToElement(WebElement element) {
         Coordinates c = ((Locatable) element).getCoordinates()
@@ -71,20 +72,21 @@ trait ActionsDesktopWeb implements IActions {
     /**
      * Gets bounds of a web element
      *
-     * @param we WebElement to get bounds of
+     * @param element WebElement to get bounds of
      * @return string array list [from left, from top, width, height]
      */
-    List<String> getBoundedRectangleOfElement(WebElement we) {
+    List<String> getBoundedRectangleOfElement(WebElement element) {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         JavascriptExecutor je = (JavascriptExecutor) device.getDriver()
         List<String> bounds = (ArrayList<String>) je.executeScript(
                 "var rect = arguments[0].getBoundingClientRect();" +
-                        "return [ '' + parseInt(rect.left), '' + parseInt(rect.top), '' + parseInt(rect.width), '' + parseInt(rect.height) ]", we)
+                        "return [ '' + parseInt(rect.left), '' + parseInt(rect.top), '' + parseInt(rect.width), '' + parseInt(rect.height) ]", element)
         bounds
     }
 
     /**
      * Gets current URL of the web browser
+     * @return current URL
      */
     String getCurrentUrl() {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
@@ -93,6 +95,7 @@ trait ActionsDesktopWeb implements IActions {
 
     /**
      * Gets title of the website
+     * @return title of web site
      */
     String getTitle() {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
@@ -124,7 +127,8 @@ trait ActionsDesktopWeb implements IActions {
     }
 
     /**
-     * Selects from dropdown by visible text
+     * Selects from select box by visible text
+     * @param element select box element
      * @param text
      */
     void selectByVisibleText(WebElement element, String text) {
@@ -134,7 +138,8 @@ trait ActionsDesktopWeb implements IActions {
     }
 
     /**
-     * Selects from dropdown by value
+     * Selects from select box by value
+     * @param element select box element
      * @param value
      */
     void selectByValue(WebElement element, String value) {
@@ -144,7 +149,8 @@ trait ActionsDesktopWeb implements IActions {
     }
 
     /**
-     * Deselects all from select box
+     * Deselect all from select box
+     * @param element - select element
      */
     void deselectAllFromSelect(WebElement element) {
         Select select = new Select(element)
@@ -162,7 +168,10 @@ trait ActionsDesktopWeb implements IActions {
     }
 
     /**
-     * Checks if radio button is selected
+     * Checks if element is selected
+     *
+     * @param element to check
+     * @return boolean
      */
     boolean isSelected(WebElement element) {
         element.isSelected()
