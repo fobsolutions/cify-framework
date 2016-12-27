@@ -48,6 +48,7 @@ trait IActions {
 
     /**
      * Waits for condition
+     * @param device device under test
      * @param condition true, false
      * @param timeOut in ms
      * @return True if condition is met
