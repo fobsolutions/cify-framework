@@ -11,7 +11,7 @@ class ReportingTest extends GroovyTestCase {
     void setUp() {
         trm = TestReportManager.getTestReportManager()
         trm.testRunStarted("TestAccount","runId12334")
-        trm.scenarioStarted("User creates a new account with iOS")
+        trm.scenarioStarted("User creates a new account with iOS", "scenarioId")
         trm.stepStarted("Given user opens iOS application")
         DeviceManager.getInstance().createDevice(DeviceCategory.IOS, "TestReportManager12345")
         trm.stepActionStarted("Open application")

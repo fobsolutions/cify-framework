@@ -1,5 +1,9 @@
 package io.cify.framework.reporting
 
+import groovy.json.internal.LazyMap
+import io.cify.framework.core.DeviceCategory
+import io.cify.framework.core.DeviceManager
+
 import static java.util.UUID.randomUUID
 
 /**
@@ -13,7 +17,7 @@ class TestReportManager {
     public static TestRun activeTestRun
     private static volatile TestReportManager instance
 
-    public TestReportManager(){
+    public TestReportManager() {
     }
 
     private static TestReportManager getInstance() {
@@ -29,9 +33,9 @@ class TestReportManager {
 
     /**
      * Returning instance of TestReportManager class object
-     * @return  TestReportManager
+     * @return TestReportManager
      */
-    public static TestReportManager getTestReportManager(){
+    public static TestReportManager getTestReportManager() {
         return getInstance()
     }
 
@@ -40,18 +44,18 @@ class TestReportManager {
      * @param name
      * @param testSuiteId
      */
-    public static void testRunStarted(String name, String testSuiteId){
+    public static void testRunStarted(String name, String testSuiteId, String cucumberFeatureId) {
         getInstance().testSuiteId = testSuiteId
-        activeTestRun = new TestRun(name)
+        activeTestRun = new TestRun(name, cucumberFeatureId)
     }
 
     /**
      * Creating new Scenario object when test scenario is started
      * @param name
      */
-    public static void scenarioStarted(String name){
+    public static void scenarioStarted(String name, String scenarioId) {
         activeTestRun?.with {
-            scenarioList.add(new Scenario(name))
+            scenarioList.add(new Scenario(name, scenarioId))
             activeScenario = scenarioList.last()
         }
     }
@@ -60,7 +64,7 @@ class TestReportManager {
      * Creating new Step object when test step is started
      * @param name
      */
-    public static void stepStarted(String name){
+    public static void stepStarted(String name) {
         getActiveScenario()?.stepList?.add(new Step(name))
     }
 
@@ -68,18 +72,18 @@ class TestReportManager {
      * Creating new StepAction object when test step action is started
      * @param name
      */
-    public static void stepActionStarted(String name){
+    public static void stepActionStarted(String name) {
         getActiveStep()?.stepActionsList?.add(new StepAction(name))
     }
 
     /**
      * Adding and report information about finished test run
      */
-    public static void testRunFinished(){
+    public static void testRunFinished() {
         activeTestRun?.with {
             endDate = System.currentTimeMillis()
             duration = activeTestRun.endDate - activeTestRun.startDate
-            result = isTestRunFailed()? "failed" : "passed"
+            result = isTestRunFailed() ? "failed" : "passed"
             Report.reportTestRun(it)
             activeTestRun = null
         }
@@ -89,7 +93,7 @@ class TestReportManager {
      * Returning true if current active test run is failed
      * @return boolean
      */
-    private static boolean isTestRunFailed(){
+    private static boolean isTestRunFailed() {
         return activeTestRun?.scenarioList?.find { it.result == "failed" }
     }
 
@@ -98,7 +102,7 @@ class TestReportManager {
      * @param result
      * @param errorMessage
      */
-    public static void scenarioFinished(String result, String errorMessage){
+    public static void scenarioFinished(String result, String errorMessage) {
         getActiveScenario()?.with {
             endDate = System.currentTimeMillis()
             duration = endDate - startDate
@@ -112,7 +116,7 @@ class TestReportManager {
      * Returning true if current active scenario is failed
      * @return boolean
      */
-    private static boolean isScenarioFailed(){
+    private static boolean isScenarioFailed() {
         return getActiveScenario()?.stepList?.find { it.result == "failed" }
     }
 
@@ -122,20 +126,20 @@ class TestReportManager {
      * @param duration
      * @param errorMessage
      */
-    public static void stepFinished(String result, long duration, String errorMessage){
+    public static void stepFinished(String result, long duration, String errorMessage) {
         String scenarioId = getActiveScenario()?.scenarioId
         getActiveStep()?.with {
             it.errorMessage = errorMessage
             it.duration = duration
             it.result = result
-            Report.reportStep(it,scenarioId)
+            Report.reportStep(it, scenarioId)
         }
     }
 
     /**
      * Adding information about finished test step action
      */
-    public static void stepActionFinished(){
+    public static void stepActionFinished() {
         getActiveStepAction()?.with {
             endDate = System.currentTimeMillis()
             duration = endDate - startDate
@@ -147,18 +151,19 @@ class TestReportManager {
      * @param deviceId
      * @param deviceCategory
      */
-    public static void addDeviceToTestReport(String deviceId, String deviceCategory){
-            Map<String, String> device = new HashMap<>()
-            device.put("deviceId", deviceId)
-            device.put("deviceCategory", deviceCategory)
-            getActiveScenario()?.deviceList?.add(device)
+    public static void addDeviceToTestReport(String deviceId, String deviceCategory) {
+        LazyMap device = [:]
+        device.put("deviceId", deviceId)
+        device.put("deviceCategory", deviceCategory)
+        device.putAll(DeviceManager.getInstance().getCapabilities().toDesiredCapabilities(DeviceCategory.valueOf(deviceCategory)).asMap())
+        getActiveScenario()?.deviceList?.add(device)
     }
 
     /**
      * Returns current active scenario
      * @return Scenario object
      */
-    public static Scenario getActiveScenario(){
+    public static Scenario getActiveScenario() {
         return activeTestRun?.activeScenario
     }
 
@@ -166,7 +171,7 @@ class TestReportManager {
      * Returns current active step
      * @return Step object
      */
-    public static Step getActiveStep(){
+    public static Step getActiveStep() {
         return getActiveScenario()?.stepList?.find { !it.result }
     }
 
@@ -174,7 +179,7 @@ class TestReportManager {
      * Returns current active step action
      * @return StepAction object
      */
-    public static StepAction getActiveStepAction(){
+    public static StepAction getActiveStepAction() {
         return getActiveStep()?.stepActionsList?.last()
     }
 
@@ -182,7 +187,7 @@ class TestReportManager {
      * Generates unique id
      * @return string
      */
-    public static String generateId(){
-        return (System.currentTimeMillis() + "-"+randomUUID()) as String
+    public static String generateId() {
+        return (System.currentTimeMillis() + "-" + randomUUID()) as String
     }
 }
