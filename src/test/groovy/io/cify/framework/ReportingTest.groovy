@@ -10,43 +10,43 @@ class ReportingTest extends GroovyTestCase {
 
     void setUp() {
         trm = TestReportManager.getTestReportManager()
-        trm.testRunStarted("TestAccount","runId12334")
+        trm.testRunStarted("TestAccount", "runId12334", "cucumberFeatureId")
         trm.scenarioStarted("User creates a new account with iOS", "scenarioId")
         trm.stepStarted("Given user opens iOS application")
         DeviceManager.getInstance().createDevice(DeviceCategory.IOS, "TestReportManager12345")
         trm.stepActionStarted("Open application")
     }
 
-    void testGetTestReportManager(){
+    void testGetTestReportManager() {
         assert trm
     }
 
-    void testTestRunStarted(){
+    void testTestRunStarted() {
         assert trm.activeTestRun
     }
 
-    void testScenarioStarted(){
+    void testScenarioStarted() {
         assert trm.getActiveScenario()
     }
 
-    void testStepStarted(){
+    void testStepStarted() {
         assert trm.getActiveStep()
     }
 
-    void  testStepActionStarted(){
+    void testStepActionStarted() {
         assert trm.getActiveStepAction()
     }
 
-    void testAddDeviceToTestReport(){
+    void testAddDeviceToTestReport() {
         assert trm.getActiveScenario().deviceList
         assert trm.getActiveScenario().deviceList.first().get("deviceId") == "TestReportManager12345"
         assert trm.getActiveScenario().deviceList.first().get("deviceCategory") == "IOS"
     }
 
-    void tearDown(){
+    void tearDown() {
         trm.stepActionFinished()
-        trm.stepFinished("passed",17345,null)
-        trm.scenarioFinished("passed",null)
+        trm.stepFinished("passed", 17345, null)
+        trm.scenarioFinished("passed", null)
         trm.testRunFinished()
         DeviceManager.getInstance().quitAllDevices()
 

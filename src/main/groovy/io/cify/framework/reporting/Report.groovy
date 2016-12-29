@@ -17,17 +17,17 @@ class Report extends TestReportManager {
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('REPORT') as Marker
 
-    private static String reportingDirectory = "build/cify/reporting/"
     private static long milli = 1000
     private static DecimalFormat decimalFormat = new DecimalFormat("0.000")
     private static String dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
 
     /**
-     * Builds and export json object with test step report information
+     * Builds json object with test step report information
      * @param step
      * @param scenarioId
+     * @return json pretty string
      */
-    static void reportStep(Step step, String scenarioId) {
+    static String reportStep(Step step, String scenarioId) {
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.step(
                 testSuiteId: testSuiteId,
@@ -44,24 +44,15 @@ class Report extends TestReportManager {
                 },
                 duration: formatDuration(step.duration), result: step.result, errorMessage: formatErrorMessage(step.errorMessage))
         LOG.info(MARKER, jsonBuilder.toPrettyString())
-        exportReport(jsonBuilder, testSuiteId as String, step.stepId)
+        return jsonBuilder.toPrettyString()
     }
 
     /**
-     * Exporting json report to local file
-     * @param jsonReport
-     * @param testSuiteId
-     * @param id
-     */
-    public static void exportReport(JsonBuilder jsonReport, String testSuiteId, String id) {
-        saveReportToFile(jsonReport.toPrettyString(), reportingDirectory + testSuiteId + "/" + id + ".json")
-    }
-
-    /**
-     * Builds and export json object with test scenario report information
+     * Builds json object with test scenario report information
      * @param scenario
+     * @return json pretty string
      */
-    static void reportScenario(Scenario scenario) {
+    static String reportScenario(Scenario scenario) {
         def deviceList = scenario.deviceList
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.scenario(
@@ -81,14 +72,15 @@ class Report extends TestReportManager {
                 endDate: formatDate(scenario.endDate),
                 duration: formatDuration(scenario.duration), result: scenario.result, errorMessage: formatErrorMessage(scenario.errorMessage))
         LOG.info(MARKER, jsonBuilder.toPrettyString())
-        exportReport(jsonBuilder, testSuiteId as String, scenario.scenarioId)
+        return jsonBuilder.toPrettyString()
     }
 
     /**
-     * Builds and export json object with test run report information
+     * Builds json object with test run report information
      * @param testRun
+     * @return json pretty string
      */
-    static void reportTestRun(TestRun testRun) {
+    static String reportTestRun(TestRun testRun) {
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.testrun(
                 testSuiteId: testSuiteId,
@@ -110,7 +102,7 @@ class Report extends TestReportManager {
                 endDate: formatDate(testRun.endDate),
                 duration: formatDuration(testRun.duration), result: testRun.result)
         LOG.info(MARKER, jsonBuilder.toPrettyString())
-        exportReport(jsonBuilder, testSuiteId as String, testRun.testRunId)
+        return jsonBuilder.toPrettyString()
     }
 
     private static String formatDate(long dateInMilliseconds) {
@@ -123,11 +115,5 @@ class Report extends TestReportManager {
 
     private static String formatDuration(long duration) {
         return duration ? decimalFormat.format(duration / milli) : 0
-    }
-
-    private static void saveReportToFile(String content, String filePath) {
-        def file = new File(filePath)
-        file.getParentFile().mkdirs()
-        file.write(content)
     }
 }
