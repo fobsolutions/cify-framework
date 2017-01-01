@@ -86,7 +86,6 @@ class Capabilities {
                 break
             default:
                 throw new CifyFrameworkException("Unsupported device category $category")
-
         }
     }
 }

@@ -28,6 +28,15 @@ class DeviceManagerTest extends GroovyTestCase {
 
     private String capsBadJson = '!!!!!!'
 
+    void testAddToDesiredCapabilities() {
+        System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
+
+        Capabilities capabilities = new DeviceManager().getCapabilities()
+        capabilities.addToDesiredCapabilities(DeviceCategory.BROWSER, "test", "testValue")
+
+        assert capabilities.toDesiredCapabilities(DeviceCategory.BROWSER).getCapability("test") == "testValue"
+    }
+
     void testShouldUseProvidedCapabilities() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
