@@ -77,16 +77,19 @@ class TestReportManager {
     }
 
     /**
-     * Adding and report information about finished test run
+     * Adding information about finished test run and returns json report
+     * @return String
      */
-    public static void testRunFinished() {
+    public static String testRunFinished() {
+        String report = null
         activeTestRun?.with {
             endDate = System.currentTimeMillis()
             duration = activeTestRun.endDate - activeTestRun.startDate
             result = isTestRunFailed() ? "failed" : "passed"
-            Report.reportTestRun(it)
+            report = Report.reportTestRun(it)
             activeTestRun = null
         }
+        return report
     }
 
     /**
@@ -98,17 +101,18 @@ class TestReportManager {
     }
 
     /**
-     * Adding and report information about finished test scenario
+     * Adding information about finished test scenario and returns json report
      * @param result
      * @param errorMessage
+     * @return String
      */
-    public static void scenarioFinished(String result, String errorMessage) {
+    public static String scenarioFinished(String result, String errorMessage) {
         getActiveScenario()?.with {
             endDate = System.currentTimeMillis()
             duration = endDate - startDate
             it.errorMessage = errorMessage
             it.result = isScenarioFailed() ? "failed" : result
-            Report.reportScenario(it)
+            return Report.reportScenario(it)
         }
     }
 
@@ -121,18 +125,19 @@ class TestReportManager {
     }
 
     /**
-     * Adding and report information about finished test step
+     * Adding information about finished test step and returns json report
      * @param result
      * @param duration
      * @param errorMessage
+     * @return String
      */
-    public static void stepFinished(String result, long duration, String errorMessage) {
+    public static String stepFinished(String result, long duration, String errorMessage) {
         String scenarioId = getActiveScenario()?.scenarioId
         getActiveStep()?.with {
             it.errorMessage = errorMessage
             it.duration = duration
             it.result = result
-            Report.reportStep(it, scenarioId)
+            return Report.reportStep(it, scenarioId)
         }
     }
 
