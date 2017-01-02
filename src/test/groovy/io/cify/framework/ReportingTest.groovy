@@ -46,12 +46,10 @@ class ReportingTest extends GroovyTestCase {
     }
 
     void tearDown() {
-
         assert new JsonSlurper().parseText(trm.stepFinished("passed", 17345, null))
         assert new JsonSlurper().parseText(trm.scenarioFinished("passed", null))
         assert new JsonSlurper().parseText(trm.testRunFinished())
         DeviceManager.getInstance().quitAllDevices()
-
         assert !trm.getActiveStepAction()
         assert !trm.getActiveStep()
         assert !trm.getActiveScenario()
