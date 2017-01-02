@@ -1,5 +1,6 @@
 package io.cify.framework
 
+import groovy.json.JsonSlurper
 import io.cify.framework.core.DeviceCategory
 import io.cify.framework.core.DeviceManager
 import io.cify.framework.reporting.TestReportManager
@@ -15,6 +16,7 @@ class ReportingTest extends GroovyTestCase {
         trm.stepStarted("Given user opens iOS application")
         DeviceManager.getInstance().createDevice(DeviceCategory.IOS, "TestReportManager12345")
         trm.stepActionStarted("Open application")
+        trm.stepActionFinished()
     }
 
     void testGetTestReportManager() {
@@ -44,10 +46,10 @@ class ReportingTest extends GroovyTestCase {
     }
 
     void tearDown() {
-        trm.stepActionFinished()
-        trm.stepFinished("passed", 17345, null)
-        trm.scenarioFinished("passed", null)
-        trm.testRunFinished()
+
+        assert new JsonSlurper().parseText(trm.stepFinished("passed", 17345, null))
+        assert new JsonSlurper().parseText(trm.scenarioFinished("passed", null))
+        assert new JsonSlurper().parseText(trm.testRunFinished())
         DeviceManager.getInstance().quitAllDevices()
 
         assert !trm.getActiveStepAction()
