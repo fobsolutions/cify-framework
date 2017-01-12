@@ -13,7 +13,7 @@ import static java.util.UUID.randomUUID
  */
 class TestReportManager {
 
-    public static testSuiteId
+    public static testsuiteId
     public static TestRun activeTestRun
     private static volatile TestReportManager instance
 
@@ -42,20 +42,20 @@ class TestReportManager {
     /**
      * Creating new TestRun object when test run is started
      * @param name
-     * @param testSuiteId
+     * @param testsuiteId
      */
-    public static void testRunStarted(String name, String testSuiteId, String cucumberFeatureId) {
-        getInstance().testSuiteId = testSuiteId
-        activeTestRun = new TestRun(name, cucumberFeatureId)
+    public static void testRunStarted(String name, String testsuiteId, String cucumberTestrunId) {
+        getInstance().testsuiteId = testsuiteId
+        activeTestRun = new TestRun(name, cucumberTestrunId)
     }
 
     /**
      * Creating new Scenario object when test scenario is started
      * @param name
      */
-    public static void scenarioStarted(String name, String scenarioId) {
+    public static void scenarioStarted(String name, String cucumberScenarioId) {
         activeTestRun?.with {
-            scenarioList.add(new Scenario(name, scenarioId))
+            scenarioList.add(new Scenario(name, cucumberScenarioId))
             activeScenario = scenarioList.last()
         }
     }
@@ -136,6 +136,8 @@ class TestReportManager {
         getActiveStep()?.with {
             it.errorMessage = errorMessage
             it.duration = duration
+            endDate = System.currentTimeMillis()
+            startDate = endDate - duration
             it.result = result
             return Report.reportStep(it, scenarioId)
         }
