@@ -17,8 +17,8 @@ class Report extends TestReportManager {
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('REPORT') as Marker
 
-    private final static long MILLI = 1000
-    private final static DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.000")
+  //  private final static long MILLI = 1000
+  //  private final static DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.000")
 
     /**
      * Builds json object with test step report information
@@ -44,11 +44,11 @@ class Report extends TestReportManager {
                     [
                             actionId: it.actionId,
                             name    : it.name,
-                            duration: formatDuration(it.duration)
+                            duration: it.duration
                     ]
                 },
                 endDate: step.endDate,
-                duration: formatDuration(step.duration), result: step.result, errorMessage: formatErrorMessage(step.errorMessage))
+                duration: step.duration, result: step.result, errorMessage: formatErrorMessage(step.errorMessage))
         LOG.info(MARKER, jsonBuilder.toPrettyString())
         return jsonBuilder.toString()
     }
@@ -71,6 +71,9 @@ class Report extends TestReportManager {
                 scenarioName: scenario.name,
                 cucumberScenarioId: scenario.cucumberScenarioId,
                 startDate: scenario.startDate,
+                passedSteps: scenario.stepList.findAll{ it.result == "passed" }.size(),
+                failedSteps: scenario.stepList.findAll{ it.result == "failed" }.size(),
+                skippedSteps: scenario.stepList.findAll{ it.result == "skipped" }.size(),
                 devices: deviceList.collect { it },
                 steps: scenario.stepList.collect {
                     [
@@ -81,15 +84,15 @@ class Report extends TestReportManager {
                                 [
                                         actionId: it.actionId,
                                         actionName    : it.name,
-                                        actionDuration: formatDuration(it.duration)
+                                        actionDuration: it.duration
                                 ]
                             },
-                            stepDuration: formatDuration(it.duration),
+                            stepDuration: it.duration,
                             stepErrorMessage: formatErrorMessage(it.errorMessage)
                     ]
                 },
                 endDate: scenario.endDate,
-                duration: formatDuration(scenario.duration), result: scenario.result, errorMessage: formatErrorMessage(scenario.errorMessage))
+                duration: scenario.duration, result: scenario.result, errorMessage: formatErrorMessage(scenario.errorMessage))
         LOG.info(MARKER, jsonBuilder.toPrettyString())
         return jsonBuilder.toString()
     }
@@ -110,6 +113,11 @@ class Report extends TestReportManager {
                 cucumberTestrunId: testRun.cucumberTestrunId,
                 startDate: testRun.startDate,
                 capabilitiesId: testRun.capabilitiesId,
+                passedScenarios: testRun.scenarioList.findAll{ it.result == "passed" }.size(),
+                failedScenarios: testRun.scenarioList.findAll{ it.result == "failed" }.size(),
+                passedSteps: sumOfStepsInTestrun(testRun,"passed"),
+                failedSteps: sumOfStepsInTestrun(testRun,"failed"),
+                skippedSteps: sumOfStepsInTestrun(testRun,"skipped"),
                 scenarios: testRun.scenarioList.collect {
                     [
                             scenarioId    : it.scenarioId,
@@ -120,16 +128,22 @@ class Report extends TestReportManager {
                     ]
                 },
                 endDate: testRun.endDate,
-                duration: formatDuration(testRun.duration), result: testRun.result)
+                duration: testRun.duration, result: testRun.result)
         LOG.info(MARKER, jsonBuilder.toPrettyString())
         return jsonBuilder.toString()
+    }
+
+    private static int sumOfStepsInTestrun(TestRun testRun, String status){
+        int result = 0
+        testRun?.scenarioList?.each{ result = result + it.stepList.findAll{ it.result == status }.size() }
+        return result
     }
 
     private static String formatErrorMessage(String errorMessage) {
         return errorMessage ? errorMessage : ""
     }
 
-    private static String formatDuration(long duration) {
+/*    private static String formatDuration(long duration) {
         return duration ? DECIMAL_FORMAT.format(duration / MILLI) : 0
-    }
+    }*/
 }
