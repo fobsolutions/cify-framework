@@ -149,7 +149,7 @@ class Report extends TestReportManager {
     }
 
     private static String formatErrorMessage(String errorMessage) {
-        return errorMessage ? errorMessage : ""
+        return errorMessage ? errorMessage : "no message"
     }
 
 }
