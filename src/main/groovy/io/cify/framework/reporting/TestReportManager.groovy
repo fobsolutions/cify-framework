@@ -16,8 +16,13 @@ class TestReportManager {
     public static testsuiteId
     public static TestRun activeTestRun
     private static volatile TestReportManager instance
+    public static boolean isReporting = false
 
     public TestReportManager() {
+        isReporting = true
+/*        if (System.getProperty("reporting") == "true"){
+            isReporting = true
+        }*/
     }
 
     private static TestReportManager getInstance() {

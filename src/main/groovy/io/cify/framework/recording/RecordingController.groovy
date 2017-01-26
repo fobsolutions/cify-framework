@@ -28,8 +28,6 @@ class RecordingController {
     private static final String TEMP = "temp"
     private static final int FPS = 2
 
-    private static boolean isReporting = false
-
     /**
      * Start recording
      *
@@ -37,9 +35,6 @@ class RecordingController {
      * */
     public static void startRecording(Device device) {
         LOG.debug(MARKER, "Start recording...")
-        if (System.getProperty("reporting") == "true"){
-            isReporting = true
-        }
         Thread.start(device.id + "_recorder") {
             device.isRecording = true
             if (new File(getVideoDirForDevice(device) + TEMP).mkdirs()) {
@@ -62,7 +57,7 @@ class RecordingController {
      * @param device - device to stop recording
      * */
     public static void stopRecording(Device device) {
-        if ( !isReporting ) {
+        if ( !TestReportManager.isReporting ) {
             try {
                 LOG.debug(MARKER, "Stop recording...")
 
@@ -91,7 +86,7 @@ class RecordingController {
             try {
                 File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
                 String filename = System.currentTimeMillis()
-                if(isReporting){
+                if(TestReportManager.isReporting){
                     filename += "_" + TestReportManager.getActiveStep().stepId + "_" + TestReportManager.getActiveStepAction().actionId
                 }
                 FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + filename + OUTPUT_SCREENSHOT_FORMAT))
