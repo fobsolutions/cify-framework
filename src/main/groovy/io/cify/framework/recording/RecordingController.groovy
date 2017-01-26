@@ -1,6 +1,7 @@
 package io.cify.framework.recording
 
 import io.cify.framework.core.Device
+import io.cify.framework.reporting.TestReportManager
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -27,6 +28,8 @@ class RecordingController {
     private static final String TEMP = "temp"
     private static final int FPS = 2
 
+    private static boolean isReporting = false
+
     /**
      * Start recording
      *
@@ -34,6 +37,9 @@ class RecordingController {
      * */
     public static void startRecording(Device device) {
         LOG.debug(MARKER, "Start recording...")
+        if (System.getProperty("reporting") == "true"){
+            isReporting = true
+        }
         Thread.start(device.id + "_recorder") {
             device.isRecording = true
             if (new File(getVideoDirForDevice(device) + TEMP).mkdirs()) {
@@ -56,20 +62,22 @@ class RecordingController {
      * @param device - device to stop recording
      * */
     public static void stopRecording(Device device) {
-        try {
-            LOG.debug(MARKER, "Stop recording...")
+        if ( !isReporting ) {
+            try {
+                LOG.debug(MARKER, "Stop recording...")
 
-            boolean success = Recording.imagesToMedia(
-                    getVideoDirForDevice(device) + TEMP,
-                    getRecordingDuration(device),
-                    getVideoDirForDevice(device),
-                    device.id + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + OUTPUT_MEDIA_FORMAT
-            )
-            if (success) {
-                deleteTemporaryImages(device)
+                boolean success = Recording.imagesToMedia(
+                        getVideoDirForDevice(device) + TEMP,
+                        getRecordingDuration(device),
+                        getVideoDirForDevice(device),
+                        device.id + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + OUTPUT_MEDIA_FORMAT
+                )
+                if (success) {
+                    deleteTemporaryImages(device)
+                }
+            } catch (all) {
+                LOG.debug("Stop recording failed cause $all.message")
             }
-        } catch (all) {
-            LOG.debug("Stop recording failed cause $all.message")
         }
     }
 
@@ -82,7 +90,11 @@ class RecordingController {
         if (device.isRecording)
             try {
                 File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-                FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+                String filename = System.currentTimeMillis()
+                if(isReporting){
+                    filename += "_" + TestReportManager.getActiveStep().stepId + "_" + TestReportManager.getActiveStepAction().actionId
+                }
+                FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + filename + OUTPUT_SCREENSHOT_FORMAT))
             } catch (all) {
                 LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
             }
