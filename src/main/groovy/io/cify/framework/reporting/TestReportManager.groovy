@@ -20,9 +20,6 @@ class TestReportManager {
 
     public TestReportManager() {
         isReporting = true
-/*        if (System.getProperty("reporting") == "true"){
-            isReporting = true
-        }*/
     }
 
     private static TestReportManager getInstance() {
@@ -192,7 +189,11 @@ class TestReportManager {
      * @return StepAction object
      */
     public static StepAction getActiveStepAction() {
-        return getActiveStep()?.stepActionsList?.last()
+        if (getActiveStep()?.stepActionsList?.size() > 0) {
+            return getActiveStep().stepActionsList.last()
+        } else {
+            return null
+        }
     }
 
     /**
