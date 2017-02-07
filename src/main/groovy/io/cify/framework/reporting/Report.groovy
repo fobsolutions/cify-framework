@@ -40,6 +40,8 @@ class Report extends TestReportManager {
                     [
                             actionId: it.actionId,
                             name    : it.name,
+                            startDate: it.startDate,
+                            endDate: it.endDate,
                             duration: it.duration
                     ]
                 },
@@ -67,7 +69,6 @@ class Report extends TestReportManager {
                 scenarioName: scenario.name,
                 cucumberScenarioId: scenario.cucumberScenarioId,
                 capabilitiesId: activeTestRun.capabilitiesId,
-                startDate: scenario.startDate,
                 passedSteps: scenario.stepList.findAll { it.result == "passed" }.size(),
                 failedSteps: scenario.stepList.findAll { it.result == "failed" }.size(),
                 skippedSteps: scenario.stepList.findAll { it.result == "skipped" }.size(),
@@ -81,13 +82,18 @@ class Report extends TestReportManager {
                                 [
                                         actionId      : it.actionId,
                                         actionName    : it.name,
-                                        actionDuration: it.duration
+                                        startDate: it.startDate,
+                                        endDate: it.endDate,
+                                        duration: it.duration
                                 ]
                             },
-                            stepDuration    : it.duration,
+                            startDate: it.startDate,
+                            endDate: it.endDate,
+                            duration    : it.duration,
                             stepErrorMessage: formatErrorMessage(it.errorMessage)
                     ]
                 },
+                startDate: scenario.startDate,
                 endDate: scenario.endDate,
                 duration: scenario.duration, result: scenario.result, errorMessage: formatErrorMessage(scenario.errorMessage))
         LOG.info(MARKER, jsonBuilder.toPrettyString())
@@ -108,7 +114,6 @@ class Report extends TestReportManager {
                 testrunId: testRun.testrunId,
                 testrunName: testRun.name,
                 cucumberTestrunId: testRun.cucumberTestrunId,
-                startDate: testRun.startDate,
                 capabilitiesId: testRun.capabilitiesId,
                 passedScenarios: testRun.scenarioList.findAll { it.result == "passed" }.size(),
                 failedScenarios: testRun.scenarioList.findAll { it.result == "failed" }.size(),
@@ -126,6 +131,7 @@ class Report extends TestReportManager {
                 },
                 testrunDevices: getUniqueDeviceList(testRun).size(),
                 testrunDeviceList: getUniqueDeviceList(testRun),
+                startDate: testRun.startDate,
                 endDate: testRun.endDate,
                 duration: testRun.duration, result: testRun.result)
         LOG.info(MARKER, jsonBuilder.toPrettyString())
