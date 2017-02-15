@@ -1,6 +1,7 @@
 package io.cify.framework.recording
 
 import io.cify.framework.core.Device
+import io.cify.framework.reporting.TestReportManager
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -22,6 +23,8 @@ class RecordingController {
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('RECORDING CONTROLLER') as Marker
 
+    private static String screenshotsReportingDir
+    private static final String SCREENSHOTS_SUB_DIR = "screenshots"
     private static final String OUTPUT_MEDIA_FORMAT = ".mp4"
     private static final String OUTPUT_SCREENSHOT_FORMAT = ".png"
     private static final String TEMP = "temp"
@@ -34,18 +37,23 @@ class RecordingController {
      * */
     public static void startRecording(Device device) {
         LOG.debug(MARKER, "Start recording...")
+        if (TestReportManager.isReporting) {
+            screenshotsReportingDir = System.getProperty("videoDir") + SCREENSHOTS_SUB_DIR
+            new File(screenshotsReportingDir).mkdirs()
+        } else {
+            new File(getVideoDirForDevice(device) + TEMP).mkdirs()
+        }
+
         Thread.start(device.id + "_recorder") {
             device.isRecording = true
-            if (new File(getVideoDirForDevice(device) + TEMP).mkdirs()) {
-                while (device.hasDriver() && device.isRecording) {
-                    try {
-                        takeScreenshot(device)
-                    } catch (all) {
-                        LOG.debug(MARKER, "Recording stopped cause: " + all.message)
-                        device.isRecording = false
-                    }
-                    sleep((Long) (1000 / FPS))
+            while (device.hasDriver() && device.isRecording) {
+                try {
+                    takeScreenshot(device)
+                } catch (all) {
+                    LOG.debug(MARKER, "Recording stopped cause: " + all.message)
+                    device.isRecording = false
                 }
+                sleep((Long) (1000 / FPS))
             }
         }
     }
@@ -56,20 +64,22 @@ class RecordingController {
      * @param device - device to stop recording
      * */
     public static void stopRecording(Device device) {
-        try {
-            LOG.debug(MARKER, "Stop recording...")
+        if (!TestReportManager.isReporting) {
+            try {
+                LOG.debug(MARKER, "Stop recording...")
 
-            boolean success = Recording.imagesToMedia(
-                    getVideoDirForDevice(device) + TEMP,
-                    getRecordingDuration(device),
-                    getVideoDirForDevice(device),
-                    device.id + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + OUTPUT_MEDIA_FORMAT
-            )
-            if (success) {
-                deleteTemporaryImages(device)
+                boolean success = Recording.imagesToMedia(
+                        getVideoDirForDevice(device) + TEMP,
+                        getRecordingDuration(device),
+                        getVideoDirForDevice(device),
+                        device.id + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + OUTPUT_MEDIA_FORMAT
+                )
+                if (success) {
+                    deleteTemporaryImages(device)
+                }
+            } catch (all) {
+                LOG.debug("Stop recording failed cause $all.message")
             }
-        } catch (all) {
-            LOG.debug("Stop recording failed cause $all.message")
         }
     }
 
@@ -80,12 +90,31 @@ class RecordingController {
      * */
     public static void takeScreenshot(Device device) {
         if (device.isRecording)
-            try {
+        try {
+            if (TestReportManager.isReporting) {
+                String scenarioId = TestReportManager.getActiveScenario()?.scenarioId
+                String deviceId = device?.getId()
+                String stepId = TestReportManager.getActiveStep()?.stepId
+                String actionId = TestReportManager.getActiveStepAction()?.actionId ?: 'no-action'
+                if (!scenarioId || !deviceId || !stepId || !actionId) {
+                    return
+                }
+                String filename = System.currentTimeMillis() + "_" + scenarioId +
+                        "_" + deviceId + "_" + stepId + "_" + actionId
                 File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-                FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
-            } catch (all) {
-                LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
+                if (scrFile.isFile()) {
+                    scrFile.getParentFile().mkdirs()
+                    FileUtils.copyFile(scrFile, new File(screenshotsReportingDir + "/" + scenarioId + "/" + filename + OUTPUT_SCREENSHOT_FORMAT))
+                }
+            } else {
+                File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
+                if (scrFile.isFile()) {
+                    FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+                }
             }
+        } catch (all) {
+            LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
+        }
     }
 
     /**

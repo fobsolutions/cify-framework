@@ -12,10 +12,18 @@ class ReportingTest extends GroovyTestCase {
     void setUp() {
         trm = TestReportManager.getTestReportManager()
         trm.testRunStarted("TestAccount", "runId12334", "cucumberFeatureId")
-        trm.scenarioStarted("User creates a new account with iOS", "scenarioId")
+        trm.scenarioStarted("User creates a new account", "scenarioId")
+        trm.stepStarted("Given user opens Android application")
+        DeviceManager.getInstance().createDevice(DeviceCategory.ANDROID, "TestReportManager33344")
+        trm.stepActionStarted("Open application1")
+        trm.stepActionFinished()
+        trm.stepFinished("passed", 27342, null)
         trm.stepStarted("Given user opens iOS application")
+        DeviceManager.getInstance().createDevice(DeviceCategory.IOS, "TestReportManager56789")
         DeviceManager.getInstance().createDevice(DeviceCategory.IOS, "TestReportManager12345")
-        trm.stepActionStarted("Open application")
+        trm.stepActionStarted("Open application2")
+        trm.stepActionFinished()
+        trm.stepActionStarted("Login")
         trm.stepActionFinished()
     }
 
@@ -41,8 +49,8 @@ class ReportingTest extends GroovyTestCase {
 
     void testAddDeviceToTestReport() {
         assert trm.getActiveScenario().deviceList
-        assert trm.getActiveScenario().deviceList.first().get("deviceId") == "TestReportManager12345"
-        assert trm.getActiveScenario().deviceList.first().get("deviceCategory") == "IOS"
+        assert trm.getActiveScenario().deviceList.first().get("deviceId") == "TestReportManager33344"
+        assert trm.getActiveScenario().deviceList.first().get("deviceCategory") == "ANDROID"
     }
 
     void tearDown() {

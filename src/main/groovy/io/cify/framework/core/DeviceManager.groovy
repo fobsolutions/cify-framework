@@ -130,6 +130,7 @@ class DeviceManager implements IDeviceManager {
                 desiredCapabilities.setCapability(key, value)
             }
 
+            deviceId = deviceId.replace("_","-")
             Device device = new Device(deviceId, category, desiredCapabilities)
             devices.add(device)
 
