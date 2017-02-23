@@ -1,6 +1,7 @@
 package io.cify.framework.reporting
 
 import groovy.json.JsonBuilder
+import groovy.json.internal.LazyMap
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
@@ -36,6 +37,7 @@ class Report extends TestReportManager {
                 stepId: step.stepId,
                 name: step.name,
                 startDate: step.startDate,
+                device: step.device,
                 actions: step.stepActionsList.collect {
                     [
                             actionId: it.actionId,
@@ -78,6 +80,7 @@ class Report extends TestReportManager {
                             stepId          : it.stepId,
                             stepName        : it.name,
                             stepResult      : it.result,
+                            stepDeviceId      : it.device.get('deviceId'),
                             actions         : it.stepActionsList.collect {
                                 [
                                         actionId      : it.actionId,
@@ -117,6 +120,12 @@ class Report extends TestReportManager {
                 capabilitiesId: testRun.capabilitiesId,
                 passedScenarios: testRun.scenarioList.findAll { it.result == "passed" }.size(),
                 failedScenarios: testRun.scenarioList.findAll { it.result == "failed" }.size(),
+                failedScenariosNames: getScenariosFailedInTestrun(testRun).collect {
+                    [
+                            scenarioId        : it.scenarioId,
+                            scenarioName      : it.name
+                    ]
+                },
                 passedSteps: sumOfAllStepsInTestrun(testRun, "passed"),
                 failedSteps: sumOfAllStepsInTestrun(testRun, "failed"),
                 skippedSteps: sumOfAllStepsInTestrun(testRun, "skipped"),
@@ -152,6 +161,17 @@ class Report extends TestReportManager {
         int result = 0
         testRun?.scenarioList?.each { result = result + it.stepList.findAll { it.result == status }.size() }
         return result
+    }
+
+    private static List getScenariosFailedInTestrun(TestRun testRun){
+        List<LazyMap> list = []
+        testRun.scenarioList.findAll { it.result == "failed" }.each{
+            LazyMap map = [:]
+            map.put('name', it.name)
+            map.put('scenarioId', it.scenarioId)
+            list.add(map)
+        }
+        return list
     }
 
     private static String formatErrorMessage(String errorMessage) {
