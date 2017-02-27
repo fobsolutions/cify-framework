@@ -74,7 +74,7 @@ class Report extends TestReportManager {
                 passedSteps: scenario.stepList.findAll { it.result == "passed" }.size(),
                 failedSteps: scenario.stepList.findAll { it.result == "failed" }.size(),
                 skippedSteps: scenario.stepList.findAll { it.result == "skipped" }.size(),
-                devices: deviceList.collect { it },
+                devices: getScenarioDeviceListWithStatus(scenario).collect { it },
                 steps: scenario.stepList.collect {
                     [
                             stepId          : it.stepId,
@@ -154,7 +154,30 @@ class Report extends TestReportManager {
                 list.add(it)
             }
         }
+        list.unique().each{  it.putAt('failedSteps', sumOfDeviceStatusInTestrun(testRun, 'failed', it.getAt('deviceId').toString()) ) }
+        list.unique().each{  it.putAt('passedSteps', sumOfDeviceStatusInTestrun(testRun, 'passed', it.getAt('deviceId').toString()) ) }
+        list.unique().each{  it.putAt('skippedSteps', sumOfDeviceStatusInTestrun(testRun, 'skipped', it.getAt('deviceId').toString()) ) }
         return list.unique()
+    }
+
+    private static int sumOfDeviceStatusInTestrun(TestRun testRun, String status, String deviceId){
+        int result = 0
+        testRun?.scenarioList?.each { result = result + it.stepList.findAll { it.result == status && it.device.get('deviceId') == deviceId }.size() }
+        return result
+    }
+
+    private static List getScenarioDeviceListWithStatus(Scenario scenario) {
+        List list = scenario.deviceList.unique()
+        list.each{  it.putAt('failedSteps', sumOfDeviceStatusInScenario(scenario, 'failed', it.getAt('deviceId').toString()) ) }
+        list.each{  it.putAt('passedSteps', sumOfDeviceStatusInScenario(scenario, 'passed', it.getAt('deviceId').toString()) ) }
+        list.each{  it.putAt('skippedSteps', sumOfDeviceStatusInScenario(scenario, 'skipped', it.getAt('deviceId').toString()) ) }
+        return list
+    }
+
+    private static int sumOfDeviceStatusInScenario(Scenario scenario, String status, String deviceId){
+        int result = 0
+        result = scenario?.stepList?.findAll { it.result == status && it.device.get('deviceId') == deviceId }?.size()
+        return result
     }
 
     private static int sumOfAllStepsInTestrun(TestRun testRun, String status) {
