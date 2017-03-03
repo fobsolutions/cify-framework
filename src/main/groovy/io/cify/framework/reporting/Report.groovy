@@ -59,7 +59,6 @@ class Report extends TestReportManager {
      * @return json string
      */
     static String reportScenario(Scenario scenario) {
-        def deviceList = scenario.deviceList
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.scenario(
                 projectName: activeTestRun.projectName,
