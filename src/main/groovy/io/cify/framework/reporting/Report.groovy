@@ -1,6 +1,7 @@
 package io.cify.framework.reporting
 
 import groovy.json.JsonBuilder
+import groovy.json.internal.LazyMap
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
@@ -36,6 +37,7 @@ class Report extends TestReportManager {
                 stepId: step.stepId,
                 name: step.name,
                 startDate: step.startDate,
+                device: step.device,
                 actions: step.stepActionsList.collect {
                     [
                             actionId: it.actionId,
@@ -57,7 +59,6 @@ class Report extends TestReportManager {
      * @return json string
      */
     static String reportScenario(Scenario scenario) {
-        def deviceList = scenario.deviceList
         def jsonBuilder = new JsonBuilder()
         jsonBuilder.scenario(
                 projectName: activeTestRun.projectName,
@@ -72,12 +73,13 @@ class Report extends TestReportManager {
                 passedSteps: scenario.stepList.findAll { it.result == "passed" }.size(),
                 failedSteps: scenario.stepList.findAll { it.result == "failed" }.size(),
                 skippedSteps: scenario.stepList.findAll { it.result == "skipped" }.size(),
-                devices: deviceList.collect { it },
+                devices: getScenarioDeviceListWithStatus(scenario).collect { it },
                 steps: scenario.stepList.collect {
                     [
                             stepId          : it.stepId,
                             stepName        : it.name,
                             stepResult      : it.result,
+                            stepDeviceId      : it.device.get('deviceId'),
                             actions         : it.stepActionsList.collect {
                                 [
                                         actionId      : it.actionId,
@@ -117,6 +119,12 @@ class Report extends TestReportManager {
                 capabilitiesId: testRun.capabilitiesId,
                 passedScenarios: testRun.scenarioList.findAll { it.result == "passed" }.size(),
                 failedScenarios: testRun.scenarioList.findAll { it.result == "failed" }.size(),
+                failedScenariosNames: getScenariosFailedInTestrun(testRun).collect {
+                    [
+                            scenarioId        : it.scenarioId,
+                            scenarioName      : it.name
+                    ]
+                },
                 passedSteps: sumOfAllStepsInTestrun(testRun, "passed"),
                 failedSteps: sumOfAllStepsInTestrun(testRun, "failed"),
                 skippedSteps: sumOfAllStepsInTestrun(testRun, "skipped"),
@@ -145,13 +153,47 @@ class Report extends TestReportManager {
                 list.add(it)
             }
         }
+        list.unique().each{  it.putAt('failedSteps', sumOfDeviceStatusInTestrun(testRun, 'failed', it.getAt('deviceId').toString()) ) }
+        list.unique().each{  it.putAt('passedSteps', sumOfDeviceStatusInTestrun(testRun, 'passed', it.getAt('deviceId').toString()) ) }
+        list.unique().each{  it.putAt('skippedSteps', sumOfDeviceStatusInTestrun(testRun, 'skipped', it.getAt('deviceId').toString()) ) }
         return list.unique()
+    }
+
+    private static int sumOfDeviceStatusInTestrun(TestRun testRun, String status, String deviceId){
+        int result = 0
+        testRun?.scenarioList?.each { result = result + it.stepList.findAll { it.result == status && it.device.get('deviceId') == deviceId }.size() }
+        return result
+    }
+
+    private static List getScenarioDeviceListWithStatus(Scenario scenario) {
+        List list = scenario.deviceList.unique()
+        list.each{  it.putAt('failedSteps', sumOfDeviceStatusInScenario(scenario, 'failed', it.getAt('deviceId').toString()) ) }
+        list.each{  it.putAt('passedSteps', sumOfDeviceStatusInScenario(scenario, 'passed', it.getAt('deviceId').toString()) ) }
+        list.each{  it.putAt('skippedSteps', sumOfDeviceStatusInScenario(scenario, 'skipped', it.getAt('deviceId').toString()) ) }
+        return list
+    }
+
+    private static int sumOfDeviceStatusInScenario(Scenario scenario, String status, String deviceId){
+        int result = 0
+        result = scenario?.stepList?.findAll { it.result == status && it.device.get('deviceId') == deviceId }?.size()
+        return result
     }
 
     private static int sumOfAllStepsInTestrun(TestRun testRun, String status) {
         int result = 0
         testRun?.scenarioList?.each { result = result + it.stepList.findAll { it.result == status }.size() }
         return result
+    }
+
+    private static List getScenariosFailedInTestrun(TestRun testRun){
+        List<LazyMap> list = []
+        testRun.scenarioList.findAll { it.result == "failed" }.each{
+            LazyMap map = [:]
+            map.put('name', it.name)
+            map.put('scenarioId', it.scenarioId)
+            list.add(map)
+        }
+        return list
     }
 
     private static String formatErrorMessage(String errorMessage) {

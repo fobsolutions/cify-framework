@@ -135,7 +135,11 @@ class TestReportManager {
      */
     public static String stepFinished(String result, long duration, String errorMessage) {
         String scenarioId = getActiveScenario()?.scenarioId
+        LazyMap map = getActiveScenario()?.deviceList?.last()
         getActiveStep()?.with {
+            if(map) {
+                it.device.putAll(map)
+            }
             it.errorMessage = errorMessage
             it.duration = duration
             endDate = System.currentTimeMillis()
