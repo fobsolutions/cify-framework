@@ -9,7 +9,6 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
