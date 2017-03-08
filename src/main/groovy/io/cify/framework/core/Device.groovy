@@ -227,6 +227,7 @@ class Device implements IDevice {
         LOG.debug(MARKER, "Create new device driver")
         LoggingOutputStream.redirectSystemOutAndSystemErrToLogger()
         quit()
+        DeviceManager.getInstance().setDeviceActive(this)
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
 

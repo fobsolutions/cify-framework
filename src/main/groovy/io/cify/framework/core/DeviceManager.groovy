@@ -38,6 +38,7 @@ class DeviceManager implements IDeviceManager {
     private List<Device> devices = []
     private static volatile DeviceManager instance
     private LazyMap credentials
+    private static List<String> devicesIdList = []
 
     /**
      * Default constructor for Device Manager
@@ -133,6 +134,7 @@ class DeviceManager implements IDeviceManager {
             deviceId = deviceId.replace("_","-")
             Device device = new Device(deviceId, category, desiredCapabilities)
             devices.add(device)
+            devicesIdList.add(deviceId)
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
@@ -153,6 +155,16 @@ class DeviceManager implements IDeviceManager {
     private static void addDeviceToTestReport(String deviceId, String category){
         TestReportManager.addDeviceToTestReport(deviceId,category)
     }
+
+    /**
+     * Returns last active device id
+     *
+     * @return String deviceId
+     */
+    public static String getActiveDeviceId(){
+        return devicesIdList.first()
+    }
+
 
     /**
      * Checks if an active device of selected category exists
@@ -260,6 +272,7 @@ class DeviceManager implements IDeviceManager {
             LOG.debug(MARKER, "No active device with category $category found")
             throw new CifyFrameworkException("No active device with category $category found")
         }
+        setDeviceActive(device)
         return device
     }
 
@@ -282,6 +295,18 @@ class DeviceManager implements IDeviceManager {
             throw new CifyFrameworkException("No active device with id $deviceId found")
         }
         return device
+    }
+
+    /**
+     * Set device active, move it to the top of devices list
+     *
+     * @param device
+     */
+    void setDeviceActive(Device device){
+        devices.remove(device)
+        devices.add(0,device)
+        devicesIdList.remove(device.id)
+        devicesIdList.add(0,device.id)
     }
 
     /**
