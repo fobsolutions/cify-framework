@@ -139,7 +139,7 @@ class TestReportManager {
         LazyMap map = getActiveScenario()?.deviceList?.find{ it.deviceId == deviceId}
 
         getActiveStep()?.with {
-            if(map && !result.equals("skipped")) {
+            if(map && result != "skipped") {
                 it.device.putAll(map)
             }
             it.errorMessage = errorMessage
