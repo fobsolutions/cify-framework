@@ -135,9 +135,11 @@ class TestReportManager {
      */
     public static String stepFinished(String result, long duration, String errorMessage) {
         String scenarioId = getActiveScenario()?.scenarioId
-        LazyMap map = getActiveScenario()?.deviceList?.last()
+        String deviceId = DeviceManager.getActiveDeviceId()
+        LazyMap map = getActiveScenario()?.deviceList?.find{ it.deviceId == deviceId}
+
         getActiveStep()?.with {
-            if(map) {
+            if(map && result != "skipped") {
                 it.device.putAll(map)
             }
             it.errorMessage = errorMessage

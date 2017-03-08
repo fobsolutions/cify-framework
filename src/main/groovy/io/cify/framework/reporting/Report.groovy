@@ -169,7 +169,6 @@ class Report extends TestReportManager {
         List list = scenario.deviceList.unique()
         list.each{  it.putAt('failedSteps', sumOfDeviceStatusInScenario(scenario, 'failed', it.getAt('deviceId').toString()) ) }
         list.each{  it.putAt('passedSteps', sumOfDeviceStatusInScenario(scenario, 'passed', it.getAt('deviceId').toString()) ) }
-        list.each{  it.putAt('skippedSteps', sumOfDeviceStatusInScenario(scenario, 'skipped', it.getAt('deviceId').toString()) ) }
         return list
     }
 
