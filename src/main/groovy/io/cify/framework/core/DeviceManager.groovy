@@ -39,6 +39,8 @@ class DeviceManager implements IDeviceManager {
     private static volatile DeviceManager instance
     private LazyMap credentials
     private static List<String> devicesIdList = []
+    private static boolean stopExecution = false
+    private static long timeout = 0
 
     /**
      * Default constructor for Device Manager
@@ -53,6 +55,12 @@ class DeviceManager implements IDeviceManager {
 
             String credentialsRaw = System.getProperty(SYSTEM_PROPERTY_CREDENTIALS, "{}")
             this.credentials = new JsonSlurper().parseText(credentialsRaw) as LazyMap
+
+            String globalTestTimeout = System.getProperty("testTimeout")
+            if(globalTestTimeout){
+                timeout = Long.parseLong(globalTestTimeout)
+            }
+
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message")
@@ -66,14 +74,36 @@ class DeviceManager implements IDeviceManager {
      */
     public static DeviceManager getInstance() {
         LOG.debug(MARKER, 'Get instance of DeviceManager')
+        if(instance != null && stopExecution){
+            LOG.debug(MARKER, "Test terminated. Test timeout reached $timeout ms")
+            finalizeExecution(instance)
+        }
         if (instance == null) {
             synchronized (DeviceManager.class) {
                 if (instance == null) {
                     instance = new DeviceManager()
+                    if(timeout > 0){
+                        startTimeoutThread()
+                    }
                 }
             }
         }
         return instance
+    }
+
+    private static finalizeExecution(DeviceManager dm){
+        dm.quitAllDevices()
+        throw new CifyFrameworkException("Test terminated. Test timeout reached $timeout ms")
+    }
+
+    private static void startTimeoutThread() {
+        LOG.debug(MARKER, "Timeout thread started. Test timeout value: $timeout ms")
+        Thread.start("cify_timeout_thread") {
+            long start = System.currentTimeMillis()
+            while (timeout > System.currentTimeMillis() - start) { //
+            }
+            stopExecution = true
+        }
     }
 
     /**
@@ -131,7 +161,7 @@ class DeviceManager implements IDeviceManager {
                 desiredCapabilities.setCapability(key, value)
             }
 
-            deviceId = deviceId.replace("_","-")
+            deviceId = deviceId.replace("_", "-")
             Device device = new Device(deviceId, category, desiredCapabilities)
             devices.add(device)
             devicesIdList.add(deviceId)
@@ -141,7 +171,7 @@ class DeviceManager implements IDeviceManager {
             throw new CifyFrameworkException("Failed to create device cause $all.message")
         }
 
-        addDeviceToTestReport(deviceId,category.toString())
+        addDeviceToTestReport(deviceId, category.toString())
         return getActiveDevice(deviceId)
     }
 
@@ -152,8 +182,8 @@ class DeviceManager implements IDeviceManager {
      *
      * @param String device category
      */
-    private static void addDeviceToTestReport(String deviceId, String category){
-        TestReportManager.addDeviceToTestReport(deviceId,category)
+    private static void addDeviceToTestReport(String deviceId, String category) {
+        TestReportManager.addDeviceToTestReport(deviceId, category)
     }
 
     /**
@@ -161,10 +191,9 @@ class DeviceManager implements IDeviceManager {
      *
      * @return String deviceId
      */
-    public static String getActiveDeviceId(){
+    public static String getActiveDeviceId() {
         return devicesIdList.first()
     }
-
 
     /**
      * Checks if an active device of selected category exists
@@ -302,11 +331,11 @@ class DeviceManager implements IDeviceManager {
      *
      * @param device
      */
-    void setDeviceActive(Device device){
+    void setDeviceActive(Device device) {
         devices.remove(device)
-        devices.add(0,device)
+        devices.add(0, device)
         devicesIdList.remove(device.id)
-        devicesIdList.add(0,device.id)
+        devicesIdList.add(0, device.id)
     }
 
     /**
