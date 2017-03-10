@@ -28,6 +28,7 @@ class Device implements IDevice {
     private WebDriver driver
 
     public boolean isRecording = false
+    public boolean active = false
 
     /**
      * Default constructor for Device
