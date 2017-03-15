@@ -9,12 +9,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
-import org.junit.internal.runners.statements.FailOnTimeout
-import org.junit.runners.model.TestTimedOutException
 import org.openqa.selenium.remote.DesiredCapabilities
-
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 import static java.util.UUID.randomUUID
 
@@ -299,9 +294,9 @@ class DeviceManager implements IDeviceManager {
      */
     void setDeviceActive(Device device) {
         device.active = true
-        getAllActiveDevices().each{
-            if(it != device){
-               it.active = false
+        getAllActiveDevices().each {
+            if (it != device) {
+                it.active = false
             }
         }
     }
