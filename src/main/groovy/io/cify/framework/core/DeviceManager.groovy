@@ -9,7 +9,12 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
+import org.junit.internal.runners.statements.FailOnTimeout
+import org.junit.runners.model.TestTimedOutException
 import org.openqa.selenium.remote.DesiredCapabilities
+
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 import static java.util.UUID.randomUUID
 
@@ -38,8 +43,6 @@ class DeviceManager implements IDeviceManager {
     private List<Device> devices = []
     private static volatile DeviceManager instance
     private LazyMap credentials
-    private static boolean stopExecution = false
-    private static long timeout = 0
 
     /**
      * Default constructor for Device Manager
@@ -55,11 +58,6 @@ class DeviceManager implements IDeviceManager {
             String credentialsRaw = System.getProperty(SYSTEM_PROPERTY_CREDENTIALS, "{}")
             this.credentials = new JsonSlurper().parseText(credentialsRaw) as LazyMap
 
-            String globalTestTimeout = System.getProperty("testTimeout")
-            if(globalTestTimeout){
-                timeout = Long.parseLong(globalTestTimeout)
-            }
-
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message")
@@ -73,36 +71,14 @@ class DeviceManager implements IDeviceManager {
      */
     public static DeviceManager getInstance() {
         LOG.debug(MARKER, 'Get instance of DeviceManager')
-        if(instance != null && stopExecution){
-            LOG.debug(MARKER, "Test terminated. Test timeout reached $timeout ms")
-            finalizeExecution(instance)
-        }
         if (instance == null) {
             synchronized (DeviceManager.class) {
                 if (instance == null) {
                     instance = new DeviceManager()
-                    if(timeout > 0){
-                        startTimeoutThread()
-                    }
                 }
             }
         }
         return instance
-    }
-
-    private static finalizeExecution(DeviceManager dm){
-        dm.quitAllDevices()
-        throw new CifyFrameworkException("Test terminated. Test timeout reached $timeout ms")
-    }
-
-    private static void startTimeoutThread() {
-        LOG.debug(MARKER, "Timeout thread started. Test timeout value: $timeout ms")
-        Thread.start("cify_timeout_thread") {
-            long start = System.currentTimeMillis()
-            while (timeout > System.currentTimeMillis() - start) { //
-            }
-            stopExecution = true
-        }
     }
 
     /**
