@@ -38,7 +38,6 @@ class DeviceManager implements IDeviceManager {
     private List<Device> devices = []
     private static volatile DeviceManager instance
     private LazyMap credentials
-    private static List<String> devicesIdList = []
 
     /**
      * Default constructor for Device Manager
@@ -53,6 +52,7 @@ class DeviceManager implements IDeviceManager {
 
             String credentialsRaw = System.getProperty(SYSTEM_PROPERTY_CREDENTIALS, "{}")
             this.credentials = new JsonSlurper().parseText(credentialsRaw) as LazyMap
+
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message")
@@ -131,17 +131,17 @@ class DeviceManager implements IDeviceManager {
                 desiredCapabilities.setCapability(key, value)
             }
 
-            deviceId = deviceId.replace("_","-")
+            deviceId = deviceId.replace("_", "-")
             Device device = new Device(deviceId, category, desiredCapabilities)
             devices.add(device)
-            devicesIdList.add(deviceId)
+            setDeviceActive(device)
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
             throw new CifyFrameworkException("Failed to create device cause $all.message")
         }
 
-        addDeviceToTestReport(deviceId,category.toString())
+        addDeviceToTestReport(deviceId, category.toString())
         return getActiveDevice(deviceId)
     }
 
@@ -152,19 +152,9 @@ class DeviceManager implements IDeviceManager {
      *
      * @param String device category
      */
-    private static void addDeviceToTestReport(String deviceId, String category){
-        TestReportManager.addDeviceToTestReport(deviceId,category)
+    private static void addDeviceToTestReport(String deviceId, String category) {
+        TestReportManager.addDeviceToTestReport(deviceId, category)
     }
-
-    /**
-     * Returns last active device id
-     *
-     * @return String deviceId
-     */
-    public static String getActiveDeviceId(){
-        return devicesIdList.first()
-    }
-
 
     /**
      * Checks if an active device of selected category exists
@@ -298,15 +288,17 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Set device active, move it to the top of devices list
+     * Set device active
      *
      * @param device
      */
-    void setDeviceActive(Device device){
-        devices.remove(device)
-        devices.add(0,device)
-        devicesIdList.remove(device.id)
-        devicesIdList.add(0,device.id)
+    void setDeviceActive(Device device) {
+        device.active = true
+        getAllActiveDevices().each {
+            if (it != device) {
+                it.active = false
+            }
+        }
     }
 
     /**

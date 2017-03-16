@@ -135,7 +135,7 @@ class TestReportManager {
      */
     public static String stepFinished(String result, long duration, String errorMessage) {
         String scenarioId = getActiveScenario()?.scenarioId
-        String deviceId = DeviceManager.getActiveDeviceId()
+        String deviceId = DeviceManager.getInstance().getAllActiveDevices().find{it.active}.getId()
         LazyMap map = getActiveScenario()?.deviceList?.find{ it.deviceId == deviceId}
 
         getActiveStep()?.with {
