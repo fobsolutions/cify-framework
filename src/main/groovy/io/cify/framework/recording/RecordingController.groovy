@@ -68,7 +68,7 @@ class RecordingController {
             try {
                 LOG.debug(MARKER, "Stop recording...")
 
-                boolean success = Recording.imagesToMedia(
+                boolean success = RecordMedia.imagesToMedia(
                         getVideoDirForDevice(device) + TEMP,
                         getRecordingDuration(device),
                         getVideoDirForDevice(device),
