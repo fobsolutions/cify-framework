@@ -196,21 +196,26 @@ class Device implements IDevice {
      * */
     @Override
     void quit() {
-        if (isRecording) {
-            RecordingController.takeScreenshot(this)
-            stopRecording()
-        }
+        LOG.debug(MARKER, "Starting to quit device with category $category")
+        try {
+            if (isRecording) {
+                RecordingController.takeScreenshot(this)
+                stopRecording()
+            }
 
-        if (hasDriver()) {
-            LOG.debug(MARKER, "Quit device driver")
-            getDriver().quit()
+            if (hasDriver()) {
+                LOG.debug(MARKER, "Quit device driver")
+                getDriver().quit()
+            }
+        } catch (all) {
+            LOG.error(MARKER, "Failed to quit device cause $all.message")
         }
     }
 
     /**
      * Checks if driver exists
      * */
-    public boolean hasDriver() {
+    boolean hasDriver() {
         LOG.debug(MARKER, "Check if driver exists")
         if (getDriver() == null) {
             LOG.debug(MARKER, "No driver found")
