@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.cify'
-version '1.3.9a'
+version '1.3.9.windowsfarm'
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
