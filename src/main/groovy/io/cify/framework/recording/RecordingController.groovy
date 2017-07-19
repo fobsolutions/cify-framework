@@ -27,7 +27,7 @@ class RecordingController {
     private static final String SCREENSHOTS_SUB_DIR = "screenshots"
     private static final String OUTPUT_MEDIA_FORMAT = ".mp4"
     private static final String OUTPUT_SCREENSHOT_FORMAT = ".png"
-    private static final String TEMP = "temp"
+    private static final String TEMP = "-temporary"
     private static final int FPS = 2
 
     /**
@@ -41,7 +41,8 @@ class RecordingController {
             screenshotsReportingDir = System.getProperty("videoDir") + SCREENSHOTS_SUB_DIR
             new File(screenshotsReportingDir).mkdirs()
         } else {
-            new File(getVideoDirForDevice(device) + TEMP).mkdirs()
+            new File(getVideoDirForDevice(device)).mkdirs()
+            new File(getOutputVideoDirForDevice(device)).mkdirs()
         }
 
         Thread.start(device.id + "_recorder") {
@@ -69,10 +70,10 @@ class RecordingController {
                 LOG.debug(MARKER, "Stop recording...")
 
                 boolean success = RecordMedia.imagesToMedia(
-                        getVideoDirForDevice(device) + TEMP,
-                        getRecordingDuration(device),
                         getVideoDirForDevice(device),
-                        device.id + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + OUTPUT_MEDIA_FORMAT
+                        getRecordingDuration(device),
+                        getOutputVideoDirForDevice(device),
+                        new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + device.id + OUTPUT_MEDIA_FORMAT
                 )
                 if (success) {
                     deleteTemporaryImages(device)
@@ -90,31 +91,31 @@ class RecordingController {
      * */
     public static void takeScreenshot(Device device) {
         if (device.isRecording)
-        try {
-            if (TestReportManager.isReporting) {
-                String scenarioId = TestReportManager.getActiveScenario()?.scenarioId
-                String deviceId = device?.getId()
-                String stepId = TestReportManager.getActiveStep()?.stepId
-                String actionId = TestReportManager.getActiveStepAction()?.actionId ?: 'no-action'
-                if (!scenarioId || !deviceId || !stepId || !actionId) {
-                    return
+            try {
+                if (TestReportManager.isReporting) {
+                    String scenarioId = TestReportManager.getActiveScenario()?.scenarioId
+                    String deviceId = device?.getId()
+                    String stepId = TestReportManager.getActiveStep()?.stepId
+                    String actionId = TestReportManager.getActiveStepAction()?.actionId ?: 'no-action'
+                    if (!scenarioId || !deviceId || !stepId || !actionId) {
+                        return
+                    }
+                    String filename = System.currentTimeMillis() + "_" + scenarioId +
+                            "_" + deviceId + "_" + stepId + "_" + actionId
+                    File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
+                    if (scrFile.isFile()) {
+                        scrFile.getParentFile().mkdirs()
+                        FileUtils.copyFile(scrFile, new File(screenshotsReportingDir + "/" + scenarioId + "/" + filename + OUTPUT_SCREENSHOT_FORMAT))
+                    }
+                } else {
+                    File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
+                    if (scrFile.isFile()) {
+                        FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device)  + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+                    }
                 }
-                String filename = System.currentTimeMillis() + "_" + scenarioId +
-                        "_" + deviceId + "_" + stepId + "_" + actionId
-                File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-                if (scrFile.isFile()) {
-                    scrFile.getParentFile().mkdirs()
-                    FileUtils.copyFile(scrFile, new File(screenshotsReportingDir + "/" + scenarioId + "/" + filename + OUTPUT_SCREENSHOT_FORMAT))
-                }
-            } else {
-                File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
-                if (scrFile.isFile()) {
-                    FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + TEMP + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
-                }
+            } catch (all) {
+                LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
             }
-        } catch (all) {
-            LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
-        }
     }
 
     /**
@@ -122,7 +123,7 @@ class RecordingController {
      * */
     public static int getRecordingDuration(Device device) {
         try {
-            File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
+            File screenshotFolder = new File(getVideoDirForDevice(device))
             File[] screenshots = screenshotFolder.listFiles()
             long duration = screenshots.last().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong() - screenshots.first().getName().replace(device.id, "").replace(OUTPUT_SCREENSHOT_FORMAT, "").toLong()
             return TimeUnit.MILLISECONDS.toSeconds(duration)
@@ -138,16 +139,26 @@ class RecordingController {
     private static String getVideoDirForDevice(Device device) {
         return System.getProperty("videoDir") +
                 System.getProperty("task", "plug-and-play") +
-                "/" +
-                device.id +
-                "/";
+                "/" + device.id + TEMP
+    }
+
+    /**
+     * Gets output video path
+     * */
+    private static String getOutputVideoDirForDevice(Device device) {
+
+        String taskName = System.getProperty("task")
+        String videoDir = System.getProperty("videoDir")
+
+        return taskName ? videoDir + taskName + "/" :
+                videoDir + "plug-and-play" + "/" + device.id + "/"
     }
 
     /**
      * Delete temporary screenshots
      * */
     private static void deleteTemporaryImages(Device device) {
-        File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
+        File screenshotFolder = new File(getVideoDirForDevice(device))
         screenshotFolder.deleteDir()
     }
 }
