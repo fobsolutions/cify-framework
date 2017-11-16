@@ -221,15 +221,15 @@ class DeviceManagerTest extends GroovyTestCase {
     }
 
 
-    void testShouldGetFirstActiveDevice() {
+    void testShouldGetLastlyCreatedActiveDevice() {
         DeviceManager deviceManager = new DeviceManager()
         DeviceCategory category = DeviceCategory.ANDROID
 
-        Device device0 = deviceManager.createDevice(category)
         1.upto(10, {
             deviceManager.createDevice(category, it.toString())
         })
 
+        Device device0 = deviceManager.createDevice(category)
         assert deviceManager.getActiveDevice().is(device0)
     }
 
