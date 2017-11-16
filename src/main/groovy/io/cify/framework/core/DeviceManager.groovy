@@ -42,7 +42,7 @@ class DeviceManager implements IDeviceManager {
     /**
      * Default constructor for Device Manager
      * */
-    public DeviceManager() {
+    DeviceManager() {
         LOG.debug(MARKER, 'Create new DeviceManager')
         try {
             Configuration.setupFrameworkConfiguration()
@@ -64,7 +64,7 @@ class DeviceManager implements IDeviceManager {
      *
      * @return DeviceManager instance
      */
-    public static DeviceManager getInstance() {
+    static DeviceManager getInstance() {
         LOG.debug(MARKER, 'Get instance of DeviceManager')
         if (instance == null) {
             synchronized (DeviceManager.class) {
@@ -236,12 +236,12 @@ class DeviceManager implements IDeviceManager {
     @Override
     Device getActiveDevice() {
         LOG.debug(MARKER, "Get first active device")
-        try {
-            return devices.first()
-        } catch (all) {
-            LOG.debug(MARKER, all.message, all)
+        Device device = devices.find { it.active }
+        if (!device) {
+            LOG.debug(MARKER, "No active device found")
             throw new CifyFrameworkException("No active device found")
         }
+        return device
     }
 
     /**
