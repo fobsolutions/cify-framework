@@ -1,6 +1,7 @@
 package io.cify.framework.core
 
 import groovy.json.JsonSlurper
+import org.openqa.selenium.remote.DesiredCapabilities
 
 class DeviceManagerTest extends GroovyTestCase {
 
@@ -35,6 +36,16 @@ class DeviceManagerTest extends GroovyTestCase {
         capabilities.addToDesiredCapabilities(DeviceCategory.BROWSER, "test", "testValue")
 
         assert capabilities.toDesiredCapabilities(DeviceCategory.BROWSER).getCapability("test") == "testValue"
+    }
+
+    void testAddObjectToDesiredCapabilities() {
+        System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
+
+        Capabilities capabilities = new DeviceManager().getCapabilities()
+        Device device = new Device("id", DeviceCategory.ANDROID, new DesiredCapabilities().setCapability("asd", "asd"))
+        capabilities.addToDesiredCapabilities(DeviceCategory.ANDROID, "test", device)
+
+        assert capabilities.toDesiredCapabilities(DeviceCategory.ANDROID).getCapability("test") == device
     }
 
     void testShouldUseProvidedCapabilities() {
