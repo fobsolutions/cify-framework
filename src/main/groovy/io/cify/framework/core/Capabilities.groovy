@@ -31,7 +31,7 @@ class Capabilities {
      *
      * @return Capabilities
      */
-    public static Capabilities parseFromJsonString(String capabilitiesJson) {
+    static Capabilities parseFromJsonString(String capabilitiesJson) {
         LOG.debug(MARKER, "Parse capabilities from json string \n $capabilitiesJson")
         return new JsonSlurper().parseText(capabilitiesJson) as Capabilities
     }
@@ -41,7 +41,7 @@ class Capabilities {
      *
      * @return String
      */
-    public String toPrettyString() {
+    String toPrettyString() {
         LOG.debug(MARKER, "Converts capabilities to json string")
         return new JsonBuilder(this).toPrettyString()
     }
@@ -53,7 +53,7 @@ class Capabilities {
      *
      * @return DesiredCapabilities
      */
-    public DesiredCapabilities toDesiredCapabilities(DeviceCategory category) {
+    DesiredCapabilities toDesiredCapabilities(DeviceCategory category) {
         LOG.debug(MARKER, "Get desired capabilities for category $category")
         switch (category) {
             case DeviceCategory.BROWSER:
@@ -72,7 +72,7 @@ class Capabilities {
      * @param key - key to add
      * @param value - value to add
      */
-    public void addToDesiredCapabilities(DeviceCategory category, String key, def value) {
+    void addToDesiredCapabilities(DeviceCategory category, String key, def value) {
         LOG.debug(MARKER, "Add to desired capabilities for category $category")
         switch (category) {
             case DeviceCategory.BROWSER:
