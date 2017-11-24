@@ -72,7 +72,7 @@ class Capabilities {
      * @param key - key to add
      * @param value - value to add
      */
-    public void addToDesiredCapabilities(DeviceCategory category, String key, String value) {
+    public void addToDesiredCapabilities(DeviceCategory category, String key, def value) {
         LOG.debug(MARKER, "Add to desired capabilities for category $category")
         switch (category) {
             case DeviceCategory.BROWSER:
