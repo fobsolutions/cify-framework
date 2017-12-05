@@ -269,3 +269,6 @@ class LoginPage extends PageObjects {
 @AndroidFindBy is used in native Android applications
 
 @iOSFindBy is used in native iOS applications
+
+
+[![Analytics](https://ga-beacon.appspot.com/UA-109814182-1/cify-pages)](https://github.com/fobsolutions/cify-pages)
