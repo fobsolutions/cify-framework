@@ -116,7 +116,7 @@ class DriverFactory {
                 ChromeDriverManager.getInstance().setup()
                 return new ChromeDriver(desiredCapabilities)
             case Capability.FIREFOX:
-                MarionetteDriverManager.getInstance().setup()
+                FirefoxDriverManager.getInstance().setup()
                 return new FirefoxDriver(desiredCapabilities)
             case Capability.OPERA:
                 OperaDriverManager.getInstance().setup()
