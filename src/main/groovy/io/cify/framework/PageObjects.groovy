@@ -3,14 +3,17 @@ package io.cify.framework
 import io.appium.java_client.pagefactory.AppiumFieldDecorator
 import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceManager
+import org.openqa.selenium.By
+import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.PageFactory
+import org.openqa.selenium.support.PageFactoryFinder
 
 import java.util.concurrent.TimeUnit
 
 /**
  * Page object class
  * */
-public class PageObjects {
+class PageObjects {
 
     /**
      * Default timeout for page object
@@ -22,7 +25,7 @@ public class PageObjects {
      *
      * @param deviceId - Device id
      * */
-    public PageObjects(String deviceId) {
+    PageObjects(String deviceId) {
         this(deviceId, DEFAULT_TIMEOUT_IN_SECONDS);
     }
 
@@ -32,7 +35,7 @@ public class PageObjects {
      * @param deviceId - Device id
      * @param timeOutInSeconds - timeout time in seconds
      * */
-    public PageObjects(String deviceId, long timeOutInSeconds) {
+    PageObjects(String deviceId, long timeOutInSeconds) {
         this(DeviceManager.getInstance().getActiveDevice(deviceId), timeOutInSeconds)
     }
 
@@ -41,7 +44,7 @@ public class PageObjects {
      *
      * @param device - Device object
      * */
-    public PageObjects(Device device) {
+    PageObjects(Device device) {
         this(device, DEFAULT_TIMEOUT_IN_SECONDS)
     }
 
@@ -51,7 +54,7 @@ public class PageObjects {
      * @param device - Device object
      * @param timeOutInSeconds - timeout
      * */
-    public PageObjects(Device device, long timeOutInSeconds) {
+    PageObjects(Device device, long timeOutInSeconds) {
         initElements(device, timeOutInSeconds)
     }
 

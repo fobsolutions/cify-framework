@@ -16,12 +16,13 @@ import org.openqa.selenium.support.ui.Select
  */
 trait ActionsDesktopWeb implements IActions {
 
+    Device device
+
     /**
      * Opens given URL
      * @param url
      */
     void open(String url) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         device.getDriver().get(url)
     }
 
@@ -30,7 +31,6 @@ trait ActionsDesktopWeb implements IActions {
      * @param element
      */
     void scrollIntoView(WebElement element) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         ((JavascriptExecutor) device.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element)
     }
 
@@ -41,7 +41,6 @@ trait ActionsDesktopWeb implements IActions {
      * @param y pixel value
      */
     void scrollTo(int x, int y) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         ((JavascriptExecutor) device.getDriver()).executeScript("scrollTo(" + x + "," + y + ")")
     }
 
@@ -64,7 +63,6 @@ trait ActionsDesktopWeb implements IActions {
      * @param child element to scroll to
      */
     void scrollVerticallyInElement(WebElement parent, WebElement child) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         int y = child.getLocation().getY() - parent.getLocation().getY()
         ((JavascriptExecutor) device.getDriver()).executeScript("arguments[0].scrollTop = arguments[1];", parent, y)
     }
@@ -76,7 +74,6 @@ trait ActionsDesktopWeb implements IActions {
      * @return string array list [from left, from top, width, height]
      */
     List<String> getBoundedRectangleOfElement(WebElement element) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         JavascriptExecutor je = (JavascriptExecutor) device.getDriver()
         List<String> bounds = (ArrayList<String>) je.executeScript(
                 "var rect = arguments[0].getBoundingClientRect();" +
@@ -89,7 +86,6 @@ trait ActionsDesktopWeb implements IActions {
      * @return current URL
      */
     String getCurrentUrl() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         device.getDriver().getCurrentUrl()
     }
 
@@ -98,7 +94,6 @@ trait ActionsDesktopWeb implements IActions {
      * @return title of web site
      */
     String getTitle() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         device.getDriver().getTitle()
     }
 
@@ -106,7 +101,6 @@ trait ActionsDesktopWeb implements IActions {
      * Navigates back
      */
     void back() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         device.getDriver().navigate().back()
     }
 
@@ -114,7 +108,6 @@ trait ActionsDesktopWeb implements IActions {
      * Navigates forward
      */
     void forward() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         device.getDriver().navigate().forward()
     }
 
@@ -122,7 +115,6 @@ trait ActionsDesktopWeb implements IActions {
      * Refreshes the page
      */
     void refresh() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.BROWSER)
         device.getDriver().navigate().refresh()
     }
 
