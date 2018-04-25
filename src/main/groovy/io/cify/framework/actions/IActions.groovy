@@ -16,6 +16,8 @@ import java.awt.image.BufferedImage
  */
 trait IActions {
 
+    Device device
+
     /**
      * Wrapper for click
      * @param element WebElement
