@@ -2,6 +2,8 @@ package io.cify.framework.actions
 
 import io.cify.framework.core.CifyFrameworkException
 import io.cify.framework.core.Device
+import io.cify.framework.core.DeviceCategory
+import io.cify.framework.core.DeviceManager
 import org.openqa.selenium.*
 import org.openqa.selenium.support.ui.ExpectedCondition
 import org.openqa.selenium.support.ui.WebDriverWait
@@ -15,8 +17,6 @@ import java.awt.image.BufferedImage
  * Interface with basic actions user can perform
  */
 trait IActions {
-
-    Device device
 
     /**
      * Wrapper for click
