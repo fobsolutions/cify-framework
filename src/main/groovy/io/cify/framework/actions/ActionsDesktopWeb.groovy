@@ -1,13 +1,14 @@
 package io.cify.framework.actions
 
 import io.cify.framework.core.Device
-import io.cify.framework.core.DeviceCategory
 import io.cify.framework.core.DeviceManager
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.interactions.internal.Coordinates
 import org.openqa.selenium.internal.Locatable
 import org.openqa.selenium.support.ui.Select
+
+import static io.cify.framework.core.DeviceCategory.BROWSER
 
 /**
  * Created by FOB Solutions
@@ -16,13 +17,12 @@ import org.openqa.selenium.support.ui.Select
  */
 trait ActionsDesktopWeb implements IActions {
 
-    Device device
-
     /**
      * Opens given URL
      * @param url
      */
     void open(String url) {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         device.getDriver().get(url)
     }
 
@@ -31,6 +31,7 @@ trait ActionsDesktopWeb implements IActions {
      * @param element
      */
     void scrollIntoView(WebElement element) {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         ((JavascriptExecutor) device.getDriver()).executeScript("arguments[0].scrollIntoView(true);", element)
     }
 
@@ -41,6 +42,7 @@ trait ActionsDesktopWeb implements IActions {
      * @param y pixel value
      */
     void scrollTo(int x, int y) {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         ((JavascriptExecutor) device.getDriver()).executeScript("scrollTo(" + x + "," + y + ")")
     }
 
@@ -63,6 +65,7 @@ trait ActionsDesktopWeb implements IActions {
      * @param child element to scroll to
      */
     void scrollVerticallyInElement(WebElement parent, WebElement child) {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         int y = child.getLocation().getY() - parent.getLocation().getY()
         ((JavascriptExecutor) device.getDriver()).executeScript("arguments[0].scrollTop = arguments[1];", parent, y)
     }
@@ -74,6 +77,7 @@ trait ActionsDesktopWeb implements IActions {
      * @return string array list [from left, from top, width, height]
      */
     List<String> getBoundedRectangleOfElement(WebElement element) {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         JavascriptExecutor je = (JavascriptExecutor) device.getDriver()
         List<String> bounds = (ArrayList<String>) je.executeScript(
                 "var rect = arguments[0].getBoundingClientRect();" +
@@ -86,6 +90,7 @@ trait ActionsDesktopWeb implements IActions {
      * @return current URL
      */
     String getCurrentUrl() {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         device.getDriver().getCurrentUrl()
     }
 
@@ -94,6 +99,7 @@ trait ActionsDesktopWeb implements IActions {
      * @return title of web site
      */
     String getTitle() {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         device.getDriver().getTitle()
     }
 
@@ -101,6 +107,7 @@ trait ActionsDesktopWeb implements IActions {
      * Navigates back
      */
     void back() {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         device.getDriver().navigate().back()
     }
 
@@ -108,6 +115,7 @@ trait ActionsDesktopWeb implements IActions {
      * Navigates forward
      */
     void forward() {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         device.getDriver().navigate().forward()
     }
 
@@ -115,6 +123,7 @@ trait ActionsDesktopWeb implements IActions {
      * Refreshes the page
      */
     void refresh() {
+        Device device = DeviceManager.getInstance().getActiveDevice(BROWSER)
         device.getDriver().navigate().refresh()
     }
 
