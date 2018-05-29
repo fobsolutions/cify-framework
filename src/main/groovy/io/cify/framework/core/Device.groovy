@@ -50,7 +50,7 @@ class Device implements IDevice {
      * @retun device id
      * */
     @Override
-    public String getId() {
+    String getId() {
         LOG.debug(MARKER, "Get device id")
         return id
     }
@@ -61,7 +61,7 @@ class Device implements IDevice {
      * @retun device category
      * */
     @Override
-    public DeviceCategory getCategory() {
+    DeviceCategory getCategory() {
         LOG.debug(MARKER, "Get device category")
         return this.category
     }
@@ -72,7 +72,7 @@ class Device implements IDevice {
      * @return WebDriver
      * */
     @Override
-    public WebDriver getDriver() {
+    WebDriver getDriver() {
         LOG.debug(MARKER, "Get device driver")
         return driver
     }
@@ -84,7 +84,7 @@ class Device implements IDevice {
      * @param value
      * */
     @Override
-    public void setCapability(String key, String value) {
+    void setCapability(String key, String value) {
         LOG.debug(MARKER, "Set desire capability $key : $value")
         if (key != null && value != null) {
             capabilities.setCapability(key, value)
@@ -97,7 +97,7 @@ class Device implements IDevice {
      * @retun DesiredCapabilities
      * */
     @Override
-    public DesiredCapabilities getCapabilities() {
+    DesiredCapabilities getCapabilities() {
         LOG.debug(MARKER, "Get all desired capabilities")
         return capabilities
     }
@@ -106,7 +106,7 @@ class Device implements IDevice {
      * Opens app on device
      * */
     @Override
-    public void openApp() {
+    void openApp() {
         openApp("", "", "")
     }
 
@@ -116,7 +116,7 @@ class Device implements IDevice {
      * @param app
      * */
     @Override
-    public void openApp(String app) {
+    void openApp(String app) {
         openApp(app, "", "");
     }
 
@@ -130,7 +130,7 @@ class Device implements IDevice {
      * @throws CifyFrameworkException  if failed to open app
      * */
     @Override
-    public void openApp(String app, String appActivity, String appPackage) {
+    void openApp(String app, String appActivity, String appPackage) {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
             File appFile = new File(app)
@@ -159,7 +159,7 @@ class Device implements IDevice {
      * @throws CifyFrameworkException  if failed to open url
      * */
     @Override
-    public void openBrowser(String url) {
+    void openBrowser(String url) {
         LOG.debug(MARKER, "Open url $url")
         try {
             if (!validateUrl(url)) {
