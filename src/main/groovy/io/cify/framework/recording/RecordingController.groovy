@@ -77,7 +77,8 @@ class RecordingController {
                         fileName
                 )
                 if (success) {
-                    device.getCapabilities().setCapability("video", fileName)
+                    String taskName = System.getProperty("task", "plug-and-play") + "/" + device.id + "/"
+                    device.getCapabilities().setCapability("video", taskName + fileName)
                     deleteTemporaryImages(device)
                 }
             } catch (all) {
