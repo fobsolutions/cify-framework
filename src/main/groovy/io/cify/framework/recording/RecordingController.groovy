@@ -77,7 +77,7 @@ class RecordingController {
                         fileName
                 )
                 if (success) {
-                    device.getCapabilities().setCapability("video", videoDir + fileName)
+                    device.getCapabilities().setCapability("video", fileName)
                     deleteTemporaryImages(device)
                 }
             } catch (all) {
