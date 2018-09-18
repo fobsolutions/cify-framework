@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.cify'
-version '1.3.18'
+version '1.3.21'
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
