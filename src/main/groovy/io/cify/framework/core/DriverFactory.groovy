@@ -31,7 +31,7 @@ class DriverFactory {
     public static final String CAPABILITY = "capability"
     public static final String REMOTE = "remote"
 
-    public static enum Capability {
+    static enum Capability {
         CHROME,
         SAFARI,
         OPERA,
@@ -113,13 +113,13 @@ class DriverFactory {
 
         switch (capability) {
             case Capability.CHROME:
-                ChromeDriverManager.getInstance().setup()
+                WebDriverManager.chromedriver().setup()
                 return new ChromeDriver(desiredCapabilities)
             case Capability.FIREFOX:
-                FirefoxDriverManager.getInstance().setup()
+                WebDriverManager.firefoxdriver().setup()
                 return new FirefoxDriver(desiredCapabilities)
             case Capability.OPERA:
-                OperaDriverManager.getInstance().setup()
+                WebDriverManager.operadriver().setup()
                 return new OperaDriver(desiredCapabilities)
             case Capability.SAFARI:
                 return new SafariDriver(desiredCapabilities)
@@ -130,10 +130,10 @@ class DriverFactory {
             case Capability.IPAD:
                 return new IOSDriver(desiredCapabilities)
             case Capability.INTERNETEXPLORER:
-                InternetExplorerDriverManager.getInstance().setup()
+                WebDriverManager.iedriver().setup()
                 return new InternetExplorerDriver(desiredCapabilities)
             case Capability.EDGE:
-                EdgeDriverManager.getInstance().setup()
+                WebDriverManager.edgedriver().setup()
                 return new EdgeDriver(desiredCapabilities)
             default:
                 throw new CifyFrameworkException("Not supported web driver capability $capability")
