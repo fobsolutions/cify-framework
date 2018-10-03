@@ -9,6 +9,7 @@ import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.edge.EdgeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
@@ -31,7 +32,7 @@ class DriverFactory {
     public static final String CAPABILITY = "capability"
     public static final String REMOTE = "remote"
 
-    public static enum Capability {
+    static enum Capability {
         CHROME,
         SAFARI,
         OPERA,
@@ -113,13 +114,18 @@ class DriverFactory {
 
         switch (capability) {
             case Capability.CHROME:
-                ChromeDriverManager.getInstance().setup()
-                return new ChromeDriver(desiredCapabilities)
+                WebDriverManager.chromedriver().setup()
+                ChromeOptions options = new ChromeOptions()
+                options.addArguments("--disable-notifications")
+                desiredCapabilities.getProperties().each {
+                    options.setCapability(it.getKey() as String, it.getValue())
+                }
+                return new ChromeDriver(options)
             case Capability.FIREFOX:
-                FirefoxDriverManager.getInstance().setup()
+                WebDriverManager.firefoxdriver().setup()
                 return new FirefoxDriver(desiredCapabilities)
             case Capability.OPERA:
-                OperaDriverManager.getInstance().setup()
+                WebDriverManager.operadriver().setup()
                 return new OperaDriver(desiredCapabilities)
             case Capability.SAFARI:
                 return new SafariDriver(desiredCapabilities)
@@ -130,10 +136,10 @@ class DriverFactory {
             case Capability.IPAD:
                 return new IOSDriver(desiredCapabilities)
             case Capability.INTERNETEXPLORER:
-                InternetExplorerDriverManager.getInstance().setup()
+                WebDriverManager.iedriver().setup()
                 return new InternetExplorerDriver(desiredCapabilities)
             case Capability.EDGE:
-                EdgeDriverManager.getInstance().setup()
+                WebDriverManager.edgedriver().setup()
                 return new EdgeDriver(desiredCapabilities)
             default:
                 throw new CifyFrameworkException("Not supported web driver capability $capability")

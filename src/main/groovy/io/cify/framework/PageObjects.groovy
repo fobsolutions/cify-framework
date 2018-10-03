@@ -3,12 +3,9 @@ package io.cify.framework
 import io.appium.java_client.pagefactory.AppiumFieldDecorator
 import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceManager
-import org.openqa.selenium.By
-import org.openqa.selenium.WebElement
 import org.openqa.selenium.support.PageFactory
-import org.openqa.selenium.support.PageFactoryFinder
 
-import java.util.concurrent.TimeUnit
+import java.time.Duration
 
 /**
  * Page object class
@@ -65,6 +62,6 @@ class PageObjects {
      * @param timeOutInSeconds - timeout
      * */
     private void initElements(Device device, long timeOutInSeconds) {
-        PageFactory.initElements(new AppiumFieldDecorator(device.getDriver(), timeOutInSeconds, TimeUnit.SECONDS), this)
+        PageFactory.initElements(new AppiumFieldDecorator(device.getDriver(), Duration.ofSeconds(timeOutInSeconds)), this)
     }
 }

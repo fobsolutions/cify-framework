@@ -9,6 +9,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition
 import org.openqa.selenium.support.ui.WebDriverWait
 
 import javax.imageio.ImageIO
+import java.awt.Graphics2D
+import java.awt.Image
 import java.awt.image.BufferedImage
 
 /**
@@ -117,6 +119,19 @@ trait IActions {
         // Get entire page screenshot
         File screenshot = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
         BufferedImage fullImg = ImageIO.read(screenshot)
+
+        // Get Screen dimensions
+        Dimension screenDimension = device.getDriver().manage().window().getSize()
+
+        // If screen dimensions are not the same as image size then resize the image
+        if (fullImg.getWidth() != screenDimension.getWidth() || fullImg.getHeight() != screenDimension.getHeight()) {
+            Image tmp = fullImg.getScaledInstance(screenDimension.getWidth(), screenDimension.getHeight(), Image.SCALE_SMOOTH)
+            BufferedImage resized = new BufferedImage(screenDimension.getWidth(), screenDimension.getHeight(), BufferedImage.TYPE_INT_ARGB)
+            Graphics2D g2d = resized.createGraphics()
+            g2d.drawImage(tmp, 0, 0, null)
+            g2d.dispose()
+            fullImg = resized
+        }
 
         // Get the location of element on the page
         Point point = element.getLocation()

@@ -4,6 +4,8 @@ import io.appium.java_client.AppiumDriver
 import io.appium.java_client.MobileDriver
 import io.appium.java_client.MultiTouchAction
 import io.appium.java_client.TouchAction
+import io.appium.java_client.touch.WaitOptions
+import io.appium.java_client.touch.offset.PointOption
 import io.cify.framework.core.CifyFrameworkException
 import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceCategory
@@ -31,7 +33,13 @@ trait ActionsMobileIOSApp implements IActions {
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         List rightTopCoordinates = [element.getLocation().getX() + element.getSize().getWidth(), element.getLocation().getY()]
         List leftTopCoordinates = [element.getLocation().getX(), element.getLocation().getY()]
-        action.press(leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1).waitAction(Duration.ofMillis(durationInMs)).moveTo(rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1).release().perform()
+        action.press(
+                PointOption.point(leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1)
+        ).waitAction(
+                WaitOptions.waitOptions(Duration.ofMillis(durationInMs))
+        ).moveTo(
+                PointOption.point(rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1)
+        ).release().perform()
     }
 
     /**
@@ -44,7 +52,7 @@ trait ActionsMobileIOSApp implements IActions {
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         List rightTopCoordinates = [element.getLocation().getX() + element.getSize().getWidth(), element.getLocation().getY()]
         List leftTopCoordinates = [element.getLocation().getX(), element.getLocation().getY()]
-        action.press(rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1).waitAction(Duration.ofMillis(durationInMs)).moveTo(leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1).release().perform()
+        action.press(PointOption.point(rightTopCoordinates[0] - 1, rightTopCoordinates[1] + 1)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(durationInMs))).moveTo(PointOption.point(leftTopCoordinates[0] + 1, leftTopCoordinates[1] + 1)).release().perform()
     }
 
     /**
@@ -60,16 +68,16 @@ trait ActionsMobileIOSApp implements IActions {
         int SWIPE_DURATION = 1000
         switch (direction) {
             case "DOWN":
-                action.press(c.leftBottomX, c.leftBottomY).waitAction(Duration.ofMillis(SWIPE_DURATION)).moveTo(c.leftTopX, c.leftTopY).release().perform()
+                action.press(PointOption.point(c.leftBottomX, c.leftBottomY)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(SWIPE_DURATION))).moveTo(PointOption.point(c.leftTopX, c.leftTopY)).release().perform()
                 break
             case "UP":
-                action.press(c.leftTopX, c.leftTopY).waitAction(Duration.ofMillis(SWIPE_DURATION)).moveTo(c.leftBottomX, c.leftBottomY).release().perform()
+                action.press(PointOption.point(c.leftTopX, c.leftTopY)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(SWIPE_DURATION))).moveTo(PointOption.point(c.leftBottomX, c.leftBottomY)).release().perform()
                 break
             case "RIGHT":
-                action.press(c.rightTopX, c.rightTopY).waitAction(Duration.ofMillis(SWIPE_DURATION)).moveTo(c.leftTopX, c.leftTopY).release().perform()
+                action.press(PointOption.point(c.rightTopX, c.rightTopY)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(SWIPE_DURATION))).moveTo(PointOption.point(c.leftTopX, c.leftTopY)).release().perform()
                 break
             case "LEFT":
-                action.press(c.leftTopX, c.leftTopY).waitAction(Duration.ofMillis(SWIPE_DURATION)).moveTo(c.rightTopX, c.rightTopY).release().perform()
+                action.press(PointOption.point(c.leftTopX, c.leftTopY)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(SWIPE_DURATION))).moveTo(PointOption.point(c.rightTopX, c.rightTopY)).release().perform()
                 break
             default: throw new CifyFrameworkException("Scroll direction $direction is not supported")
 
@@ -86,8 +94,8 @@ trait ActionsMobileIOSApp implements IActions {
         MultiTouchAction action = new MultiTouchAction(device.getDriver() as MobileDriver)
         Dimension screenSize = device.getDriver().manage().window().getSize()
 
-        action1.press((screenSize.getWidth() * 0.4).toInteger(), (screenSize.getHeight() * 0.5).toInteger()).moveTo(0, (-screenSize.getHeight() * 0.2).toInteger()).release()
-        action2.press((screenSize.getWidth() * 0.6).toInteger(), (screenSize.getHeight() * 0.5).toInteger()).moveTo(0, (-screenSize.getHeight() * 0.2).toInteger()).release()
+        action1.press(PointOption.point((screenSize.getWidth() * 0.4).toInteger(), (screenSize.getHeight() * 0.5).toInteger())).moveTo(PointOption.point(0, (-screenSize.getHeight() * 0.2).toInteger())).release()
+        action2.press(PointOption.point((screenSize.getWidth() * 0.6).toInteger(), (screenSize.getHeight() * 0.5).toInteger())).moveTo(PointOption.point(0, (-screenSize.getHeight() * 0.2).toInteger())).release()
 
         action.add(action1).add(action2).perform()
     }
@@ -100,7 +108,7 @@ trait ActionsMobileIOSApp implements IActions {
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         Dimension dimension = device.getDriver().manage().window().getSize()
         int bottomY = dimension.getHeight() - 400
-        action.press(dimension.getWidth(), dimension.getHeight()).waitAction(Duration.ofMillis(1000)).moveTo(dimension.getWidth(), bottomY).release().perform()
+        action.press(PointOption.point(dimension.getWidth(), dimension.getHeight())).waitAction(WaitOptions.waitOptions(Duration.ofMillis(1000))).moveTo(PointOption.point(dimension.getWidth(), bottomY)).release().perform()
     }
 
     /**
@@ -114,7 +122,7 @@ trait ActionsMobileIOSApp implements IActions {
         int startY = (screenSize.getHeight() * 0.5)
         int endX = (screenSize.getWidth() * 0.8)
         int endY = (screenSize.getHeight() * 0.5)
-        action.press(startX, startY).waitAction(Duration.ofMillis(1000)).moveTo(endX, endY).release().perform()
+        action.press(PointOption.point(startX, startY)).waitAction(WaitOptions.waitOptions(Duration.ofMillis(1000))).moveTo(PointOption.point(endX, endY)).release().perform()
     }
 
     /**
@@ -126,7 +134,7 @@ trait ActionsMobileIOSApp implements IActions {
         Dimension screenSize = device.getDriver().manage().window().getSize()
         int X = screenSize.getWidth() / 2
         int Y = screenSize.getHeight() / 2
-        action.tap(X, Y).perform()
+        action.tap(PointOption.point(X, Y)).perform()
     }
 
     /**
@@ -138,7 +146,7 @@ trait ActionsMobileIOSApp implements IActions {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         MobileDriver driver = device.getDriver() as MobileDriver
         MultiTouchAction multiTouch = new MultiTouchAction(driver)
-        TouchAction action = new TouchAction(driver).press(element).release().press(element).release()
+        TouchAction action = new TouchAction(driver).press(PointOption.point(element.getLocation().getX(), element.getLocation().getY())).release().press(PointOption.point(element.getLocation().getX(), element.getLocation().getY())).release()
         try {
             multiTouch.add(action).perform()
         } catch (all) {
@@ -154,7 +162,7 @@ trait ActionsMobileIOSApp implements IActions {
     void longTap(WebElement element) {
         Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         MobileDriver driver = device.getDriver() as MobileDriver
-        TouchAction action = new TouchAction(driver).longPress(element)
+        TouchAction action = new TouchAction(driver).longPress(PointOption.point(element.getLocation().getX(), element.getLocation().getY()))
         try {
             action.perform()
         } catch (all) {
