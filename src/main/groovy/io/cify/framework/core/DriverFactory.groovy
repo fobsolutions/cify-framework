@@ -9,6 +9,7 @@ import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.edge.EdgeDriver
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.ie.InternetExplorerDriver
@@ -114,7 +115,12 @@ class DriverFactory {
         switch (capability) {
             case Capability.CHROME:
                 WebDriverManager.chromedriver().setup()
-                return new ChromeDriver(desiredCapabilities)
+                ChromeOptions options = new ChromeOptions()
+                options.addArguments("--disable-notifications")
+                desiredCapabilities.getProperties().each {
+                    options.setCapability(it.getKey() as String, it.getValue())
+                }
+                return new ChromeDriver(options)
             case Capability.FIREFOX:
                 WebDriverManager.firefoxdriver().setup()
                 return new FirefoxDriver(desiredCapabilities)
