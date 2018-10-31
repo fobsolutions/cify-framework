@@ -24,8 +24,8 @@ pipeline {
             steps {
                 withCredentials(
                         [
-                                string(credentialsId: 'BINTRAY_API_KEY', variable: '$BINTRAY_API_KEY'),
-                                string(credentialsId: 'BINTRAY_USERNAME', variable: '$BINTRAY_USERNAME')
+                                string(credentialsId: 'BINTRAY_API_KEY', variable: 'BINTRAY_API_KEY'),
+                                string(credentialsId: 'BINTRAY_USERNAME', variable: 'BINTRAY_USERNAME')
                         ]
                 ) {
                     sh './gradlew --no-daemon bintrayUpload -PbintrayUser=$BINTRAY_USERNAME -PbintrayApiKey=$BINTRAY_API_KEY'
