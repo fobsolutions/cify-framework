@@ -39,7 +39,7 @@ bintray {
     publications = ['mavenJava']
     pkg {
         repo = group
-        name = rootProject.name
+        name = 'cify-framework'
         userOrg = 'fobsolutions'
         vcsUrl = 'https://github.com/fobsolutions/cify-framework'
         licenses = ['Apache-2.0']
