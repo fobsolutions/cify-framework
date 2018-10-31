@@ -29,6 +29,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            artifactId 'cify-framework'
         }
     }
 }
@@ -36,19 +37,15 @@ publishing {
 bintray {
     user = project.hasProperty('bintrayUser') ? project.bintrayUser : System.getenv('BINTRAY_USER')
     key = project.hasProperty('bintrayApiKey') ? project.bintrayApiKey : System.getenv('BINTRAY_API_KEY')
+    publish = true
+    override = true
     publications = ['mavenJava']
     pkg {
         repo = group
         name = "cify-framework"
         userOrg = 'fobsolutions'
-        vcsUrl = 'https://github.com/fobsolutions/cify-framework'
+        vcsUrl = 'https://github.cogram/fobsolutions/cify-framework'
         licenses = ['Apache-2.0']
-        version {
-            gpg {
-                sign = true //Determines whether to GPG sign the files. The default is false
-            }
-            released = new Date()
-        }
     }
 }
 
