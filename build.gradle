@@ -39,10 +39,16 @@ bintray {
     publications = ['mavenJava']
     pkg {
         repo = group
-        name = 'cify-framework'
+        name = "cify-framework"
         userOrg = 'fobsolutions'
         vcsUrl = 'https://github.com/fobsolutions/cify-framework'
         licenses = ['Apache-2.0']
+        version {
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+            }
+            released = new Date()
+        }
     }
 }
 
