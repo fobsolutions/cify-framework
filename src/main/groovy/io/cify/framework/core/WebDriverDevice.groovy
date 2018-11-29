@@ -1,6 +1,6 @@
 package io.cify.framework.core
 
-import io.cify.framework.core.interfaces.IDevice
+import io.cify.framework.core.interfaces.IWebDriverDevice
 import io.cify.framework.logging.LoggingOutputStream
 import io.cify.framework.recording.RecordingController
 import org.apache.logging.log4j.LogManager
@@ -13,10 +13,10 @@ import org.openqa.selenium.remote.DesiredCapabilities
 /**
  * Created by FOB Solutions
  *
- * This is a model class for Device
+ * This is a model class for WebDriverDevice
  */
 
-class Device implements IDevice {
+class WebDriverDevice implements IWebDriverDevice {
 
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('DEVICE') as Marker
@@ -31,13 +31,13 @@ class Device implements IDevice {
     public boolean active = false
 
     /**
-     * Default constructor for Device
+     * Default constructor for WebDriverDevice
      *
      * @param id unique device id
      * @param category device category
      * @param capabilities device desired capabilities
      * */
-    protected Device(String id, DeviceCategory category, DesiredCapabilities capabilities) {
+    protected WebDriverDevice(String id, DeviceCategory category, DesiredCapabilities capabilities) {
         LOG.debug(MARKER, "Create new device with id $id, category $category and capabilities $capabilities")
         this.id = id
         this.category = category
@@ -56,6 +56,34 @@ class Device implements IDevice {
     }
 
     /**
+     * Is device active
+     * @return
+     */
+    @Override
+    boolean isActive() {
+        return active
+    }
+
+    /**
+     * Set device active
+     * @param active
+     */
+    @Override
+    void setActive(boolean active) {
+        this.active = active
+    }
+
+    /**
+     * Run command from client
+     * @param closure
+     * @return
+     */
+    @Override
+    def runCommand(Closure closure) {
+        return closure
+    }
+
+    /**
      * Gets category for device
      *
      * @retun device category
@@ -67,7 +95,7 @@ class Device implements IDevice {
     }
 
     /**
-     * Gets driver from Device
+     * Gets driver from WebDriverDevice
      *
      * @return WebDriver
      * */
@@ -99,7 +127,7 @@ class Device implements IDevice {
     @Override
     DesiredCapabilities getCapabilities() {
         LOG.debug(MARKER, "Get all desired capabilities")
-        return capabilities
+        return capabilities as DesiredCapabilities
     }
 
     /**
@@ -117,7 +145,7 @@ class Device implements IDevice {
      * */
     @Override
     void openApp(String app) {
-        openApp(app, "", "");
+        openApp(app, "", "")
     }
 
     /**

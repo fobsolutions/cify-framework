@@ -3,6 +3,7 @@ package io.cify.framework.core
 import groovy.json.JsonSlurper
 import groovy.json.StringEscapeUtils
 import groovy.json.internal.LazyMap
+import io.cify.framework.core.interfaces.ICustomDevice
 import io.cify.framework.core.interfaces.IDeviceManager
 import io.cify.framework.reporting.TestReportManager
 import org.apache.logging.log4j.LogManager
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.remote.DesiredCapabilities
+import org.openqa.selenium.support.ui.WebDriverWait
 
 import static java.util.UUID.randomUUID
 
@@ -25,22 +27,22 @@ class DeviceManager implements IDeviceManager {
     private static final Marker MARKER = MarkerManager.getMarker('DEVICE MANAGER') as Marker
 
     /**
-     * System property to be used to pass capabilities to Device Manager
+     * System property to be used to pass capabilities to WebDriverDevice Manager
      * */
     public static final String SYSTEM_PROPERTY_CAPABILITIES = "capabilities"
 
     /**
-     * System property to be used to pass credentials of device farm providers to Device Manager
+     * System property to be used to pass credentials of device farm providers to WebDriverDevice Manager
      */
     public static final String SYSTEM_PROPERTY_CREDENTIALS = "credentials"
 
     private Capabilities capabilities
-    private List<Device> devices = []
+    private List<ICustomDevice> devices = []
     private static volatile DeviceManager instance
     private LazyMap credentials
 
     /**
-     * Default constructor for Device Manager
+     * Default constructor for WebDriverDevice Manager
      * */
     DeviceManager() {
         LOG.debug(MARKER, 'Create new DeviceManager')
@@ -55,12 +57,12 @@ class DeviceManager implements IDeviceManager {
 
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
-            throw new CifyFrameworkException("Failed to create Device Manager instance: $all.message")
+            throw new CifyFrameworkException("Failed to create WebDriverDevice Manager instance: $all.message")
         }
     }
 
     /**
-     * Returns instance of Device Manager
+     * Returns instance of WebDriverDevice Manager
      *
      * @return DeviceManager instance
      */
@@ -77,7 +79,7 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Returns Device Manager capabilities
+     * Returns WebDriverDevice Manager capabilities
      *
      * @return Capabilities
      */
@@ -92,11 +94,35 @@ class DeviceManager implements IDeviceManager {
      *
      * @param category device category
      *
-     * @return Device
+     * @return WebDriverDevice
      */
     @Override
-    Device createDevice(DeviceCategory category) {
-        return createDevice(category, generateRandomDeviceId())
+    WebDriverDevice createWebDriverDevice(DeviceCategory category) {
+        return createWebDriverDevice(category, generateRandomDeviceId())
+    }
+
+    /**
+     * Creates custom device with Custom category
+     * @return
+     */
+    @Override
+    ICustomDevice createCustomDevice(ICustomDevice customDevice) {
+        customDevice.active = true
+        devices.add(customDevice)
+        return getActiveDevice()
+    }
+
+    /**
+     * Create Custom Device with specified id
+     * @param deviceId
+     * @return
+     */
+    @Override
+    ICustomDevice createCustomDevice() {
+        CustomDevice customDevice = new CustomDevice(generateRandomDeviceId(), DeviceCategory.CUSTOM, capabilities.getCustomCapabilities())
+        customDevice.setActive(true)
+        devices.add(customDevice)
+        getActiveDevice()
     }
 
     /**
@@ -105,12 +131,12 @@ class DeviceManager implements IDeviceManager {
      * @param category device category
      * @param deviceId unique device id
      *
-     * @return Device
+     * @return WebDriverDevice
      * @throws CifyFrameworkException  if device id is null or empty
      * @throws CifyFrameworkException  if active device with same id already exists
      */
     @Override
-    Device createDevice(DeviceCategory category, String deviceId) {
+    WebDriverDevice createWebDriverDevice(DeviceCategory category, String deviceId) {
         LOG.debug(MARKER, "Create new device with category $category and device id $deviceId")
         try {
 
@@ -118,7 +144,7 @@ class DeviceManager implements IDeviceManager {
                 throw new CifyFrameworkException("Failed to create device. Id is null or empty")
             }
             if (hasActiveDevice(deviceId)) {
-                throw new CifyFrameworkException("Failed to create device. Device with id $deviceId already exists")
+                throw new CifyFrameworkException("Failed to create device. WebDriverDevice with id $deviceId already exists")
             }
 
             DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category)
@@ -132,7 +158,7 @@ class DeviceManager implements IDeviceManager {
             }
 
             deviceId = deviceId.replace("_", "-")
-            Device device = new Device(deviceId, category, desiredCapabilities)
+            WebDriverDevice device = new WebDriverDevice(deviceId, category, desiredCapabilities)
             devices.add(device)
             setDeviceActive(device)
 
@@ -142,7 +168,7 @@ class DeviceManager implements IDeviceManager {
         }
 
         addDeviceToTestReport(deviceId, category.toString())
-        return getActiveDevice(deviceId)
+        return getActiveDevice(deviceId) as WebDriverDevice
     }
 
     /**
@@ -166,7 +192,7 @@ class DeviceManager implements IDeviceManager {
     @Override
     boolean hasActiveDevice(DeviceCategory category) {
         LOG.debug(MARKER, "Check if device with category $category exists")
-        Device device = devices.find { device ->
+        ICustomDevice device = devices.find { device ->
             device.getCategory() == category
         }
 
@@ -175,7 +201,7 @@ class DeviceManager implements IDeviceManager {
             return false
         }
 
-        LOG.debug(MARKER, "Device with category $category found")
+        LOG.debug(MARKER, "WebDriverDevice with category $category found")
         return true
     }
 
@@ -189,7 +215,7 @@ class DeviceManager implements IDeviceManager {
     @Override
     boolean hasActiveDevice(String deviceId) {
         LOG.debug(MARKER, "Check if device with id $deviceId exists")
-        Device device = devices.find { device ->
+        ICustomDevice device = devices.find { device ->
             device.getId() == deviceId
         }
 
@@ -198,17 +224,17 @@ class DeviceManager implements IDeviceManager {
             return false
         }
 
-        LOG.debug(MARKER, "Device with id $deviceId found")
+        LOG.debug(MARKER, "WebDriverDevice with id $deviceId found")
         return true
     }
 
     /**
      * Returns all active devices
      *
-     * @return List < Device >
+     * @return List < WebDriverDevice >
      */
     @Override
-    List<Device> getAllActiveDevices() {
+    List<ICustomDevice> getAllActiveDevices() {
         LOG.debug(MARKER, "Get all active devices")
         return devices
     }
@@ -218,10 +244,10 @@ class DeviceManager implements IDeviceManager {
      *
      * @param category device category
      *
-     * @return List < Device >
+     * @return List < WebDriverDevice >
      */
     @Override
-    List<Device> getAllActiveDevices(DeviceCategory category) {
+    List<ICustomDevice> getAllActiveDevices(DeviceCategory category) {
         LOG.debug(MARKER, "Find all active devices of category $category")
         return devices.findAll { device ->
             device.getCategory() == category
@@ -231,12 +257,12 @@ class DeviceManager implements IDeviceManager {
     /**
      * Returns first active device
      *
-     * @return Device
+     * @return WebDriverDevice
      */
     @Override
-    Device getActiveDevice() {
+    ICustomDevice getActiveDevice() {
         LOG.debug(MARKER, "Get first active device")
-        Device device = devices.find { it.active }
+        ICustomDevice device = devices.find { it.active }
         if (!device) {
             LOG.debug(MARKER, "No active device found")
             throw new CifyFrameworkException("No active device found")
@@ -249,13 +275,13 @@ class DeviceManager implements IDeviceManager {
      *
      * @param category device category
      *
-     * @return Device
+     * @return WebDriverDevice
      * @throws CifyFrameworkException  if no active device found
      */
     @Override
-    Device getActiveDevice(DeviceCategory category) {
+    ICustomDevice getActiveDevice(DeviceCategory category) {
         LOG.debug(MARKER, "Find first active devices of category $category")
-        Device device = devices.find { device ->
+        ICustomDevice device = devices.find { device ->
             device.getCategory() == category
         }
         if (device == null) {
@@ -271,13 +297,13 @@ class DeviceManager implements IDeviceManager {
      *
      * @param deviceId device unique id
      *
-     * @return Device
+     * @return WebDriverDevice
      * @throws CifyFrameworkException  if no active device found
      */
     @Override
-    Device getActiveDevice(String deviceId) {
+    ICustomDevice getActiveDevice(String deviceId) {
         LOG.debug(MARKER, "Find active device with id $deviceId")
-        Device device = devices.find { device ->
+        ICustomDevice device = devices.find { device ->
             device.getId() == deviceId
         }
         if (device == null) {
@@ -292,7 +318,7 @@ class DeviceManager implements IDeviceManager {
      *
      * @param device
      */
-    void setDeviceActive(Device device) {
+    void setDeviceActive(ICustomDevice device) {
         device.active = true
         getAllActiveDevices().each {
             if (it != device) {
@@ -309,7 +335,7 @@ class DeviceManager implements IDeviceManager {
     @Override
     void quitDevice(String deviceId) {
         LOG.debug(MARKER, "Quit device with id $deviceId")
-        Device device = getActiveDevice(deviceId)
+        ICustomDevice device = getActiveDevice(deviceId)
         quitDevice(device)
     }
 
@@ -319,7 +345,7 @@ class DeviceManager implements IDeviceManager {
      * @param device device
      */
     @Override
-    void quitDevice(Device device) {
+    void quitDevice(ICustomDevice device) {
         LOG.debug(MARKER, "Quit device $device")
         if (device != null) {
             device.quit()

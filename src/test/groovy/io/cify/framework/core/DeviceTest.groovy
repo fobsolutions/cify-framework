@@ -15,14 +15,14 @@ class DeviceTest extends GroovyTestCase {
     private DesiredCapabilities iOSCaps = new DesiredCapabilities(["version": "9.3.5"])
     private DesiredCapabilities browserCaps = new DesiredCapabilities(["category": "chrome"])
 
-    private Device androidDevice
-    private Device iOSDevice
-    private Device browserDevice
+    private WebDriverDevice androidDevice
+    private WebDriverDevice iOSDevice
+    private WebDriverDevice browserDevice
 
     void setUp() {
-        androidDevice = new Device(androidDeviceId, DeviceCategory.ANDROID, androidCaps)
-        iOSDevice = new Device(iOSDeviceId, DeviceCategory.IOS, iOSCaps)
-        browserDevice = new Device(browserDeviceId, DeviceCategory.BROWSER, browserCaps)
+        androidDevice = new WebDriverDevice(androidDeviceId, DeviceCategory.ANDROID, androidCaps)
+        iOSDevice = new WebDriverDevice(iOSDeviceId, DeviceCategory.IOS, iOSCaps)
+        browserDevice = new WebDriverDevice(browserDeviceId, DeviceCategory.BROWSER, browserCaps)
     }
 
     void testShouldHaveCorrectId() {

@@ -1,6 +1,6 @@
 package io.cify.framework.recording
 
-import io.cify.framework.core.Device
+import io.cify.framework.core.WebDriverDevice
 import io.cify.framework.reporting.TestReportManager
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
@@ -35,7 +35,7 @@ class RecordingController {
      *
      * @param device - device to record
      * */
-    static void startRecording(Device device) {
+    static void startRecording(WebDriverDevice device) {
         LOG.debug(MARKER, "Start recording...")
         if (TestReportManager.isReporting) {
             screenshotsReportingDir = System.getProperty("videoDir") + SCREENSHOTS_SUB_DIR
@@ -63,7 +63,7 @@ class RecordingController {
      *
      * @param device - device to stop recording
      * */
-    static void stopRecording(Device device) {
+    static void stopRecording(WebDriverDevice device) {
         if (!TestReportManager.isReporting) {
             try {
                 LOG.debug(MARKER, "Stop recording...")
@@ -92,7 +92,7 @@ class RecordingController {
      *
      * @param device - device to take screenshot
      * */
-    static void takeScreenshot(Device device) {
+    static void takeScreenshot(WebDriverDevice device) {
         if (device.isRecording)
             try {
                 if (TestReportManager.isReporting) {
@@ -124,7 +124,7 @@ class RecordingController {
     /**
      * Get recording time
      * */
-    static int getRecordingDuration(Device device) {
+    static int getRecordingDuration(WebDriverDevice device) {
         try {
             File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
             File[] screenshots = screenshotFolder.listFiles()
@@ -139,7 +139,7 @@ class RecordingController {
     /**
      * Gets video path
      * */
-    private static String getVideoDirForDevice(Device device) {
+    private static String getVideoDirForDevice(WebDriverDevice device) {
         return System.getProperty("videoDir") +
                 System.getProperty("task", "plug-and-play") +
                 "/" +
@@ -150,7 +150,7 @@ class RecordingController {
     /**
      * Delete temporary screenshots
      * */
-    private static void deleteTemporaryImages(Device device) {
+    private static void deleteTemporaryImages(WebDriverDevice device) {
         File screenshotFolder = new File(getVideoDirForDevice(device) + TEMP)
         screenshotFolder.deleteDir()
     }

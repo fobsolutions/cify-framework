@@ -1,16 +1,16 @@
 package io.cify.framework.factory
 
 import io.cify.framework.annotations.Title
-import io.cify.framework.core.Device
+import io.cify.framework.core.WebDriverDevice
 
 /**
  * Created by FOB Solutions
  */
 class FactoryTestClass implements FactoryTestClassInterface {
 
-    Device device;
+    WebDriverDevice device;
 
-    FactoryTestClass(Device device) {
+    FactoryTestClass(WebDriverDevice device) {
         this.device = device;
     }
 

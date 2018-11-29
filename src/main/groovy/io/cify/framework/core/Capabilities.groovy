@@ -23,6 +23,7 @@ class Capabilities {
     private LazyMap android = [:]
     private LazyMap ios = [:]
     private LazyMap browser = [:]
+    private LazyMap custom = [:]
 
     /**
      * Parses capabilities json to Capabilities
@@ -67,8 +68,16 @@ class Capabilities {
     }
 
     /**
+     * Get custom capabilities from capabilities
+     * @return
+     */
+    LazyMap getCustomCapabilities() {
+        return custom
+    }
+
+    /**
      * Adds to desired capabilities
-     * @param category - Device category
+     * @param category - WebDriverDevice category
      * @param key - key to add
      * @param value - value to add
      */

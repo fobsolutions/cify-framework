@@ -2,7 +2,7 @@ package io.cify.framework
 
 import io.cify.framework.annotations.Title
 import io.cify.framework.core.CifyFrameworkException
-import io.cify.framework.core.Device
+import io.cify.framework.core.WebDriverDevice
 import io.cify.framework.reporting.TestReportManager
 
 import java.lang.reflect.InvocationHandler
@@ -43,7 +43,7 @@ public class Factory implements InvocationHandler {
      * @return Object
      * @throws CifyFrameworkException if failed to create proxy instance
      * */
-    public static Object get(Device device, String className) {
+    public static Object get(WebDriverDevice device, String className) {
         LOG.debug(MARKER, "Create new proxy instance for class $className and device $device")
 
         try {

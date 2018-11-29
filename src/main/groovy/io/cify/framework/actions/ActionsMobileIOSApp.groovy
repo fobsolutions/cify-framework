@@ -7,9 +7,9 @@ import io.appium.java_client.TouchAction
 import io.appium.java_client.touch.WaitOptions
 import io.appium.java_client.touch.offset.PointOption
 import io.cify.framework.core.CifyFrameworkException
-import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceCategory
 import io.cify.framework.core.DeviceManager
+import io.cify.framework.core.WebDriverDevice
 import org.openqa.selenium.Dimension
 import org.openqa.selenium.WebElement
 
@@ -29,7 +29,7 @@ trait ActionsMobileIOSApp implements IActions {
      * @param duration duration of the swipe in milliseconds
      */
     void swipeRight(WebElement element, Integer durationInMs) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         List rightTopCoordinates = [element.getLocation().getX() + element.getSize().getWidth(), element.getLocation().getY()]
         List leftTopCoordinates = [element.getLocation().getX(), element.getLocation().getY()]
@@ -48,7 +48,7 @@ trait ActionsMobileIOSApp implements IActions {
      * @param duration duration of the swipe in milliseconds
      */
     void swipeLeft(WebElement element, Integer durationInMs) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         List rightTopCoordinates = [element.getLocation().getX() + element.getSize().getWidth(), element.getLocation().getY()]
         List leftTopCoordinates = [element.getLocation().getX(), element.getLocation().getY()]
@@ -57,12 +57,12 @@ trait ActionsMobileIOSApp implements IActions {
 
     /**
      * Performs scrolling on given element
-     * @param device Device instance
+     * @param device WebDriverDevice instance
      * @param element WebElement to perform scroll on
      * @param direction direction of the scroll: UP, DOWN, RIGHT, LEFT
      */
     void scrollElement(WebElement element, String direction) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         Coordinates c = new Coordinates(element)
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         int SWIPE_DURATION = 1000
@@ -88,7 +88,7 @@ trait ActionsMobileIOSApp implements IActions {
      * Tilts the map
      */
     void tilt() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         TouchAction action1 = new TouchAction(device.getDriver() as MobileDriver)
         TouchAction action2 = new TouchAction(device.getDriver() as MobileDriver)
         MultiTouchAction action = new MultiTouchAction(device.getDriver() as MobileDriver)
@@ -104,7 +104,7 @@ trait ActionsMobileIOSApp implements IActions {
      * Scrolls down
      * */
     void scrollDown() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         Dimension dimension = device.getDriver().manage().window().getSize()
         int bottomY = dimension.getHeight() - 400
@@ -115,7 +115,7 @@ trait ActionsMobileIOSApp implements IActions {
      * Swipes from right to left
      */
     void swipeRightToLeft() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         Dimension screenSize = device.getDriver().manage().window().getSize()
         int startX = (screenSize.getWidth() * 0.2)
@@ -129,7 +129,7 @@ trait ActionsMobileIOSApp implements IActions {
      * Taps in the middle of the screen (X*Y/2)
      */
     void tapInTheMiddleOfScreen() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         TouchAction action = new TouchAction(device.getDriver() as AppiumDriver)
         Dimension screenSize = device.getDriver().manage().window().getSize()
         int X = screenSize.getWidth() / 2
@@ -143,7 +143,7 @@ trait ActionsMobileIOSApp implements IActions {
      * @param element - element to double tap
      * */
     void doubleTapElement(WebElement element) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         MobileDriver driver = device.getDriver() as MobileDriver
         MultiTouchAction multiTouch = new MultiTouchAction(driver)
         TouchAction action = new TouchAction(driver).press(PointOption.point(element.getLocation().getX(), element.getLocation().getY())).release().press(PointOption.point(element.getLocation().getX(), element.getLocation().getY())).release()
@@ -160,7 +160,7 @@ trait ActionsMobileIOSApp implements IActions {
      * @param element - element to long tap
      */
     void longTap(WebElement element) {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         MobileDriver driver = device.getDriver() as MobileDriver
         TouchAction action = new TouchAction(driver).longPress(PointOption.point(element.getLocation().getX(), element.getLocation().getY()))
         try {
@@ -174,7 +174,7 @@ trait ActionsMobileIOSApp implements IActions {
      * Hides soft keyboard
      */
     void hideKeyboard() {
-        Device device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
+        WebDriverDevice device = DeviceManager.getInstance().getActiveDevice(DeviceCategory.IOS)
         try {
             (device.getDriver() as MobileDriver).hideKeyboard()
         } catch (ignored) {

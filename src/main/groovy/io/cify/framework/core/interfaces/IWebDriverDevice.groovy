@@ -1,39 +1,16 @@
 package io.cify.framework.core.interfaces
 
-import io.cify.framework.core.DeviceCategory
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.remote.DesiredCapabilities
 
 /**
  * Created by FOB Solutions
  */
-interface IDevice {
-
-    /**
-     * Gets device ID
-     * */
-    String getId()
-
-    /**
-     * Gets device category
-     * */
-    DeviceCategory getCategory()
+interface IWebDriverDevice extends ICustomDevice {
 
     /**
      * Gets device driver
      * */
     WebDriver getDriver()
-
-    /**
-     * Sets capability to device
-     * */
-    void setCapability(String key, String value)
-
-    /**
-     * Gets device capabilities
-     * @return DesiredCapability
-     */
-    DesiredCapabilities getCapabilities()
 
     /**
      * Open application
@@ -69,9 +46,4 @@ interface IDevice {
      * Stops recording
      */
     void stopRecording()
-
-    /**
-     * Closes the device
-     */
-    void quit()
 }

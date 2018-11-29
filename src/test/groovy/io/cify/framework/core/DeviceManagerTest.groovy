@@ -42,7 +42,7 @@ class DeviceManagerTest extends GroovyTestCase {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
         Capabilities capabilities = new DeviceManager().getCapabilities()
-        Device device = new Device("id", DeviceCategory.ANDROID, new DesiredCapabilities().setCapability("asd", "asd"))
+        WebDriverDevice device = new WebDriverDevice("id", DeviceCategory.ANDROID, new DesiredCapabilities().setCapability("asd", "asd"))
         capabilities.addToDesiredCapabilities(DeviceCategory.ANDROID, "test", device)
 
         assert capabilities.toDesiredCapabilities(DeviceCategory.ANDROID).getCapability("test") == device
@@ -81,7 +81,7 @@ class DeviceManagerTest extends GroovyTestCase {
     void testShouldCreateAndroidDevice() {
         DeviceCategory category = DeviceCategory.ANDROID
 
-        Device device = new DeviceManager().createDevice(category)
+        WebDriverDevice device = new DeviceManager().createWebDriverDevice(category)
         assert device.getCategory().is(category)
     }
 
@@ -89,7 +89,7 @@ class DeviceManagerTest extends GroovyTestCase {
     void testShouldCreateIOSDevice() {
         DeviceCategory category = DeviceCategory.IOS
 
-        Device device = new DeviceManager().createDevice(category)
+        WebDriverDevice device = new DeviceManager().createWebDriverDevice(category)
         assert device.getCategory().is(category)
     }
 
@@ -97,7 +97,7 @@ class DeviceManagerTest extends GroovyTestCase {
     void testShouldCreateBrowserDevice() {
         DeviceCategory category = DeviceCategory.BROWSER
 
-        Device device = new DeviceManager().createDevice(category)
+        WebDriverDevice device = new DeviceManager().createWebDriverDevice(category)
         assert device.getCategory().is(category)
     }
 
@@ -106,7 +106,7 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category = DeviceCategory.ANDROID
         String deviceId = "phone"
 
-        Device device = new DeviceManager().createDevice(category, deviceId)
+        WebDriverDevice device = new DeviceManager().createWebDriverDevice(category, deviceId)
         assert device.getId().is(deviceId)
     }
 
@@ -117,8 +117,8 @@ class DeviceManagerTest extends GroovyTestCase {
         String deviceId0 = "phone-0"
         String deviceId1 = "phone-1"
 
-        Device device0 = deviceManager.createDevice(category, deviceId0)
-        Device device1 = deviceManager.createDevice(category, deviceId1)
+        WebDriverDevice device0 = deviceManager.createWebDriverDevice(category, deviceId0)
+        WebDriverDevice device1 = deviceManager.createWebDriverDevice(category, deviceId1)
 
         assert device0.getId() != device1.getId()
     }
@@ -128,7 +128,7 @@ class DeviceManagerTest extends GroovyTestCase {
         String deviceId = ""
 
         shouldFail {
-            new DeviceManager().createDevice(category, deviceId)
+            new DeviceManager().createWebDriverDevice(category, deviceId)
         }
     }
 
@@ -138,14 +138,14 @@ class DeviceManagerTest extends GroovyTestCase {
         String deviceId = null
 
         shouldFail {
-            new DeviceManager().createDevice(category, deviceId)
+            new DeviceManager().createWebDriverDevice(category, deviceId)
         }
     }
 
     void testShouldFailToCreateDeviceWithNullCategory() {
 
         shouldFail {
-            new DeviceManager().createDevice(null)
+            new DeviceManager().createWebDriverDevice(null)
         }
     }
 
@@ -156,8 +156,8 @@ class DeviceManagerTest extends GroovyTestCase {
         String deviceId = "phone"
 
         shouldFail {
-            deviceManager.createDevice(category0, deviceId)
-            deviceManager.createDevice(category1, deviceId)
+            deviceManager.createWebDriverDevice(category0, deviceId)
+            deviceManager.createWebDriverDevice(category1, deviceId)
         }
     }
 
@@ -165,7 +165,7 @@ class DeviceManagerTest extends GroovyTestCase {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, capsWithoutAndroid)
 
         shouldFail {
-            new DeviceManager().createDevice(DeviceCategory.ANDROID)
+            new DeviceManager().createWebDriverDevice(DeviceCategory.ANDROID)
         }
     }
 
@@ -173,7 +173,7 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceManager deviceManager = new DeviceManager()
         DeviceCategory category = DeviceCategory.ANDROID
 
-        deviceManager.createDevice(category)
+        deviceManager.createWebDriverDevice(category)
 
         assert deviceManager.hasActiveDevice(category)
     }
@@ -183,7 +183,7 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category = DeviceCategory.ANDROID
         String deviceId = "phone"
 
-        deviceManager.createDevice(category, deviceId)
+        deviceManager.createWebDriverDevice(category, deviceId)
 
         assert deviceManager.hasActiveDevice(deviceId)
     }
@@ -199,13 +199,13 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category2 = DeviceCategory.BROWSER
 
         1.upto(10, {
-            deviceManager.createDevice(category0, it.toString())
+            deviceManager.createWebDriverDevice(category0, it.toString())
         })
         11.upto(20, {
-            deviceManager.createDevice(category1, it.toString())
+            deviceManager.createWebDriverDevice(category1, it.toString())
         })
         21.upto(30, {
-            deviceManager.createDevice(category2, it.toString())
+            deviceManager.createWebDriverDevice(category2, it.toString())
         })
 
         assert deviceManager.getAllActiveDevices().size() == 30
@@ -219,13 +219,13 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category2 = DeviceCategory.BROWSER
 
         1.upto(10, {
-            deviceManager.createDevice(category0, it.toString())
+            deviceManager.createWebDriverDevice(category0, it.toString())
         })
         11.upto(20, {
-            deviceManager.createDevice(category1, it.toString())
+            deviceManager.createWebDriverDevice(category1, it.toString())
         })
         21.upto(30, {
-            deviceManager.createDevice(category2, it.toString())
+            deviceManager.createWebDriverDevice(category2, it.toString())
         })
 
         assert deviceManager.getAllActiveDevices(category0).size() == 10
@@ -237,10 +237,10 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category = DeviceCategory.ANDROID
 
         1.upto(10, {
-            deviceManager.createDevice(category, it.toString())
+            deviceManager.createWebDriverDevice(category, it.toString())
         })
 
-        Device device0 = deviceManager.createDevice(category)
+        WebDriverDevice device0 = deviceManager.createWebDriverDevice(category)
         assert deviceManager.getActiveDevice().is(device0)
     }
 
@@ -248,9 +248,9 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceManager deviceManager = new DeviceManager()
         DeviceCategory category = DeviceCategory.ANDROID
 
-        Device device = deviceManager.createDevice(category)
+        WebDriverDevice device = deviceManager.createWebDriverDevice(category)
         1.upto(10, {
-            deviceManager.createDevice(category, it.toString())
+            deviceManager.createWebDriverDevice(category, it.toString())
         })
 
         assert deviceManager.getActiveDevice(category).is(device)
@@ -261,7 +261,7 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category = DeviceCategory.ANDROID
         String deviceId = "phone"
 
-        Device device = deviceManager.createDevice(category, deviceId)
+        WebDriverDevice device = deviceManager.createWebDriverDevice(category, deviceId)
         assert deviceManager.getActiveDevice(deviceId).is(device)
     }
 
@@ -289,7 +289,7 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category = DeviceCategory.ANDROID
         String deviceId = "phone"
 
-        deviceManager.createDevice(category, deviceId)
+        deviceManager.createWebDriverDevice(category, deviceId)
         deviceManager.quitDevice(deviceId)
 
         shouldFail {
@@ -302,7 +302,7 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category = DeviceCategory.ANDROID
 
         1.upto(10, {
-            deviceManager.createDevice(category, it.toString())
+            deviceManager.createWebDriverDevice(category, it.toString())
         })
         deviceManager.quitAllDevices()
 
@@ -317,13 +317,13 @@ class DeviceManagerTest extends GroovyTestCase {
         DeviceCategory category2 = DeviceCategory.BROWSER
 
         1.upto(10, {
-            deviceManager.createDevice(category0, it.toString())
+            deviceManager.createWebDriverDevice(category0, it.toString())
         })
         11.upto(20, {
-            deviceManager.createDevice(category1, it.toString())
+            deviceManager.createWebDriverDevice(category1, it.toString())
         })
         21.upto(30, {
-            deviceManager.createDevice(category2, it.toString())
+            deviceManager.createWebDriverDevice(category2, it.toString())
         })
         deviceManager.quitAllDevices(category1)
 

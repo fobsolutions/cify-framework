@@ -1,7 +1,7 @@
 package io.cify.framework
 
-import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceCategory
+import io.cify.framework.core.WebDriverDevice
 import io.cify.framework.factory.FactoryTestClassInterface
 import org.openqa.selenium.remote.DesiredCapabilities
 
@@ -10,17 +10,17 @@ import org.openqa.selenium.remote.DesiredCapabilities
  */
 class FactoryTest extends GroovyTestCase {
 
-    private Device device
-    private Device deviceAndroidUIType
-    private Device deviceIOSUIType
+    private WebDriverDevice device
+    private WebDriverDevice deviceAndroidUIType
+    private WebDriverDevice deviceIOSUIType
 
     private String className = 'io.cify.framework.factory.FactoryTestClass'
     private String classNameBad = 'FactoryTestClass'
 
     void setUp() {
-        device = new Device('phone', DeviceCategory.ANDROID, new DesiredCapabilities([:]))
-        deviceAndroidUIType = new Device('phone', DeviceCategory.ANDROID, new DesiredCapabilities(['UIType': 'Android']))
-        deviceIOSUIType = new Device('phone', DeviceCategory.ANDROID, new DesiredCapabilities(['UIType': 'IOS']))
+        device = new WebDriverDevice('phone', DeviceCategory.ANDROID, new DesiredCapabilities([:]))
+        deviceAndroidUIType = new WebDriverDevice('phone', DeviceCategory.ANDROID, new DesiredCapabilities(['UIType': 'Android']))
+        deviceIOSUIType = new WebDriverDevice('phone', DeviceCategory.ANDROID, new DesiredCapabilities(['UIType': 'IOS']))
     }
 
     void testShouldCreateProxyInstanceForDeviceWithoutUIType() {

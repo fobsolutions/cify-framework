@@ -2,9 +2,7 @@ package io.cify.framework.actions
 
 import io.appium.java_client.ios.IOSDriver
 import io.cify.framework.core.CifyFrameworkException
-import io.cify.framework.core.Device
-import io.cify.framework.core.DeviceCategory
-import io.cify.framework.core.DeviceManager
+import io.cify.framework.core.WebDriverDevice
 import org.openqa.selenium.*
 import org.openqa.selenium.support.ui.ExpectedCondition
 import org.openqa.selenium.support.ui.WebDriverWait
@@ -58,7 +56,7 @@ trait IActions {
      * @param timeOut in ms
      * @return True if condition is met
      */
-    boolean waitForCondition(Device device, ExpectedCondition condition, long timeOut) {
+    boolean waitForCondition(WebDriverDevice device, ExpectedCondition condition, long timeOut) {
         try {
             WebDriverWait w = new WebDriverWait(device.getDriver(), timeOut)
             w.until(condition)
@@ -87,7 +85,7 @@ trait IActions {
      * @param locator
      * @return
      */
-    static boolean isDisplayed(Device device, By locator) {
+    static boolean isDisplayed(WebDriverDevice device, By locator) {
         try {
             return device.getDriver().findElement(locator).isDisplayed()
         } catch (ignored) {
@@ -115,7 +113,7 @@ trait IActions {
      * @param element
      * @return File
      * */
-    static File takeScreenshotOfElement(Device device, WebElement element) {
+    static File takeScreenshotOfElement(WebDriverDevice device, WebElement element) {
 
         // Get entire page screenshot
         File screenshot = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)

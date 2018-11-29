@@ -8,5 +8,6 @@ package io.cify.framework.core
 enum DeviceCategory {
     BROWSER,
     ANDROID,
-    IOS
+    IOS,
+    CUSTOM
 }

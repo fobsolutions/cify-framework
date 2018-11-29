@@ -1,7 +1,7 @@
 package io.cify.framework
 
 import io.cify.framework.actions.IActions
-import io.cify.framework.core.Device
+import io.cify.framework.core.WebDriverDevice
 import io.cify.framework.core.DeviceManager
 
 /**
@@ -21,7 +21,7 @@ public class Actions {
     /**
      * Gets default actions for device with id
      *
-     * @param acticeDeviceId - Device id for active device
+     * @param acticeDeviceId - WebDriverDevice id for active device
      * @return IActions interface object
      * */
     public static IActions getActions(String activeDeviceId) {
@@ -34,7 +34,7 @@ public class Actions {
      * @param device
      * @return IActions interface object
      * */
-    public static IActions getActions(Device device) {
+    public static IActions getActions(WebDriverDevice device) {
         return (IActions) Factory.get(device, "io.cify.framework.actions.Actions")
     }
 
@@ -62,11 +62,11 @@ public class Actions {
     /**
      * Gets custom actions for device and for given classpath
      *
-     * @param device - Device object
+     * @param device - WebDriverDevice object
      * @param className - class package and name
      * @return generic class object
      * */
-    public static def getCustomActions(Device device, String className) {
+    public static def getCustomActions(WebDriverDevice device, String className) {
         return Factory.get(device, className)
     }
 }

@@ -1,7 +1,7 @@
 package io.cify.framework.core.interfaces
 
 import io.cify.framework.core.Capabilities
-import io.cify.framework.core.Device
+import io.cify.framework.core.WebDriverDevice
 import io.cify.framework.core.DeviceCategory
 
 /**
@@ -18,17 +18,30 @@ interface IDeviceManager {
     /**
      * Creates device with category
      * @param category
-     * @return Device
+     * @return WebDriverDevice
      */
-    Device createDevice(DeviceCategory category)
+    WebDriverDevice createWebDriverDevice(DeviceCategory category)
+
+    /**
+     * Creates custom device with Custom category
+     * @return
+     */
+    ICustomDevice createCustomDevice(ICustomDevice customDevice)
+
+    /**
+     * Create Custom Device with specified id
+     * @param deviceId
+     * @return
+     */
+    ICustomDevice createCustomDevice()
 
     /**
      * Creates device with category and given id
      * @param category
      * @param deviceId
-     * @return Device
+     * @return WebDriverDevice
      */
-    Device createDevice(DeviceCategory category, String deviceId)
+    WebDriverDevice createWebDriverDevice(DeviceCategory category, String deviceId)
 
     /**
      * Checks if device already active
@@ -46,36 +59,36 @@ interface IDeviceManager {
 
     /**
      * Gets active device
-     * @return Device
+     * @return WebDriverDevice
      */
-    Device getActiveDevice()
+    ICustomDevice getActiveDevice()
 
     /**
      * Gets active device by category
      * @param category
-     * @return Device
+     * @return WebDriverDevice
      */
-    Device getActiveDevice(DeviceCategory category)
+    ICustomDevice getActiveDevice(DeviceCategory category)
 
     /**
      * Gets active device
      * @param deviceId
-     * @return Device
+     * @return WebDriverDevice
      */
-    Device getActiveDevice(String deviceId)
+    ICustomDevice getActiveDevice(String deviceId)
 
     /**
      * Gets all active devices
-     * @return List < Device >
+     * @return List < WebDriverDevice >
      */
-    List<Device> getAllActiveDevices()
+    List<ICustomDevice> getAllActiveDevices()
 
     /**
      * Gets all active devices by category
      * @param category
-     * @return List < Device >
+     * @return List < WebDriverDevice >
      */
-    List<Device> getAllActiveDevices(DeviceCategory category)
+    List<ICustomDevice> getAllActiveDevices(DeviceCategory category)
 
     /**
      * Closes device with id
@@ -87,7 +100,7 @@ interface IDeviceManager {
      * Closes device
      * @param device
      */
-    void quitDevice(Device device)
+    void quitDevice(ICustomDevice device)
 
     /**
      * Closes all devices
