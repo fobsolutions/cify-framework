@@ -1,6 +1,7 @@
 package io.cify.framework.recording
 
 import io.cify.framework.core.Device
+import io.cify.framework.http.HttpConnector
 import io.cify.framework.reporting.TestReportManager
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.LogManager
@@ -29,6 +30,7 @@ class RecordingController {
     private static final String OUTPUT_SCREENSHOT_FORMAT = ".png"
     private static final String TEMP = "-temporary"
     private static final int FPS = 2
+    static final String FLICK_VIDEO_RECORDING_CAPABILITY = "flickRecording"
 
     /**
      * Start recording
@@ -75,7 +77,7 @@ class RecordingController {
                         getVideoDirForDevice(device),
                         getRecordingDuration(device),
                         getOutputVideoDirForDevice(device),
-                        new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + device.id + OUTPUT_MEDIA_FORMAT
+                        getOutputVideoFilename(device)
                 )
                 if (success) {
                     String taskName = System.getProperty("task", "plug-and-play") + "/" + device.id + "/"
@@ -89,12 +91,36 @@ class RecordingController {
     }
 
     /**
+     * Stop flick video recording
+     *
+     * @param device - device to stop flick recording
+     * @param farmUrl - device farm url
+     * @param sessionId - device session id
+     * */
+    public static void stopFlickRecording(Device device, String farmUrl, String sessionId) {
+        try {
+            LOG.debug(MARKER, "Stop flick recording...")
+            String outputFile = getOutputVideoDirForDevice(device) + getOutputVideoFilename(device)
+            LOG.debug(MARKER, "Parameters: url=$farmUrl, sessionId=$sessionId, outputFile=$outputFile")
+
+            if (farmUrl && sessionId && outputFile) {
+                HttpConnector.requestDeviceStopRecording(farmUrl, sessionId, outputFile)
+            } else {
+                LOG.debug(MARKER, "Missing or wrong parameter")
+            }
+
+        } catch (all) {
+            LOG.debug("Stop flick recording failed cause $all.message")
+        }
+    }
+
+    /**
      * Take screenshot
      *
      * @param device - device to take screenshot
      * */
     static void takeScreenshot(Device device) {
-        if (device.isRecording)
+        if (device.isRecording) {
             try {
                 if (TestReportManager.isReporting) {
                     String scenarioId = TestReportManager.getActiveScenario()?.scenarioId
@@ -114,12 +140,13 @@ class RecordingController {
                 } else {
                     File scrFile = ((TakesScreenshot) device.getDriver()).getScreenshotAs(OutputType.FILE)
                     if (scrFile.isFile()) {
-                        FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device)  + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
+                        FileUtils.copyFile(scrFile, new File(getVideoDirForDevice(device) + "/" + System.currentTimeMillis() + OUTPUT_SCREENSHOT_FORMAT))
                     }
                 }
             } catch (all) {
                 LOG.debug(MARKER, "Taking screenshot failed cause: " + all.message)
             }
+        }
     }
 
     /**
@@ -156,6 +183,13 @@ class RecordingController {
 
         return taskName ? videoDir + taskName + "/" :
                 videoDir + "plug-and-play" + "/" + device.id + "/"
+    }
+
+    /**
+     * Gets output video file name
+     * */
+    private static String getOutputVideoFilename(Device device) {
+        return new SimpleDateFormat("yyyyMMdd_HHmmss_").format(new Date()) + device.id + OUTPUT_MEDIA_FORMAT
     }
 
     /**
