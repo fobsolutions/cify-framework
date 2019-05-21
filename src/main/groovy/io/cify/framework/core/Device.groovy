@@ -134,7 +134,8 @@ class Device implements IDevice {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
             File appFile = new File(app)
-            if (appFile.isFile() && (!app.startsWith("http://") && !app.startsWith("https://"))) {
+            if (appFile.isFile() && (!app.startsWith("http://") && !app.startsWith("https://")
+                                                                && !app.startsWith("s3://"))) {
                 String fileName = appFile.getName()
                 String path = appFile.toURI().getRawPath().replace(fileName, "").replace(":", "").toLowerCase()
                 app = path + fileName
