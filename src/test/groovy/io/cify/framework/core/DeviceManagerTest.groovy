@@ -1,21 +1,18 @@
 package io.cify.framework.core
 
-import groovy.json.JsonSlurper
-import org.openqa.selenium.remote.DesiredCapabilities
-
 class DeviceManagerTest extends GroovyTestCase {
 
-
     private String caps = '''{
-        "android": {
-           "version": ""
-        },
-        "browser": {
+        "android": [{
+           "version": "",
+           "capabilityId":"unique"
+        }],
+        "browser": [{
            "category": "chrome"
-        },
-        "ios": {
+        }],
+        "ios": [{
            "version": ""
-        }
+        }]
     }'''
 
     private String capsWithoutAndroid = '''{
@@ -29,7 +26,7 @@ class DeviceManagerTest extends GroovyTestCase {
 
     private String capsBadJson = '!!!!!!'
 
-    void testAddToDesiredCapabilities() {
+    void testShouldAddToCapabilities() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
         Capabilities capabilities = new DeviceManager().getCapabilities()
@@ -38,21 +35,19 @@ class DeviceManagerTest extends GroovyTestCase {
         assert capabilities.toDesiredCapabilities(DeviceCategory.BROWSER).getCapability("test") == "testValue"
     }
 
-    void testAddObjectToDesiredCapabilities() {
+    void testShouldAddToCapabilitiesWithId() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
         Capabilities capabilities = new DeviceManager().getCapabilities()
-        Device device = new Device("id", DeviceCategory.ANDROID, new DesiredCapabilities().setCapability("asd", "asd"))
-        capabilities.addToDesiredCapabilities(DeviceCategory.ANDROID, "test", device)
-
-        assert capabilities.toDesiredCapabilities(DeviceCategory.ANDROID).getCapability("test") == device
+        capabilities.addToDesiredCapabilities(DeviceCategory.ANDROID, "test", "testValue")
+        assert capabilities.toDesiredCapabilities("unique").getCapability("test") == "testValue"
     }
 
     void testShouldUseProvidedCapabilities() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
         Capabilities capabilities = new DeviceManager().getCapabilities()
-        Capabilities systemProperties = new JsonSlurper().parseText(caps) as Capabilities
+        Capabilities systemProperties = Capabilities.parseFromJsonString(caps)
 
         assert capabilities.toPrettyString() == systemProperties.toPrettyString()
     }
@@ -231,8 +226,7 @@ class DeviceManagerTest extends GroovyTestCase {
         assert deviceManager.getAllActiveDevices(category0).size() == 10
     }
 
-
-    void testShouldGetLastlyCreatedActiveDevice() {
+    void testShouldGetFirstActiveDevice() {
         DeviceManager deviceManager = new DeviceManager()
         DeviceCategory category = DeviceCategory.ANDROID
 
@@ -242,6 +236,40 @@ class DeviceManagerTest extends GroovyTestCase {
 
         Device device0 = deviceManager.createDevice(category)
         assert deviceManager.getActiveDevice().is(device0)
+    }
+
+    void testShouldGetSetActiveDevice() {
+        DeviceManager deviceManager = new DeviceManager()
+        DeviceCategory category = DeviceCategory.ANDROID
+
+        Device device0 = deviceManager.createDevice(category)
+        1.upto(10, {
+            deviceManager.createDevice(category, it.toString())
+        })
+
+        deviceManager.setDeviceActive(device0)
+
+        assert deviceManager.getActiveDevice().is(device0)
+    }
+
+    void testShouldGetActiveCategoryDevice() {
+        DeviceManager deviceManager = new DeviceManager()
+        DeviceCategory category1 = DeviceCategory.ANDROID
+        DeviceCategory category2 = DeviceCategory.BROWSER
+        DeviceCategory category3 = DeviceCategory.IOS
+
+
+        Device device1 = deviceManager.createDevice(category1)
+        Device device2 = deviceManager.createDevice(category2)
+        Device device3 = deviceManager.createDevice(category3)
+        deviceManager.createDevice(category1)
+
+        deviceManager.setFirstDeviceOfCategoryActive(category1)
+        assert deviceManager.getActiveDevice().is(device1)
+        deviceManager.setFirstDeviceOfCategoryActive(category2)
+        assert deviceManager.getActiveDevice().is(device2)
+        deviceManager.setFirstDeviceOfCategoryActive(category3)
+        assert deviceManager.getActiveDevice().is(device3)
     }
 
     void testShouldGetFirstActiveDeviceByCategory() {
@@ -328,6 +356,56 @@ class DeviceManagerTest extends GroovyTestCase {
         deviceManager.quitAllDevices(category1)
 
         assert deviceManager.getAllActiveDevices(category1).size() == 0
+    }
+
+    void testShouldCreateDeviceWithCapabilityId() {
+        DeviceManager deviceManager = new DeviceManager()
+        deviceManager.createDevice("ChromeMac")
+
+        assert deviceManager.getActiveDevice().capabilities.getCapability("capabilityId") == "ChromeMac"
+        assert deviceManager.getActiveDevice().getCategory() == DeviceCategory.BROWSER
+    }
+
+    void testCreateDeviceWithCapabilityAndUniqueId() {
+        DeviceManager deviceManager = new DeviceManager()
+        deviceManager.createDevice("ChromeMac", "browser_test")
+
+        assert deviceManager.getActiveDevice().capabilities.getCapability("capabilityId") == "ChromeMac"
+        assert deviceManager.getActiveDevice().getCategory() == DeviceCategory.BROWSER
+        assert deviceManager.getActiveDevice().getId() == "browser_test"
+    }
+
+    void testShouldQuitSpecificDevice() {
+        DeviceManager deviceManager = new DeviceManager()
+        Device device = deviceManager.createDevice(DeviceCategory.ANDROID)
+
+        assert deviceManager.getAllActiveDevices().size() > 0
+        deviceManager.quitDevice(device)
+        assert deviceManager.getAllActiveDevices().isEmpty()
+    }
+
+    void testShouldSetDeviceActiveById() {
+        DeviceManager deviceManager = new DeviceManager()
+        deviceManager.createDevice(DeviceCategory.ANDROID, "Android1")
+        deviceManager.createDevice(DeviceCategory.ANDROID, "Android2")
+        deviceManager.createDevice(DeviceCategory.ANDROID, "Android3")
+
+        deviceManager.setDeviceWithDeviceIdActive("Android2")
+        assert deviceManager.getActiveDevice().getId() == "Android2"
+    }
+
+    void testShouldNotSetNonexistingDeviceActive() {
+        shouldFail { new DeviceManager().setDeviceWithDeviceIdActive("2") }
+    }
+
+    void testShouldSetDeviceActiveByCapabilityId() {
+        DeviceManager deviceManager = new DeviceManager()
+        deviceManager.createDevice("Android1")
+        deviceManager.createDevice("Android2")
+        deviceManager.createDevice("Android3")
+
+        deviceManager.setDeviceWithCapabilityIdActive("Android2")
+        assert deviceManager.getActiveDevice().getCapabilities().getCapability("capabilityId") == "Android2"
     }
 
     void tearDown() {

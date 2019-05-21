@@ -1,6 +1,7 @@
 package io.cify.framework.core
 
 import groovy.json.JsonBuilder
+import groovy.json.JsonException
 import groovy.json.JsonSlurper
 import groovy.json.internal.LazyMap
 import org.apache.logging.log4j.LogManager
@@ -20,9 +21,11 @@ class Capabilities {
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('CAPABILITIES') as Marker
 
-    private LazyMap android = [:]
-    private LazyMap ios = [:]
-    private LazyMap browser = [:]
+    private List<LazyMap> capabilityList = []
+
+    private Capabilities(List capsList) {
+        capabilityList = capsList
+    }
 
     /**
      * Parses capabilities json to Capabilities
@@ -32,18 +35,34 @@ class Capabilities {
      * @return Capabilities
      */
     static Capabilities parseFromJsonString(String capabilitiesJson) {
-        LOG.debug(MARKER, "Parse capabilities from json string \n $capabilitiesJson")
-        return new JsonSlurper().parseText(capabilitiesJson) as Capabilities
+
+        def json = new JsonSlurper().parseText(capabilitiesJson)
+        List<Map> parsedList = []
+        try {
+            json.each {
+                category, capabilitiesList ->
+                    capabilitiesList.eachWithIndex { caps, index ->
+                        if (!caps.capabilityId)
+                            caps.put('capabilityId', category + index + caps.hashCode())
+
+                        Map map = [id: caps.capabilityId, category: category, capabilities: caps, available: true]
+                        parsedList.add(map)
+                    }
+            }
+        } catch (ignore) {
+            throw new JsonException("Error occurred while parsing capabilities. Check the structure of your capabilities.json/configuration.json.")
+        }
+        return new Capabilities(parsedList)
     }
 
     /**
-     * Converts capabilities to json string
+     * Converts capabilities list to json string
      *
      * @return String
      */
     String toPrettyString() {
         LOG.debug(MARKER, "Converts capabilities to json string")
-        return new JsonBuilder(this).toPrettyString()
+        return new JsonBuilder(capabilityList).toPrettyString()
     }
 
     /**
@@ -55,37 +74,78 @@ class Capabilities {
      */
     DesiredCapabilities toDesiredCapabilities(DeviceCategory category) {
         LOG.debug(MARKER, "Get desired capabilities for category $category")
-        switch (category) {
-            case DeviceCategory.BROWSER:
-                return new DesiredCapabilities(browser)
-            case DeviceCategory.ANDROID:
-                return new DesiredCapabilities(android)
-            case DeviceCategory.IOS:
-                return new DesiredCapabilities(ios)
+        Map result = [:]
+        try {
+            result = capabilityList.find {
+                (it.category as String).toUpperCase() == category.toString() && it.available
+            }.capabilities as LazyMap
+        } catch (NullPointerException) {
+            new CifyFrameworkException("No available capabilities for $category found")
         }
-        throw new CifyFrameworkException("Unsupported device category $category")
+        return new DesiredCapabilities(result)
+    }
+
+    /**
+     * Returns desired capabilities for given capabilityId
+     *
+     * @param capabilityId capabilities identifier
+     * @return DesiredCapabilities
+     */
+    DesiredCapabilities toDesiredCapabilities(String capabilityId) {
+        LOG.debug(MARKER, "Get desired capabilities for capabilityID $capabilityId")
+        Map result = [:]
+        try {
+            result = capabilityList.find { it.id == capabilityId && it.available }.capabilities as LazyMap
+        } catch (NullPointerException) {
+            new CifyFrameworkException("No available capabilities for $capabilityId found")
+        }
+        return new DesiredCapabilities(result)
     }
 
     /**
      * Adds to desired capabilities
+     *
      * @param category - Device category
      * @param key - key to add
      * @param value - value to add
      */
-    void addToDesiredCapabilities(DeviceCategory category, String key, def value) {
+    void addToDesiredCapabilities(DeviceCategory category, String key, String value) {
         LOG.debug(MARKER, "Add to desired capabilities for category $category")
-        switch (category) {
-            case DeviceCategory.BROWSER:
-                browser.put(key, value)
-                break
-            case DeviceCategory.ANDROID:
-                android.put(key, value)
-                break
-            case DeviceCategory.IOS:
-                ios.put(key, value)
-                break
-            default:
-                throw new CifyFrameworkException("Unsupported device category $category")
+        try {
+            capabilityList.findAll { (it.category as String).toUpperCase() == category.toString() }.each {
+                it.capabilities.put(key, value)
+            }
+        } catch (NullPointerException) {
+            throw new CifyFrameworkException("Could not add $key:$value. Capabilities for category $category not found.")
+        }
+    }
+
+    /**
+     * Sets available key of capability with given capabilityId to given value
+     *
+     * @param capabilityId id of the capability
+     *
+     * @param value value given to available key
+     */
+    void setAvailable(String capabilityId, boolean isAvailable) {
+        try {
+            capabilityList.find { it.id == capabilityId }.available = isAvailable
+        } catch (NullPointerException) {
+            throw new CifyFrameworkException("Setting \"available\":$isAvailable failed. Capability with capabilityId:$capabilityId not found")
+
+        }
+    }
+
+    /**
+     * Gets category from capability with given id
+     * @param capabilityId id of the capability
+     * @return
+     */
+    DeviceCategory getCategory(String capabilityId) {
+        try {
+            DeviceCategory.valueOf((capabilityList.find { it.id == capabilityId }.category as String).toUpperCase())
+        } catch (NullPointerException) {
+            throw new CifyFrameworkException("No category found for capabilityId:$capabilityId")
         }
     }
 }
