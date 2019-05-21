@@ -138,6 +138,13 @@ class Device implements IDevice {
                 String fileName = appFile.getName()
                 String path = appFile.toURI().getRawPath().replace(fileName, "").replace(":", "").toLowerCase()
                 app = path + fileName
+
+                /* app path workaround works only if test executor OS and farm OS are the same type */
+                String osName = System.getProperty("os.name").toLowerCase()
+                if (osName.indexOf("win") >= 0 ) {
+                    app = app.substring(1, 2) + ":" + app.substring(2, app.length())
+                    app.replace("/", "\\")
+                }
             }
 
             app ? setCapability("app", app) : null
