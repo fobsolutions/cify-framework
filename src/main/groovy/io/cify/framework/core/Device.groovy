@@ -137,14 +137,14 @@ class Device implements IDevice {
         try {
             File appFile = new File(app)
             if (appFile.isFile() && (!app.startsWith("http://") && !app.startsWith("https://")
-                                                                && !app.startsWith("s3://"))) {
+                    && !app.startsWith("s3://"))) {
                 String fileName = appFile.getName()
                 String path = appFile.toURI().getRawPath().replace(fileName, "").replace(":", "").toLowerCase()
                 app = path + fileName
 
                 /* app path workaround works only if test executor OS and farm OS are the same type */
                 String osName = System.getProperty("os.name").toLowerCase()
-                if (osName.indexOf("win") >= 0 ) {
+                if (osName.indexOf("win") >= 0) {
                     app = app.substring(1, 2) + ":" + app.substring(2, app.length())
                     app.replace("/", "\\")
                 }
@@ -253,7 +253,7 @@ class Device implements IDevice {
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
 
-        if (getCapabilities().getCapability("videoRecord") == "true") {
+        if (getCapabilities().getCapability("videoRecord") == "true" || System.getProperty("videoRecord") == "true") {
             startRecording()
         }
     }

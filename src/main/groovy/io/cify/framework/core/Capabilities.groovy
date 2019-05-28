@@ -148,4 +148,12 @@ class Capabilities {
             throw new CifyFrameworkException("No category found for capabilityId:$capabilityId")
         }
     }
+
+    /**
+     * Returns list of all available capabilities to Framework given from configuration/capabilities
+     * @return
+     */
+    List<LazyMap> getCapabilitiesList() {
+        capabilityList
+    }
 }
