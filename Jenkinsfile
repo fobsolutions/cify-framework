@@ -1,4 +1,4 @@
-node('master') {
+node {
 
     def changeRequest = env.CHANGE_ID
     def branchName = env.BRANCH_NAME
