@@ -71,16 +71,15 @@ class RecordingController {
             try {
                 LOG.debug(MARKER, "Stop recording...")
 
-                String fileName = device.id + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + OUTPUT_MEDIA_FORMAT
-                String videoDir = getVideoDirForDevice(device)
+                String fileName = getOutputVideoFilename(device)
                 boolean success = RecordMedia.imagesToMedia(
                         getVideoDirForDevice(device),
                         getRecordingDuration(device),
                         getOutputVideoDirForDevice(device),
-                        getOutputVideoFilename(device)
+                        fileName
                 )
                 if (success) {
-                    String taskName = System.getProperty("task", "plug-and-play") + "/" + device.id + "/"
+                    String taskName = System.getProperty("task", "plug-and-play") + "/"
                     device.getCapabilities().setCapability("video", taskName + fileName)
                     deleteTemporaryImages(device)
                 }
