@@ -33,9 +33,6 @@
       },
       {
         "capability": "chrome"
-      },
-      {
-        "capability": "chrome"
       }
     ],
     "android": [

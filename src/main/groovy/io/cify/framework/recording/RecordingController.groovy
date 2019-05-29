@@ -180,6 +180,10 @@ class RecordingController {
         String taskName = System.getProperty("task")
         String videoDir = System.getProperty("videoDir")
 
+        if (!videoDir) {
+            videoDir = "build/cify/videos/"
+        }
+
         return taskName ? videoDir + taskName + "/" :
                 videoDir + "plug-and-play" + "/" + device.id + "/"
     }

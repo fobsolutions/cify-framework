@@ -35,10 +35,10 @@ class Capabilities {
      * @return Capabilities
      */
     static Capabilities parseFromJsonString(String capabilitiesJson) {
-
-        def json = new JsonSlurper().parseText(capabilitiesJson)
         List<Map> parsedList = []
         try {
+            def json = new JsonSlurper().parseText(capabilitiesJson)
+            // Convert json to the list of capabilities
             json.each {
                 category, capabilitiesList ->
                     capabilitiesList.eachWithIndex { caps, index ->
@@ -79,7 +79,7 @@ class Capabilities {
             result = capabilityList.find {
                 (it.category as String).toUpperCase() == category.toString() && it.available
             }.capabilities as LazyMap
-        } catch (NullPointerException) {
+        } catch (NullPointerException ignored) {
             new CifyFrameworkException("No available capabilities for $category found")
         }
         return new DesiredCapabilities(result)
@@ -96,7 +96,7 @@ class Capabilities {
         Map result = [:]
         try {
             result = capabilityList.find { it.id == capabilityId && it.available }.capabilities as LazyMap
-        } catch (NullPointerException) {
+        } catch (NullPointerException ignored) {
             new CifyFrameworkException("No available capabilities for $capabilityId found")
         }
         return new DesiredCapabilities(result)
@@ -115,7 +115,7 @@ class Capabilities {
             capabilityList.findAll { (it.category as String).toUpperCase() == category.toString() }.each {
                 it.capabilities.put(key, value)
             }
-        } catch (NullPointerException) {
+        } catch (NullPointerException ignored) {
             throw new CifyFrameworkException("Could not add $key:$value. Capabilities for category $category not found.")
         }
     }
@@ -130,9 +130,8 @@ class Capabilities {
     void setAvailable(String capabilityId, boolean isAvailable) {
         try {
             capabilityList.find { it.id == capabilityId }.available = isAvailable
-        } catch (NullPointerException) {
+        } catch (NullPointerException ignored) {
             throw new CifyFrameworkException("Setting \"available\":$isAvailable failed. Capability with capabilityId:$capabilityId not found")
-
         }
     }
 
@@ -143,8 +142,8 @@ class Capabilities {
      */
     DeviceCategory getCategory(String capabilityId) {
         try {
-            DeviceCategory.valueOf((capabilityList.find { it.id == capabilityId }.category as String).toUpperCase())
-        } catch (NullPointerException) {
+            return DeviceCategory.valueOf((capabilityList.find { it.id == capabilityId }.category as String).toUpperCase())
+        } catch (NullPointerException ignored) {
             throw new CifyFrameworkException("No category found for capabilityId:$capabilityId")
         }
     }
@@ -154,6 +153,6 @@ class Capabilities {
      * @return
      */
     List<LazyMap> getCapabilitiesList() {
-        capabilityList
+        return capabilityList
     }
 }

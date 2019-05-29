@@ -119,7 +119,7 @@ class Device implements IDevice {
      * */
     @Override
     void openApp(String app) {
-        openApp(app, "", "");
+        openApp(app, "", "")
     }
 
     /**
@@ -213,13 +213,13 @@ class Device implements IDevice {
                 stopRecording()
             }
 
-            if (capabilities.getCapability(RecordingController.FLICK_VIDEO_RECORDING_CAPABILITY) == "true" && hasDriver()) {
-                String farmUrl = capabilities.getCapability(REMOTE_CAPABILITY) as String
-                String sessionId = ((RemoteWebDriver) getDriver()).getSessionId().toString()
-                RecordingController.stopFlickRecording(this, farmUrl, sessionId)
-            }
-
             if (hasDriver()) {
+                if (capabilities.getCapability(RecordingController.FLICK_VIDEO_RECORDING_CAPABILITY) == "true") {
+                    String farmUrl = capabilities.getCapability(REMOTE_CAPABILITY) as String
+                    String sessionId = ((RemoteWebDriver) getDriver()).getSessionId().toString()
+                    RecordingController.stopFlickRecording(this, farmUrl, sessionId)
+                }
+
                 LOG.debug(MARKER, "Quit device driver")
                 getDriver().quit()
             }
@@ -266,6 +266,6 @@ class Device implements IDevice {
      * @return boolean
      * */
     private static boolean validateUrl(String url) {
-        !(url == null || url.isEmpty())
+        return !(url == null || url.isEmpty())
     }
 }
