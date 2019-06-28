@@ -4,8 +4,8 @@ import io.cify.framework.core.Device
 import io.cify.framework.core.DeviceManager
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.WebElement
+import org.openqa.selenium.interactions.Locatable
 import org.openqa.selenium.interactions.internal.Coordinates
-import org.openqa.selenium.internal.Locatable
 import org.openqa.selenium.support.ui.Select
 
 import static io.cify.framework.core.DeviceCategory.BROWSER

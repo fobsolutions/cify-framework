@@ -191,8 +191,7 @@ class DriverFactory {
      * @param desiredCapabilities DesiredCapabilities
      * @return WebDriver
      * */
-    private
-    static WebDriver createRemoteDriver(Capability capability, DesiredCapabilities desiredCapabilities) {
+    private static WebDriver createRemoteDriver(Capability capability, DesiredCapabilities desiredCapabilities) {
         LOG.debug(MARKER, "Create $capability remote driver desired capabilities \n $desiredCapabilities")
 
         desiredCapabilities = mergeCapabilitiesWithDefault(desiredCapabilities)

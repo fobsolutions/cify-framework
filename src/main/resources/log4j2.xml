@@ -8,8 +8,8 @@
             <PatternLayout pattern="${PATTERN}"/>
         </Console>
         <RollingFile name="RollingFile"
-                     filename="build/cify/framework-log/cify-framework${date:yyyyMMdd_HHmmss}${sys:task:-}.log"
-                     filepattern="build/cify/framework-log/cify-framework-%d{yyyyMMdd_HHmmss}${sys:task:-}.log">
+                     filename="build/cify/framework-log/cify-framework_${date:yyyyMMdd_HHmmss}${sys:task:-}.log"
+                     filepattern="build/cify/framework-log/cify-framework_%d{yyyyMMdd_HHmmss}${sys:task:-}.log">
             <PatternLayout pattern="[%-5level] %d{yyyyMMdd_HHmmss} [%t] %c{1} [%marker] - %msg%n"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
