@@ -48,3 +48,7 @@ bintray {
         licenses = ['Apache-2.0']
     }
 }
+
+tasks.withType(Test) {
+    systemProperty('CONFIG_FILE_PREFIX', './src/test/groovy/io/cify/framework/')
+}

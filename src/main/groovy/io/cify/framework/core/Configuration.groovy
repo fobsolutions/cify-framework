@@ -18,8 +18,7 @@ class Configuration {
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('CONFIGURATION') as Marker
 
-
-    private static final String CONFIGURATION_FILE = "configuration.json"
+    private static final String CONFIGURATION_FILE = System.getProperty("CONFIG_FILE_PREFIX", "") + "configuration.json"
     private static final String TASK_NAME = "task"
 
     /**
