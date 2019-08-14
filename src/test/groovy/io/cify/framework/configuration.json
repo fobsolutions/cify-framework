@@ -1,0 +1,109 @@
+{
+  "videoRecord": false,
+  "videoDir": "build/cify/videos/",
+  "capabilities": {
+    "browser": [
+      {
+        "capability": "chrome",
+        "capabilityId": "ChromeMac"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      },
+      {
+        "capability": "chrome"
+      }
+    ],
+    "android": [
+      {
+        "capability": "android",
+        "capabilityId": "Android1"
+      },
+      {
+        "capability": "android",
+        "capabilityId": "Android2"
+      },
+      {
+        "capability": "android",
+        "capabilityId": "Android3"
+      },
+      {
+        "capability": "android"
+      },
+      {
+        "capability": "android"
+      },
+      {
+        "capability": "android"
+      },
+      {
+        "capability": "android"
+      },
+      {
+        "capability": "android"
+      },
+      {
+        "capability": "android"
+      },
+      {
+        "capability": "android"
+      },
+      {
+        "capability": "android"
+      }
+    ],
+    "ios": [
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      },
+      {
+        "capability": "iphone"
+      }
+    ]
+  }
+}

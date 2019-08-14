@@ -9,6 +9,7 @@ import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
+import org.openqa.selenium.remote.RemoteWebDriver
 
 /**
  * Created by FOB Solutions
@@ -20,6 +21,7 @@ class Device implements IDevice {
 
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('DEVICE') as Marker
+    private static final String REMOTE_CAPABILITY = "remote"
 
     private String id
     private DeviceCategory category
@@ -98,7 +100,7 @@ class Device implements IDevice {
      * */
     @Override
     DesiredCapabilities getCapabilities() {
-        LOG.debug(MARKER, "Get all desired capabilities")
+        LOG.debug(MARKER, "Get all desired capabilities " + capabilities)
         return capabilities
     }
 
@@ -117,7 +119,7 @@ class Device implements IDevice {
      * */
     @Override
     void openApp(String app) {
-        openApp(app, "", "");
+        openApp(app, "", "")
     }
 
     /**
@@ -134,10 +136,18 @@ class Device implements IDevice {
         LOG.debug(MARKER, "Open app $app, $appActivity, $appPackage")
         try {
             File appFile = new File(app)
-            if (appFile.isFile() && (!app.startsWith("http://") && !app.startsWith("https://"))) {
+            if (appFile.isFile() && (!app.startsWith("http://") && !app.startsWith("https://")
+                    && !app.startsWith("s3://"))) {
                 String fileName = appFile.getName()
                 String path = appFile.toURI().getRawPath().replace(fileName, "").replace(":", "").toLowerCase()
                 app = path + fileName
+
+                /* app path workaround works only if test executor OS and farm OS are the same type */
+                String osName = System.getProperty("os.name").toLowerCase()
+                if (osName.indexOf("win") >= 0) {
+                    app = app.substring(1, 2) + ":" + app.substring(2, app.length())
+                    app.replace("/", "\\")
+                }
             }
 
             app ? setCapability("app", app) : null
@@ -192,7 +202,7 @@ class Device implements IDevice {
     }
 
     /**
-     * Quits app or browser
+     * Quits app or browser and stops video recording
      * */
     @Override
     void quit() {
@@ -204,6 +214,12 @@ class Device implements IDevice {
             }
 
             if (hasDriver()) {
+                if (capabilities.getCapability(RecordingController.FLICK_VIDEO_RECORDING_CAPABILITY) == "true") {
+                    String farmUrl = capabilities.getCapability(REMOTE_CAPABILITY) as String
+                    String sessionId = ((RemoteWebDriver) getDriver()).getSessionId().toString()
+                    RecordingController.stopFlickRecording(this, farmUrl, sessionId)
+                }
+
                 LOG.debug(MARKER, "Quit device driver")
                 getDriver().quit()
             }
@@ -237,7 +253,7 @@ class Device implements IDevice {
         WebDriver driver = DriverFactory.getDriver(getCapabilities())
         this.driver = driver
 
-        if (System.getProperty("videoRecord") == "true") {
+        if (getCapabilities().getCapability("videoRecord") == "true" || System.getProperty("videoRecord") == "true") {
             startRecording()
         }
     }
@@ -250,6 +266,6 @@ class Device implements IDevice {
      * @return boolean
      * */
     private static boolean validateUrl(String url) {
-        !(url == null || url.isEmpty())
+        return !(url == null || url.isEmpty())
     }
 }

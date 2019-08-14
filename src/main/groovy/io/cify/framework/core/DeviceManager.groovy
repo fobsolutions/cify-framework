@@ -23,6 +23,7 @@ class DeviceManager implements IDeviceManager {
 
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('DEVICE MANAGER') as Marker
+    private static final String CAPABILITY_ID = "capabilityId"
 
     /**
      * System property to be used to pass capabilities to Device Manager
@@ -42,7 +43,7 @@ class DeviceManager implements IDeviceManager {
     /**
      * Default constructor for Device Manager
      * */
-    DeviceManager() {
+    private DeviceManager() {
         LOG.debug(MARKER, 'Create new DeviceManager')
         try {
             Configuration.setupFrameworkConfiguration()
@@ -111,20 +112,21 @@ class DeviceManager implements IDeviceManager {
      */
     @Override
     Device createDevice(DeviceCategory category, String deviceId) {
+        DesiredCapabilities desiredCapabilities
         LOG.debug(MARKER, "Create new device with category $category and device id $deviceId")
         try {
 
             if (deviceId == null || deviceId.isEmpty()) {
-                throw new CifyFrameworkException("Failed to create device. Id is null or empty")
+                throw new CifyFrameworkException("Id is null or empty")
             }
             if (hasActiveDevice(deviceId)) {
-                throw new CifyFrameworkException("Failed to create device. Device with id $deviceId already exists")
+                throw new CifyFrameworkException("Device with id $deviceId already exists")
             }
 
-            DesiredCapabilities desiredCapabilities = capabilities.toDesiredCapabilities(category)
+            desiredCapabilities = capabilities.toDesiredCapabilities(category)
 
             if (desiredCapabilities.asMap().isEmpty()) {
-                throw new CifyFrameworkException("Failed to create device. No capabilities provided for $category")
+                throw new CifyFrameworkException("No capabilities provided for $category")
             }
 
             credentials.each { key, value ->
@@ -135,13 +137,74 @@ class DeviceManager implements IDeviceManager {
             Device device = new Device(deviceId, category, desiredCapabilities)
             devices.add(device)
             setDeviceActive(device)
-
         } catch (all) {
             LOG.debug(MARKER, all.message, all)
-            throw new CifyFrameworkException("Failed to create device cause $all.message")
+            throw new CifyFrameworkException("Failed to create device. Cause: $all.message")
         }
 
         addDeviceToTestReport(deviceId, category.toString())
+        capabilities.setAvailable(desiredCapabilities.getCapability(CAPABILITY_ID) as String, false)
+
+        return getActiveDevice(deviceId)
+    }
+
+    /**
+     * Creates device with capabilities identified by capabilityId
+     * @param capabilityId capability identifier
+     * @return Device
+     */
+    @Override
+    Device createDevice(String capabilityId) {
+        createDevice(capabilityId, generateRandomDeviceId())
+    }
+
+    /**
+     * Creates device with capabilities identified by capabilityId and with unique deviceId
+     * @param capabilityId capability identifier
+     * @param deviceId unique device id
+     * @return Device
+     */
+    @Override
+    Device createDevice(String capabilityId, String deviceId) {
+        DeviceCategory category
+        DesiredCapabilities desiredCapabilities
+        LOG.debug(MARKER, "Create new device with capabilityId $capabilityId")
+        try {
+
+            if (capabilityId == null || capabilityId.isEmpty()) {
+                throw new CifyFrameworkException("CapabilityId is null or empty")
+            }
+
+            if (deviceId == null || deviceId.isEmpty()) {
+                throw new CifyFrameworkException("DeviceId is null or empty")
+            }
+
+            if (hasActiveDevice(deviceId)) {
+                throw new CifyFrameworkException("Device with id $deviceId already exists")
+            }
+
+            desiredCapabilities = capabilities.toDesiredCapabilities(capabilityId)
+
+            if (desiredCapabilities.asMap().isEmpty()) {
+                throw new CifyFrameworkException("No capabilities provided for $capabilityId")
+            }
+
+            credentials.each { key, value ->
+                desiredCapabilities.setCapability(key, value)
+            }
+
+            category = capabilities.getCategory(capabilityId)
+            Device device = new Device(deviceId, category, desiredCapabilities)
+            devices.add(device)
+            setDeviceActive(device)
+        } catch (all) {
+            LOG.debug(MARKER, all.message, all)
+            throw new CifyFrameworkException("Failed to create device. Cause: $all.message")
+        }
+
+        addDeviceToTestReport(deviceId, category.toString())
+        capabilities.setAvailable(desiredCapabilities.getCapability(CAPABILITY_ID) as String, false)
+
         return getActiveDevice(deviceId)
     }
 
@@ -157,7 +220,7 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Checks if an active device of selected category exists
+     * Checks if a device of selected category exists
      *
      * @param category device category
      *
@@ -180,7 +243,7 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Checks if an active device with id exists
+     * Checks if a device with id exists
      *
      * @param deviceId device id
      *
@@ -203,7 +266,7 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Returns all active devices
+     * Returns all devices
      *
      * @return List < Device >
      */
@@ -214,7 +277,7 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Returns list of all active devices by category
+     * Returns list of all devices by category
      *
      * @param category device category
      *
@@ -229,7 +292,7 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Returns first active device
+     * Returns currently active device
      *
      * @return Device
      */
@@ -245,12 +308,12 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Returns first active device by category
+     * Returns first device by category
      *
      * @param category device category
      *
      * @return Device
-     * @throws CifyFrameworkException  if no active device found
+     * @throws CifyFrameworkException  if no device found
      */
     @Override
     Device getActiveDevice(DeviceCategory category) {
@@ -262,17 +325,16 @@ class DeviceManager implements IDeviceManager {
             LOG.debug(MARKER, "No active device with category $category found")
             throw new CifyFrameworkException("No active device with category $category found")
         }
-        setDeviceActive(device)
         return device
     }
 
     /**
-     * Returns first active device by id
+     * Returns device by id
      *
      * @param deviceId device unique id
      *
      * @return Device
-     * @throws CifyFrameworkException  if no active device found
+     * @throws CifyFrameworkException  if no device found
      */
     @Override
     Device getActiveDevice(String deviceId) {
@@ -288,11 +350,51 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Set device active
+     * Sets device active
      *
-     * @param device
+     * @param device Device to set active
      */
     void setDeviceActive(Device device) {
+        try {
+            device.active = true
+            getAllActiveDevices().each {
+                if (it != device) {
+                    it.active = false
+                }
+            }
+        } catch (NullPointerException) {
+            throw new CifyFrameworkException("Could not set device as active. Requested device does not exists")
+        }
+    }
+
+    /**
+     * Sets device with device id as active
+     * @param deviceId
+     */
+    @Override
+    void setDeviceWithDeviceIdActive(String deviceId) {
+        Device device = getAllActiveDevices().find { it.getId() == deviceId }
+        setDeviceActive(device)
+    }
+
+    /**
+     * Sets device created using capabilities identified with given capabilityId as active
+     * @param capabilityId
+     */
+    @Override
+    void setDeviceWithCapabilityIdActive(String capabilityId) {
+        Device device = getAllActiveDevices().find { it.getCapabilities().getCapability(CAPABILITY_ID) == capabilityId }
+        setDeviceActive(device)
+    }
+
+    /**
+     * Sets first device from device list with given category as active
+     *
+     * @param category DeviceCategory
+     */
+    @Override
+    void setFirstDeviceOfCategoryActive(DeviceCategory category) {
+        Device device = getActiveDevice(category)
         device.active = true
         getAllActiveDevices().each {
             if (it != device) {
@@ -310,6 +412,7 @@ class DeviceManager implements IDeviceManager {
     void quitDevice(String deviceId) {
         LOG.debug(MARKER, "Quit device with id $deviceId")
         Device device = getActiveDevice(deviceId)
+        setCapabilityAvailable(device)
         quitDevice(device)
     }
 
@@ -323,6 +426,7 @@ class DeviceManager implements IDeviceManager {
         LOG.debug(MARKER, "Quit device $device")
         if (device != null) {
             device.quit()
+            setCapabilityAvailable(device)
             devices.removeElement(device)
         }
     }
@@ -336,6 +440,7 @@ class DeviceManager implements IDeviceManager {
         LOG.debug(MARKER, "Quit all active devices")
         devices.each { device ->
             device.quit()
+            setCapabilityAvailable(device)
         }
         devices.clear()
     }
@@ -354,12 +459,21 @@ class DeviceManager implements IDeviceManager {
     }
 
     /**
-     * Create random device uuid
+     * Creates random device uuid
      *
      * @return String
      */
     private static String generateRandomDeviceId() {
         def uuid = randomUUID() as String
         return uuid.toUpperCase()
+    }
+
+    /**
+     * Marks capability used by given device as available
+     * That device should be removed after calling this method
+     * @param device
+     */
+    private void setCapabilityAvailable(Device device) {
+        capabilities.setAvailable(device.getCapabilities().getCapability(CAPABILITY_ID) as String, true)
     }
 }

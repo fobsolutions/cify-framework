@@ -31,6 +31,21 @@ interface IDeviceManager {
     Device createDevice(DeviceCategory category, String deviceId)
 
     /**
+     * Creates device with capabilities identified by capabilityId
+     * @param capabilityId capability identifier
+     * @return Device
+     */
+    Device createDevice(String capabilityId)
+
+    /**
+     * Creates device with capabilities identified by capabilityId and with unique deviceId
+     * @param capabilityId capability identifier
+     * @param deviceId unique device id
+     * @return Device
+     */
+    Device createDevice(String capabilityId, String deviceId)
+
+    /**
      * Checks if device already active
      * @param category
      * @return boolean
@@ -43,6 +58,24 @@ interface IDeviceManager {
      * @return boolean
      */
     boolean hasActiveDevice(String deviceId)
+
+    /**
+     * Sets device with device id as active
+     * @param deviceId
+     */
+    void setDeviceWithDeviceIdActive(String deviceId)
+
+    /**
+     * Sets device created using capabilities identified with given capabilityId as active
+     * @param capabilityId
+     */
+    void setDeviceWithCapabilityIdActive(String capabilityId)
+
+    /**
+     * Sets first device from device list with given category as active
+     * @param category DeviceCategory
+     */
+    void setFirstDeviceOfCategoryActive(DeviceCategory category)
 
     /**
      * Gets active device

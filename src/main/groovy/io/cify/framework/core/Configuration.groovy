@@ -18,8 +18,7 @@ class Configuration {
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('CONFIGURATION') as Marker
 
-
-    private static final String CONFIGURATION_FILE = "configuration.json"
+    private static final String CONFIGURATION_FILE = System.getProperty("CONFIG_FILE_PREFIX", "") + "configuration.json"
     private static final String TASK_NAME = "task"
 
     /**
@@ -53,13 +52,13 @@ class Configuration {
     private static LazyMap readFrameworkConfigurationFile() {
         if (System.getProperty(TASK_NAME)) {
             LOG.warn(MARKER, "Using configuration parameters from Cify-Runner...")
-            [:]
+            return [:]
         } else {
             File configurationFile = new File(CONFIGURATION_FILE)
             if (!configurationFile.exists()) {
                 throw new FileNotFoundException("Cannot find configuration file! Please add configuration.json to project root!")
             }
-            new JsonSlurper().parseText(configurationFile.text) as LazyMap
+            return new JsonSlurper().parseText(configurationFile.text) as LazyMap
         }
     }
 }
