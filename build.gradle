@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.cify'
-version '1.4.5'
+version '2.0.0'
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
@@ -14,12 +14,17 @@ repositories {
 
 dependencies {
     compile localGroovy()
+    compile gradleApi()
 
     compile 'org.apache.logging.log4j:log4j-core:2.12.1'
     compile 'org.seleniumhq.selenium:selenium-java:3.141.59'
     compile 'io.appium:java-client:7.0.0'
     compile 'io.github.bonigarcia:webdrivermanager:3.7.1'
     compile 'io.humble:humble-video-all:0.3.0'
+
+    compile 'org.codehaus.gpars:gpars:1.1.0'
+    compile 'info.cukes:gherkin:2.12.2'
+    compile 'commons-validator:commons-validator:1.6'
 
     testCompile 'junit:junit:4.12'
 }
