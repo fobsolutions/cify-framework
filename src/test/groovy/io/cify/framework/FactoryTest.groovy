@@ -1,7 +1,7 @@
 package io.cify.framework
 
+import io.cify.common.DeviceCategory
 import io.cify.framework.core.Device
-import io.cify.framework.core.DeviceCategory
 import io.cify.framework.factory.FactoryTestClassInterface
 import org.openqa.selenium.remote.DesiredCapabilities
 

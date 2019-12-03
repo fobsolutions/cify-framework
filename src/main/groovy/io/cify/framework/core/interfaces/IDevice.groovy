@@ -1,6 +1,6 @@
 package io.cify.framework.core.interfaces
 
-import io.cify.framework.core.DeviceCategory
+import io.cify.common.DeviceCategory
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 

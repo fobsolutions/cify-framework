@@ -1,15 +1,20 @@
 package io.cify.framework
 
 import groovy.json.JsonSlurper
-import io.cify.framework.core.DeviceCategory
+import io.cify.common.DeviceCategory
 import io.cify.framework.core.DeviceManager
 import io.cify.framework.reporting.TestReportManager
+
+import static io.cify.common.CifyConstants.SYSTEM_PROPERTY_CAPABILITIES
+import static io.cify.common.CifyConstants.SYSTEM_PROPERTY_TASK_NAME
 
 class ReportingTest extends GroovyTestCase {
 
     TestReportManager trm
 
     void setUp() {
+        System.setProperty(SYSTEM_PROPERTY_TASK_NAME, "TestName")
+        System.setProperty(SYSTEM_PROPERTY_CAPABILITIES, "{'capabilities':{'android':[{'name':'testDevice'}]}}")
         trm = TestReportManager.getTestReportManager()
         trm.testRunStarted("TestAccount", "runId12334", "cucumberFeatureId")
         trm.scenarioStarted("User creates a new account", "scenarioId")

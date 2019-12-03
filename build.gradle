@@ -20,6 +20,7 @@ dependencies {
     compile 'io.appium:java-client:7.0.0'
     compile 'io.github.bonigarcia:webdrivermanager:3.7.1'
     compile 'io.humble:humble-video-all:0.3.0'
+    compile 'io.cify:cify-common:1.0.0'
 
     testCompile 'junit:junit:4.12'
 }

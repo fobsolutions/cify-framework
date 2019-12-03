@@ -1,5 +1,6 @@
 package io.cify.framework.core
 
+import io.cify.common.DeviceCategory
 import org.openqa.selenium.remote.DesiredCapabilities
 
 /**

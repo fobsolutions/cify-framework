@@ -1,5 +1,8 @@
 package io.cify.framework.core
 
+import io.cify.common.DeviceCategory
+import io.cify.common.capability.conf.CapabilityConfig
+
 class DeviceManagerTest extends GroovyTestCase {
 
     private String caps = '''{
@@ -29,7 +32,7 @@ class DeviceManagerTest extends GroovyTestCase {
     void testShouldAddToCapabilities() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
-        Capabilities capabilities = new DeviceManager().getCapabilities()
+        CapabilityConfig capabilities = new DeviceManager().getCapabilities()
         capabilities.addToDesiredCapabilities(DeviceCategory.BROWSER, "test", "testValue")
 
         assert capabilities.toDesiredCapabilities(DeviceCategory.BROWSER).getCapability("test") == "testValue"
@@ -38,7 +41,7 @@ class DeviceManagerTest extends GroovyTestCase {
     void testShouldAddToCapabilitiesWithId() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
-        Capabilities capabilities = new DeviceManager().getCapabilities()
+        CapabilityConfig capabilities = new DeviceManager().getCapabilities()
         capabilities.addToDesiredCapabilities(DeviceCategory.ANDROID, "test", "testValue")
         assert capabilities.toDesiredCapabilities("unique").getCapability("test") == "testValue"
     }
@@ -46,8 +49,8 @@ class DeviceManagerTest extends GroovyTestCase {
     void testShouldUseProvidedCapabilities() {
         System.setProperty(DeviceManager.SYSTEM_PROPERTY_CAPABILITIES, caps)
 
-        Capabilities capabilities = new DeviceManager().getCapabilities()
-        Capabilities systemProperties = Capabilities.parseFromJsonString(caps)
+        CapabilityConfig capabilities = new DeviceManager().getCapabilities()
+        CapabilityConfig systemProperties = Capabilities.parseFromJsonString(caps)
 
         assert capabilities.toPrettyString() == systemProperties.toPrettyString()
     }

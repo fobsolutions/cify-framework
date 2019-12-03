@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.Logger
 
+import static io.cify.common.CifyConstants.*
+
 /**
  * Created by FOB Solutions
  *
@@ -18,13 +20,10 @@ class Configuration {
     private static final Logger LOG = LogManager.getLogger(this.class) as Logger
     private static final Marker MARKER = MarkerManager.getMarker('CONFIGURATION') as Marker
 
-    private static final String CONFIGURATION_FILE = System.getProperty("CONFIG_FILE_PREFIX", "") + "configuration.json"
-    private static final String TASK_NAME = "task"
-
     /**
      * Set framework parameters to system properties
      * */
-    public static void setupFrameworkConfiguration() {
+    static void setupFrameworkConfiguration() {
         mergeCommandLindAndFileContent()
     }
 
@@ -35,7 +34,7 @@ class Configuration {
         LazyMap configMap = readFrameworkConfigurationFile()
         configMap.each {
             String value
-            if (it.getKey() == DeviceManager.SYSTEM_PROPERTY_CAPABILITIES || it.getKey() == DeviceManager.SYSTEM_PROPERTY_CREDENTIALS) {
+            if (it.getKey() == SYSTEM_PROPERTY_CAPABILITIES || it.getKey() == SYSTEM_PROPERTY_CREDENTIALS) {
                 value = System.getProperty(it.getKey() as String, JsonOutput.toJson(it.getValue()))
             } else {
                 value = System.getProperty(it.getKey() as String, it.getValue() as String)
@@ -50,13 +49,13 @@ class Configuration {
      * @return LazyMap - Configuration map
      * */
     private static LazyMap readFrameworkConfigurationFile() {
-        if (System.getProperty(TASK_NAME)) {
+        if (System.getProperty(SYSTEM_PROPERTY_TASK_NAME)) {
             LOG.warn(MARKER, "Using configuration parameters from Cify-Runner...")
             return [:]
         } else {
-            File configurationFile = new File(CONFIGURATION_FILE)
+            File configurationFile = new File(System.getProperty("CONFIG_FILE_PREFIX", "") + CIFY_CONFIG_FILE_NAME)
             if (!configurationFile.exists()) {
-                throw new FileNotFoundException("Cannot find configuration file! Please add configuration.json to project root!")
+                throw new FileNotFoundException("Cannot find configuration file! Please add $CIFY_CONFIG_FILE_NAME to project root!")
             }
             return new JsonSlurper().parseText(configurationFile.text) as LazyMap
         }

@@ -8,7 +8,7 @@ import org.openqa.selenium.interactions.Locatable
 import org.openqa.selenium.interactions.internal.Coordinates
 import org.openqa.selenium.support.ui.Select
 
-import static io.cify.framework.core.DeviceCategory.BROWSER
+import static io.cify.common.DeviceCategory.BROWSER
 
 /**
  * Created by FOB Solutions

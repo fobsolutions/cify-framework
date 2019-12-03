@@ -1,8 +1,8 @@
 package io.cify.framework.core.interfaces
 
-import io.cify.framework.core.Capabilities
+import io.cify.common.DeviceCategory
+import io.cify.common.capability.conf.CapabilityConfig
 import io.cify.framework.core.Device
-import io.cify.framework.core.DeviceCategory
 
 /**
  * Created by FOB Solutions
@@ -13,7 +13,7 @@ interface IDeviceManager {
      * Gets capabilities for current run
      * @return Capabilities
      */
-    Capabilities getCapabilities()
+    CapabilityConfig getCapabilities()
 
     /**
      * Creates device with category

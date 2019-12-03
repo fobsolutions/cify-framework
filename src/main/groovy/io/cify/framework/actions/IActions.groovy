@@ -3,15 +3,12 @@ package io.cify.framework.actions
 import io.appium.java_client.ios.IOSDriver
 import io.cify.framework.core.CifyFrameworkException
 import io.cify.framework.core.Device
-import io.cify.framework.core.DeviceCategory
-import io.cify.framework.core.DeviceManager
 import org.openqa.selenium.*
 import org.openqa.selenium.support.ui.ExpectedCondition
 import org.openqa.selenium.support.ui.WebDriverWait
 
 import javax.imageio.ImageIO
-import java.awt.Graphics2D
-import java.awt.Image
+import java.awt.*
 import java.awt.image.BufferedImage
 
 /**

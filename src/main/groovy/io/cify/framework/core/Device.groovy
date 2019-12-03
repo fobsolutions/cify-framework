@@ -1,5 +1,6 @@
 package io.cify.framework.core
 
+import io.cify.common.DeviceCategory
 import io.cify.framework.core.interfaces.IDevice
 import io.cify.framework.logging.LoggingOutputStream
 import io.cify.framework.recording.RecordingController
