@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     // Check the latest version above
-    compile 'io.cify:cify-framework:1.2.8'
+    compile 'io.cify:cify-framework:1.4.6'
 }
 ```
 
