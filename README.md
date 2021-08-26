@@ -1,5 +1,3 @@
-[ ![Download](https://api.bintray.com/packages/fobsolutions/io.cify/cify-framework/images/download.svg) ](https://bintray.com/fobsolutions/io.cify/cify-framework/_latestVersion)
-
 1. <a href="#what">What Is Cify Framework?</a>
 2. <a href="#usage">How To Use Cify Framework</a>
 
@@ -19,7 +17,7 @@ Add Gradle dependency to your project as following:
 ```
 repositories {
     maven {
-        url "http://fobsolutions.bintray.com/io.cify"
+        url = 'https://cify-artifacts.s3.eu-central-1.amazonaws.com'
     }
 }
 
