@@ -1,8 +1,8 @@
 package io.cify.framework.reporting
 
-import groovy.json.internal.LazyMap
 import io.cify.framework.core.DeviceCategory
 import io.cify.framework.core.DeviceManager
+import org.apache.groovy.json.internal.LazyMap
 
 import static java.util.UUID.randomUUID
 

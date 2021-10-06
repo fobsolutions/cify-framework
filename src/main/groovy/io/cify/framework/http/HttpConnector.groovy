@@ -1,12 +1,12 @@
 package io.cify.framework.http
 
-import org.apache.http.HttpEntity
-import org.apache.http.HttpStatus
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.util.EntityUtils
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
+import org.apache.hc.core5.http.HttpEntity
+import org.apache.hc.core5.http.HttpStatus
+import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager

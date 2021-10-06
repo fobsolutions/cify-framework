@@ -1,7 +1,7 @@
 package io.cify.framework.reporting
 
 import groovy.json.JsonBuilder
-import groovy.json.internal.LazyMap
+import org.apache.groovy.json.internal.LazyMap
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager

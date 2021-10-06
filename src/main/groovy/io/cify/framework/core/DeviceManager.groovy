@@ -2,9 +2,9 @@ package io.cify.framework.core
 
 import groovy.json.JsonSlurper
 import groovy.json.StringEscapeUtils
-import groovy.json.internal.LazyMap
 import io.cify.framework.core.interfaces.IDeviceManager
 import io.cify.framework.reporting.TestReportManager
+import org.apache.groovy.json.internal.LazyMap
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager

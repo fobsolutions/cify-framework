@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'io.cify'
-version '1.4.6'
+version '1.4.7'
 
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
@@ -13,15 +13,15 @@ repositories {
 }
 
 dependencies {
-    compile localGroovy()
+    implementation localGroovy()
 
-    compile 'org.apache.logging.log4j:log4j-core:2.12.1'
-    compile 'org.seleniumhq.selenium:selenium-java:3.141.59'
-    compile 'io.appium:java-client:7.0.0'
-    compile 'io.github.bonigarcia:webdrivermanager:3.7.1'
-    compile 'io.humble:humble-video-all:0.3.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+    implementation 'io.appium:java-client:7.5.1'
+    implementation 'io.github.bonigarcia:webdrivermanager:5.0.2'
+    implementation 'io.humble:humble-video-all:0.3.0'
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 }
 
 
