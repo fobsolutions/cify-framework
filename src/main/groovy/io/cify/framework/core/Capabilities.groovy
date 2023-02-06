@@ -3,7 +3,7 @@ package io.cify.framework.core
 import groovy.json.JsonBuilder
 import groovy.json.JsonException
 import groovy.json.JsonSlurper
-import groovy.json.internal.LazyMap
+import org.apache.groovy.json.internal.LazyMap
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
 import org.apache.logging.log4j.MarkerManager
